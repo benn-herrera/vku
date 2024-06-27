@@ -37,8 +37,11 @@ All wrapped types work interchangeably with base types in the base API
     * compile utility functions
        * in one C++ source file define VKU_IMPLEMENT before including vku/vku.h 
 * Adding a new version
+    * Python 3.11+ required
+        * No additional packages needed
     * ./gen_vku.sh <MAJ.min.patch> # eg 1.3.280
-    * version must match a tagged SDK release in https://github.com/KhronosGroup/VulkanHeaders
+        * On Windows run from git bash 
+    * version must match a tag in https://github.com/KhronosGroup/VulkanHeaders.gits
     * ./gen_vku.sh -h for more details.
 
 ### TODO:

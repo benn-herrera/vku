@@ -1,4 +1,5 @@
 __pycache__/
 Vulkan-Headers/
 .venv/
-.idea/
+debug/
+

@@ -1,0 +1,8 @@
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+*.h text
+*.md text
+*.py text eol=lf
+*.sh text eol=lf
+*.txt text

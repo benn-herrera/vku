@@ -21,7 +21,7 @@ root = tree.getroot()
 
 FILE_HEADER = f"""
 #pragma once
-// {VKU_H.name} {VKU_H.parent.parent.parent.name} generated {datetime.now} by {Path(sys.argv[0]).name}
+// {VKU_H.name} {VKU_H.parent.parent.parent.name} generated {datetime.now()} by {Path(sys.argv[0]).name}
 // see https://github.com/benn-herrera/vku.git LICENSE.md and README.md
 // define VKU_INLINE_ALL for header-only with no compiled functions
 // or 
@@ -36,6 +36,10 @@ FILE_HEADER = f"""
 # define VKU_FUNC
 #endif // VKU_INLINE_ALL, VKU_IMPLEMENT
 
+#if !defined(VK_VERSION_1_0)
+# include "vulkan.h"
+#endif
+
 #if !defined(VK_NULL_HANDLE)
 # define VK_NULL_HANDLE 0
 #endif
@@ -43,42 +47,80 @@ FILE_HEADER = f"""
 namespace vku {{
 """[1:-1]
 
+FRIEND_OP_FMT = """
+    friend auto operator {OP}(const UType& lhs, const VkType rhs) {{ return lhs.v {OP} rhs; }}
+    friend auto operator {OP}(const VkType lhs, const UType& rhs) {{ return lhs {OP} rhs.v; }}
+"""[1:-1]
 
-# TODO: break out the functionality of the operator macros
-# into a python function that inlines the equivalent.
-# makes for easier debugging when you can step into an explicit line of code.
-WRAPPER_TEMPLATES = """
-#define VKU_FRIEND_OP(OP) \\
-    friend auto operator OP(const UType& lhs, const VkType rhs) { return lhs.v OP rhs; } \\
-    friend auto operator OP(const VkType lhs, const UType& rhs) { return lhs OP rhs.v; }    
+PRIM_MOD_OP_FMT = """
+    VkType operator {OP}(const VkType rhs) {{ v {OP} rhs; return v; }}
+"""[1:-1]
 
-#define VKU_MOD_OP(OP) \\
-    VkType operator OP(const VkType rhs) { v OP rhs; return v; }
+STRUCT_MOD_OP_FMT = """
+    VkType& operator {OP}(const VkType rhs) {{ v {OP} rhs; return v; }}
+"""[1:-1]
 
-#define VKU_FRIEND_COMPS() \\
-    VKU_FRIEND_OP(==) \\
-    VKU_FRIEND_OP(!=) \\
-    VKU_FRIEND_OP(<) \\
-    VKU_FRIEND_OP(>=) \\
-    VKU_FRIEND_OP(>) \\
-    VKU_FRIEND_OP(>=)
+UNARY_OP_FMT = """
+    auto operator {OP}(){{ return {OP}(v); }}
+"""[1:-1]
 
-  template<typename T, unsigned int I>
-  struct EnumT {
-    using UType = EnumT;
-    using VkType = T;
-    static constexpr auto kInitVal = (VkType)I;
-    
-    EnumT(VkType i=kInitVal) : v(i) {}
-    
-    operator VkType() const { return v; }
+CAST_OPS = """
+    operator const VkType&() const { return v; }
     operator VkType&() { return v; }
     VkType* operator&() { return &v; }
     const VkType* operator&() const { return &v; }
+"""[1:-1]
 
-    VKU_MOD_OP(=);
-    VKU_FRIEND_COMPS();    
-  private:
+PRIM_ASSIGN_OPS = PRIM_MOD_OP_FMT.format(OP='=')
+STRUCT_ASSIGN_OPS = STRUCT_MOD_OP_FMT.format(OP='=')
+
+BOOL_OPS = ".\n".join([
+    UNARY_OP_FMT.format(OP='bool'),
+    UNARY_OP_FMT.format(OP='!'),
+])[:-1]
+
+RMW_MOD_OPS = "\n".join([
+    PRIM_MOD_OP_FMT.format(OP='|='),
+    PRIM_MOD_OP_FMT.format(OP='&='),
+    PRIM_MOD_OP_FMT.format(OP='^='),
+    PRIM_MOD_OP_FMT.format(OP='+='),
+    PRIM_MOD_OP_FMT.format(OP='-='),
+])[:-1]
+
+FRIEND_COMP_OPS = "\n".join([
+    FRIEND_OP_FMT.format(OP='<'),
+    FRIEND_OP_FMT.format(OP='<='),
+    FRIEND_OP_FMT.format(OP='>'),
+    FRIEND_OP_FMT.format(OP='>=')
+])[:-1]
+
+FRIEND_EQ_OPS = "\n".join([
+    FRIEND_OP_FMT.format(OP='=='),
+    FRIEND_OP_FMT.format(OP='!='),
+])[:-1]
+
+FRIEND_EXPR_OPS = "\n".join([
+    FRIEND_OP_FMT.format(OP='|'),
+    FRIEND_OP_FMT.format(OP='&'),
+    FRIEND_OP_FMT.format(OP='^'),
+    FRIEND_OP_FMT.format(OP='+'),
+    FRIEND_OP_FMT.format(OP='-')
+])
+
+WRAPPER_TEMPLATES = ".\n".join([
+"""
+  template<typename T, unsigned int I>
+  struct EnumT {
+    static constexpr auto kInitVal = (VkType)I;     
+    using UType = EnumT;    
+    using VkType = T;        
+    EnumT(VkType i=kInitVal) : v(i) {}    
+""",
+    PRIM_ASSIGN_OPS,
+    CAST_OPS,
+    FRIEND_COMP_OPS,
+    FRIEND_EQ_OPS,
+"""  private:
     VkType v;
   };
 
@@ -87,29 +129,16 @@ WRAPPER_TEMPLATES = """
     using UType = FlagsT;
     using VkType = T;
     
-    FlagsT(VkType i=(VkType)0) : v(i) {}
-    
-    operator VkType() const { return v; }
-    operator VkType&() { return v; }
-    VkType* operator&() { return &v; }
-    const VkType* operator&() const { return &v; }
-    operator bool() const { return !!v; }
-    bool operator!() const { return v; }
-    
-    VKU_MOD_OP(=);    
-    VKU_MOD_OP(|=);
-    VKU_MOD_OP(&=);
-    VKU_MOD_OP(^=);
-    VKU_MOD_OP(+=);
-    VKU_MOD_OP(-=);
-    
-    VKU_FRIEND_COMPS();
-    VKU_FRIEND_OP(|);
-    VKU_FRIEND_OP(&);
-    VKU_FRIEND_OP(^);
-    VKU_FRIEND_OP(+);
-    VKU_FRIEND_OP(-);
-  private:
+    FlagsT(VkType i=(VkType)0) : v(i) {}    
+""",
+    PRIM_ASSIGN_OPS,
+    BOOL_OPS,
+    CAST_OPS,
+    RMW_MOD_OPS,
+    FRIEND_COMP_OPS,
+    FRIEND_EQ_OPS,
+    FRIEND_EXPR_OPS,
+    """  private:
     VkType v;
   };
   
@@ -118,26 +147,41 @@ WRAPPER_TEMPLATES = """
     using UType = HandleT;
     using VkType = T;
     
-    HandleT(VkType i = (VkType)0) : v(i) {}
-    
-    operator VkType() const { return v; }
-    operator VkType&() { return v; }
-    VkType* operator&() { return &v; }
-    const VkType* operator&() const { return &v; }
-    operator bool() const { return !!v; }
-    bool operator!() const { return v; }
-    
-    VKU_MOD_OP(=);
-    
-    VKU_FRIEND_OP(==);
-    VKU_FRIEND_OP(!=);
-  private:
+    HandleT(VkType i = (VkType)0) : v(i) {}    
+""",
+    PRIM_ASSIGN_OPS,
+    BOOL_OPS,
+    CAST_OPS,
+    FRIEND_EQ_OPS,
+"""  private:
     VkType v;
   };
-#undef VKU_FRIEND_OP
-#undef VKU_MOD_OP
-#undef VKU_FRIEND_COMPS
-"""[1:-1]
+"""[1:-1],
+"""
+  template<class T, int TypeVal>
+  struct InfoT : public T {
+    using UType = InfoT;
+    using VkType = T;
+    static constexpr auto kStructType = (VkStructureType)TypeVal;
+    InfoT() { *this = VkType{ kStructType }; }
+    InfoT(const VkType& rhs) { *((VkType*)this) = rhs; }
+""",
+    CAST_OPS,
+    STRUCT_ASSIGN_OPS,
+"""  };
+
+  template<typename T>
+  struct DescriptionT : public T {
+    using UType = DescriptionT;
+    using VkType = T;
+    DescriptionT() { *this = VkType{}; }
+    DescriptionT(const VkType& rhs) { *((VkType*)this) = bd; }
+""",
+    CAST_OPS,
+    PRIM_ASSIGN_OPS,
+"""  };
+"""
+])[1:-1]
 
 
 ENUMS_SECTION = [
@@ -157,22 +201,14 @@ FLAGS_SECTION = [
 
 HANDLES_SECTION = [
 """
-  // wrapped handle types"
+  // wrapped handle types
 """[1:-1]
 ]
 
 
 STRUCTS_SECTION = [
 """
-  // struct wrappers
-  template<typename VkS, int SType>
-  struct SWrap : public VkS {
-    SWrap() : VkS{} {
-        sType = (VkStructureType)SType;
-    }
-    SWrap(const SWrap&) = default;    
-    SWrap(const VkS& s) = default;
-  };
+  // wrapped info (type identified) and description (not type identified) structs
 """[1:-1]
 ]
 

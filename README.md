@@ -6,7 +6,7 @@
     * Just adds some mercy utility types and simple, useful functions
     * Does not constrain usage of Vulkan
     * None of the Vulkan API functions are wrapped
-* No additional dependencies
+* No dependencies beyond vulkan headers
 * No use of std:: strings or containers
 * No heap allocations
 * No boost syndrome

@@ -16,9 +16,6 @@ VK_XML, VKU_H = Path(sys.argv[1]), Path(sys.argv[2])
 
 assert ((VK_XML.suffix == ".xml") and VK_XML.exists() and (VKU_H.suffix == ".h")), "args must be paths to vk.xml vku.h"
 
-tree = ET.parse(VK_XML)
-root = tree.getroot()
-
 FILE_HEADER = f"""
 #pragma once
 // {VKU_H.name} {VKU_H.parent.parent.parent.name} generated {datetime.now()} by {Path(sys.argv[0]).name}
@@ -185,7 +182,6 @@ FLAGS_SECTION = [
 
 HANDLES_SECTION = [
   "  // wrapped handle types",
-  "  using Image = HandleT<VkImage>;"
 ]
 
 STRUCTS_SECTION = [
@@ -224,32 +220,78 @@ ALWAYS_INLINE_FUNCTIONS_SECTION = [
   }"""[1:]
 ]
 
-
 FILE_FOOTER = "} // end namespace vku"
 
-FILE_SECTIONS = [
-    FILE_HEADER,
-    WRAPPER_TEMPLATES,
-    "",
-    *ENUMS_SECTION,
-    "",
-    *FLAGS_SECTION,
-    "",
-    *HANDLES_SECTION,
-    "",
-    *STRUCTS_SECTION,
-    "",
-    FUNCTION_PROTOS_HEADER,
-    *FUNCTION_PROTOS_SECTION,
-    FUNCTION_PROTOS_FOOTER,
-    "",
-    FUNCTIONS_HEADER,
-    *FUNCTIONS_IMPL_SECTION,
-    FUNCTIONS_FOOTER,
-    "",
-    *ALWAYS_INLINE_FUNCTIONS_SECTION,
-    FILE_FOOTER
-]
 
-os.makedirs(VKU_H.parent.as_posix(), exist_ok=True)
-VKU_H.write_text("\n".join(FILE_SECTIONS))
+def write_vku_h():
+    # Accumulate the results and write them out
+    file_sections = [
+        FILE_HEADER,
+        WRAPPER_TEMPLATES,
+        "",
+        *ENUMS_SECTION,
+        "",
+        *FLAGS_SECTION,
+        "",
+        *HANDLES_SECTION,
+        "",
+        *STRUCTS_SECTION,
+        "",
+        FUNCTION_PROTOS_HEADER,
+        *FUNCTION_PROTOS_SECTION,
+        FUNCTION_PROTOS_FOOTER,
+        "",
+        FUNCTIONS_HEADER,
+        *FUNCTIONS_IMPL_SECTION,
+        FUNCTIONS_FOOTER,
+        "",
+        *ALWAYS_INLINE_FUNCTIONS_SECTION,
+        FILE_FOOTER
+    ]
+    os.makedirs(VKU_H.parent.as_posix(), exist_ok=True)
+    VKU_H.write_text("\n".join(file_sections))
+
+
+DOC = ET.parse(VK_XML)
+REGISTRY = DOC.getroot()
+
+
+def handle_type(type_name: str) -> str:
+    return f"  using {type_name[2:]} = HandleT<{type_name}>;"
+
+
+def protect(macro: str, block: str) -> str:
+    return f"""#if defined({macro})
+{block}
+#endif"""
+
+
+def gen_type_wrappers():
+    platform_macros = {}
+    platform_for_type = {}
+
+    for platform in REGISTRY.find("./platforms"):
+        platform_macros[platform.attrib['name']] = platform.attrib['protect']
+
+    for extension in [
+        e for e in REGISTRY.find("./extensions")
+        if 'platform' in e.attrib
+    ]:
+        for plat_type in [pt for pt in extension.find('./require') if 'name' in pt.attrib]:
+            platform_for_type[plat_type.attrib['name']] = extension.attrib['platform']
+
+    for type_entry in [
+        t for t in  REGISTRY.find("./types")
+        if t.tag == 'type' and
+           'objtypeenum' in t.attrib and
+           t.attrib.get('category') == 'handle'
+    ]:
+        type_name = type_entry.find("./name").text
+        platform = platform_for_type.get(type_name)
+        handle_line = handle_type(type_name)
+        HANDLES_SECTION.append(
+            handle_line if platform is None else protect(platform_macros[platform], handle_line)
+        )
+
+gen_type_wrappers()
+write_vku_h()

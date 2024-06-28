@@ -26,6 +26,7 @@ FILE_HEADER = f"""
 // define VKU_INLINE_ALL for header-only with no compiled functions
 // or 
 // define VKU_IMPLEMENT in exactly on C++ source file before including vku/vku.h
+
 #if defined(VKU_INLINE_ALL)
 # define VKU_FUNC inline
 # if defined(VKU_IMPLEMENT)
@@ -35,61 +36,128 @@ FILE_HEADER = f"""
 # define VKU_FUNC
 #endif // VKU_INLINE_ALL, VKU_IMPLEMENT
 
+#if !defined(VK_NULL_HANDLE)
+# define VK_NULL_HANDLE 0
+#endif
+
 namespace vku {{
+"""[1:-1]
+
+
+# TODO: break out the functionality of the operator macros
+# into a python function that inlines the equivalent.
+# makes for easier debugging when you can step into an explicit line of code.
+WRAPPER_TEMPLATES = """
+#define VKU_FRIEND_OP(OP) \\
+    friend auto operator OP(const UType& lhs, const VkType rhs) { return lhs.v OP rhs; } \\
+    friend auto operator OP(const VkType lhs, const UType& rhs) { return lhs OP rhs.v; }    
+
+#define VKU_MOD_OP(OP) \\
+    VkType operator OP(const VkType rhs) { v OP rhs; return v; }
+
+#define VKU_FRIEND_COMPS() \\
+    VKU_FRIEND_OP(==) \\
+    VKU_FRIEND_OP(!=) \\
+    VKU_FRIEND_OP(<) \\
+    VKU_FRIEND_OP(>=) \\
+    VKU_FRIEND_OP(>) \\
+    VKU_FRIEND_OP(>=)
+
+  template<typename T, unsigned int I>
+  struct EnumT {
+    using UType = EnumT;
+    using VkType = T;
+    static constexpr auto kInitVal = (VkType)I;
+    
+    EnumT(VkType i=kInitVal) : v(i) {}
+    
+    operator VkType() const { return v; }
+    operator VkType&() { return v; }
+    VkType* operator&() { return &v; }
+    const VkType* operator&() const { return &v; }
+
+    VKU_MOD_OP(=);
+    VKU_FRIEND_COMPS();    
+  private:
+    VkType v;
+  };
+
+  template<typename T>
+  struct FlagsT {
+    using UType = FlagsT;
+    using VkType = T;
+    
+    FlagsT(VkType i=(VkType)0) : v(i) {}
+    
+    operator VkType() const { return v; }
+    operator VkType&() { return v; }
+    VkType* operator&() { return &v; }
+    const VkType* operator&() const { return &v; }
+    operator bool() const { return !!v; }
+    bool operator!() const { return v; }
+    
+    VKU_MOD_OP(=);    
+    VKU_MOD_OP(|=);
+    VKU_MOD_OP(&=);
+    VKU_MOD_OP(^=);
+    VKU_MOD_OP(+=);
+    VKU_MOD_OP(-=);
+    
+    VKU_FRIEND_COMPS();
+    VKU_FRIEND_OP(|);
+    VKU_FRIEND_OP(&);
+    VKU_FRIEND_OP(^);
+    VKU_FRIEND_OP(+);
+    VKU_FRIEND_OP(-);
+  private:
+    VkType v;
+  };
+  
+ template<typename T>
+  struct HandleT {
+    using UType = HandleT;
+    using VkType = T;
+    
+    HandleT(VkType i = (VkType)0) : v(i) {}
+    
+    operator VkType() const { return v; }
+    operator VkType&() { return v; }
+    VkType* operator&() { return &v; }
+    const VkType* operator&() const { return &v; }
+    operator bool() const { return !!v; }
+    bool operator!() const { return v; }
+    
+    VKU_MOD_OP(=);
+    
+    VKU_FRIEND_OP(==);
+    VKU_FRIEND_OP(!=);
+  private:
+    VkType v;
+  };
+#undef VKU_FRIEND_OP
+#undef VKU_MOD_OP
+#undef VKU_FRIEND_COMPS
 """[1:-1]
 
 
 ENUMS_SECTION = [
 """
-  // enum wrappers
-  template<typename VkE, int Init=0>
-  struct EWrap {
-    EWrap() = default;
-    EWrap(const EWrap&) = default;    
-    EWrap(VkE e) : val(e) {}
-    operator VkE() const { return val; }    
-    EWrap operator=(const EWrap&) = default;
-    EWrap operator=(VkE e) { val = e; return *this; }
-    VkE val = (E)Init;
-  };
+  // wrapped enum types
 """[1:-1]
 ]
 
 
 FLAGS_SECTION = [
 """
-  // flags wrappers"
-  template<typename VkF>
-  struct FWrap {
-    FWrap() = default;
-    FWrap(const FWrap&) = default;    
-    FWrap(VkF f) : val(f) {}
-    operator VkF() const { return val; }    
-    FWrap operator=(const FWrap&) = default;
-    FWrap operator=(VkF f) { val = f; return *this; }
-    VkF val = (VkF)0;
-    // TODO: friend operators
-  };
+  // wrapped flag types
+  using Flags = FlagsT<VkFlags>;
 """[1:-1]
 ]
 
 
 HANDLES_SECTION = [
 """
-  // handle wrappers"
-#if !defined(VK_NULL_HANDLE)
-# define VK_NULL_HANDLE nullptr
-#endif
-  template<typename VkH>
-  struct HWrap {
-    HWrap() = default;
-    HWrap(const HWrap&) = default;    
-    HWrap(VkH h) : val(h) {}
-    operator VkH() const { return val; }    
-    HWrap operator=(const FWrap&) = default;
-    HWrap operator=(VkH h) { val = h; return *this; }  
-    VkH val = VK_NULL_HANDLE;
-  };
+  // wrapped handle types"
 """[1:-1]
 ]
 
@@ -161,6 +229,8 @@ FILE_FOOTER="""
 
 FILE_SECTIONS = [
     FILE_HEADER,
+    WRAPPER_TEMPLATES,
+    "",
     *ENUMS_SECTION,
     "",
     *FLAGS_SECTION,

@@ -8,10 +8,11 @@
     * None of the Vulkan API functions are wrapped
 * No additional dependencies
 * No use of std:: strings or containers
+* No heap allocations
 * No boost syndrome
     * No bloat or major compilation overhead.
     * Using one function or type does not compel the use of others
-    * All types are mix & match with base API - incremental adoption is painless
+    * All types are mix & match with base API - incremental integration is painless
 
 ### Types
 * Structs subclassed with default zero initialization
@@ -19,7 +20,6 @@
 * Enum wrappers with default initialization to invalid values
 * Flags type wrappers with default zero initialization
 * Handle type wrappers with default null initialization
-* VK_NULL_HANDLE definition added if not defined
 
 All wrapped types work interchangeably with base types in the base API
 

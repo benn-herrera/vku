@@ -1,5 +1,5 @@
 __pycache__/
 Vulkan-Headers/
-.venv/
-debug/
 
+tests/tmp/
+test/build/

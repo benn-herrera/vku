@@ -37,7 +37,7 @@ FILE_HEADER = f"""
 #endif // VKU_INLINE_ALL, VKU_IMPLEMENT
 
 #if !defined(VK_VERSION_1_0)
-# include "vulkan.h"
+# include "vulkan/vulkan.h"
 #endif
 
 #if !defined(VK_NULL_HANDLE)
@@ -57,11 +57,11 @@ PRIM_MOD_OP_FMT = """
 """[1:-1]
 
 STRUCT_MOD_OP_FMT = """
-    VkType& operator {OP}(const VkType rhs) {{ v {OP} rhs; return v; }}
+    VkType& operator {OP}(const VkType& rhs) {{ (VkType&)*this {OP} rhs; return *this; }}
 """[1:-1]
 
 UNARY_OP_FMT = """
-    auto operator {OP}(){{ return {OP}(v); }}
+    {RV}operator {OP}(){{ return {OP}(v); }}
 """[1:-1]
 
 CAST_OPS = """
@@ -74,10 +74,10 @@ CAST_OPS = """
 PRIM_ASSIGN_OPS = PRIM_MOD_OP_FMT.format(OP='=')
 STRUCT_ASSIGN_OPS = STRUCT_MOD_OP_FMT.format(OP='=')
 
-BOOL_OPS = ".\n".join([
-    UNARY_OP_FMT.format(OP='bool'),
-    UNARY_OP_FMT.format(OP='!'),
-])[:-1]
+BOOL_OPS = "\n".join([
+    UNARY_OP_FMT.format(RV='', OP='bool'),
+    UNARY_OP_FMT.format(RV='auto ', OP='!'),
+])
 
 RMW_MOD_OPS = "\n".join([
     PRIM_MOD_OP_FMT.format(OP='|='),
@@ -85,19 +85,19 @@ RMW_MOD_OPS = "\n".join([
     PRIM_MOD_OP_FMT.format(OP='^='),
     PRIM_MOD_OP_FMT.format(OP='+='),
     PRIM_MOD_OP_FMT.format(OP='-='),
-])[:-1]
+])
 
 FRIEND_COMP_OPS = "\n".join([
     FRIEND_OP_FMT.format(OP='<'),
     FRIEND_OP_FMT.format(OP='<='),
     FRIEND_OP_FMT.format(OP='>'),
     FRIEND_OP_FMT.format(OP='>=')
-])[:-1]
+])
 
 FRIEND_EQ_OPS = "\n".join([
     FRIEND_OP_FMT.format(OP='=='),
     FRIEND_OP_FMT.format(OP='!='),
-])[:-1]
+])
 
 FRIEND_EXPR_OPS = "\n".join([
     FRIEND_OP_FMT.format(OP='|'),
@@ -107,15 +107,13 @@ FRIEND_EXPR_OPS = "\n".join([
     FRIEND_OP_FMT.format(OP='-')
 ])
 
-WRAPPER_TEMPLATES = ".\n".join([
-"""
-  template<typename T, unsigned int I>
+WRAPPER_TEMPLATES = "\n".join([
+"""template<typename T, uint32_t I>
   struct EnumT {
-    static constexpr auto kInitVal = (VkType)I;     
-    using UType = EnumT;    
-    using VkType = T;        
-    EnumT(VkType i=kInitVal) : v(i) {}    
-""",
+    using UType = EnumT;
+    using VkType = T;  
+    static constexpr auto kInitVal = (VkType)I;
+    EnumT(VkType i=kInitVal) : v(i) {}""",
     PRIM_ASSIGN_OPS,
     CAST_OPS,
     FRIEND_COMP_OPS,
@@ -129,8 +127,7 @@ WRAPPER_TEMPLATES = ".\n".join([
     using UType = FlagsT;
     using VkType = T;
     
-    FlagsT(VkType i=(VkType)0) : v(i) {}    
-""",
+    FlagsT(VkType i=(VkType)0) : v(i) {}""",
     PRIM_ASSIGN_OPS,
     BOOL_OPS,
     CAST_OPS,
@@ -141,32 +138,28 @@ WRAPPER_TEMPLATES = ".\n".join([
     """  private:
     VkType v;
   };
-  
+
  template<typename T>
   struct HandleT {
     using UType = HandleT;
     using VkType = T;
-    
-    HandleT(VkType i = (VkType)0) : v(i) {}    
-""",
+
+    HandleT(VkType i = (VkType)0) : v(i) {}""",
     PRIM_ASSIGN_OPS,
     BOOL_OPS,
     CAST_OPS,
     FRIEND_EQ_OPS,
-"""  private:
+"""
+  private:
     VkType v;
   };
-"""[1:-1],
-"""
-  template<class T, int TypeVal>
+  template<class T, int32_t STYPE>
   struct InfoT : public T {
     using UType = InfoT;
     using VkType = T;
-    static constexpr auto kStructType = (VkStructureType)TypeVal;
+    static constexpr auto kStructType = VkStructureType(STYPE);
     InfoT() { *this = VkType{ kStructType }; }
-    InfoT(const VkType& rhs) { *((VkType*)this) = rhs; }
-""",
-    CAST_OPS,
+    InfoT(const VkType& rhs) { (VkType&)*this = rhs; }""",
     STRUCT_ASSIGN_OPS,
 """  };
 
@@ -175,93 +168,64 @@ WRAPPER_TEMPLATES = ".\n".join([
     using UType = DescriptionT;
     using VkType = T;
     DescriptionT() { *this = VkType{}; }
-    DescriptionT(const VkType& rhs) { *((VkType*)this) = bd; }
-""",
-    CAST_OPS,
-    PRIM_ASSIGN_OPS,
-"""  };
-"""
-])[1:-1]
+    DescriptionT(const VkType& rhs) { (VkType&)*this = rhs; }""",
+    STRUCT_ASSIGN_OPS,
+"  };"
+])
 
 
 ENUMS_SECTION = [
-"""
-  // wrapped enum types
-"""[1:-1]
+  "  // wrapped enum types"
 ]
-
 
 FLAGS_SECTION = [
-"""
-  // wrapped flag types
-  using Flags = FlagsT<VkFlags>;
-"""[1:-1]
+"""  // wrapped flag types
+  using Flags = FlagsT<VkFlags>;"""
 ]
-
 
 HANDLES_SECTION = [
-"""
-  // wrapped handle types
-"""[1:-1]
+  "  // wrapped handle types",
+  "  using Image = HandleT<VkImage>;"
 ]
-
 
 STRUCTS_SECTION = [
-"""
-  // wrapped info (type identified) and description (not type identified) structs
-"""[1:-1]
+  "  // wrapped info (type identified) and description (not type identified) structs"
 ]
-
 
 FUNCTION_PROTOS_HEADER = """
 // function prototypes
-#if !defined(VKU_INLINE_ALL)
-"""[1:-1]
+#if !defined(VKU_INLINE_ALL)"""[1:]
 
 FUNCTION_PROTOS_SECTION = [
   "  extern const char* member_to_string_vp(const VkPhysicalDeviceFeatures&, const void* member);"
 ]
 
-
-FUNCTION_PROTOS_FOOTER = """
-#endif // VKU_INLINE_ALL
-"""[1:-1]
-
+FUNCTION_PROTOS_FOOTER = "#endif // VKU_INLINE_ALL"
 
 FUNCTIONS_HEADER = """
-// function implementations
-#if defined(VKU_IMPLEMENT) || defined(VKU_INLINE_ALL)
-"""[1:-1]
-
+  // function implementations
+#if defined(VKU_IMPLEMENT) || defined(VKU_INLINE_ALL)"""[1:]
 
 FUNCTIONS_IMPL_SECTION = [
 """
   VKU_FUNC const char* member_to_string_vp(const VkPhysicalDeviceFeatures& s, const void* member) {
     return nullptr;
-  }
-"""[1:-1]
+  }"""[1:]
 ]
 
-
-FUNCTIONS_FOOTER = """
-#endif // VKU_IMPLEMENT || VKU_INLINE_ALL
-"""[1:-1]
-
+FUNCTIONS_FOOTER = "#endif // VKU_IMPLEMENT || VKU_INLINE_ALL"
 
 ALWAYS_INLINE_FUNCTIONS_SECTION = [
 """
   // always inlined functions
-  template<MT>
-  inline const char* to_string(const VkPhysicalDeviceFeatures& s, const MT& m) {
+  template<typename T>
+  inline const char* to_string(const VkPhysicalDeviceFeatures& s, const T& m) {
       return member_to_string_vp(s, &m);
-  }  
-"""[1:-1]
+  }"""[1:]
 ]
 
 
-FILE_FOOTER="""
-} // end namespace vku
-"""[1:-1]
+FILE_FOOTER = "} // end namespace vku"
 
 FILE_SECTIONS = [
     FILE_HEADER,

@@ -45,7 +45,7 @@ fi
 
 GEN_VKU_PY="${THIS_DIR}/gen_vku.py"
 VK_HEADERS_SANDBOX="${THIS_DIR}/${VK_HEADERS_NAME}"
-VK_XML="${THIS_DIR}/${VK_HEADERS_NAME}/registry/vk.xml"
+VK_XML="${VK_HEADERS_SANDBOX}/registry/vk.xml"
 
 set -eux
 

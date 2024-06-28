@@ -1,5 +1,5 @@
 __pycache__/
 Vulkan-Headers/
 
+build/
 tests/tmp/
-test/build/

@@ -16,6 +16,7 @@ function usage() {
     echo "    priority is given to sdk release tags (vulkan-sdk-M,m.p.f)"
     echo "    if you need a newer version than the last sdk tagged version use the full M.m.p.f version"
     echo "    default is ${DEFAULT_SDK_VER}"
+    echo "    version 0.0.0 is used for development of vku scripts and tests."
     exit ${1}
 }
 
@@ -54,10 +55,16 @@ if [[ ! -d "${VK_HEADERS_SANDBOX}" ]]; then
 fi
 
 (cd "${VK_HEADERS_SANDBOX}" && git fetch --tags)
-VK_HEADERS_TAG=$(cd "${VK_HEADERS_SANDBOX}" && git tag | grep -e "${VK_SDK_VER//\./\\.}" | sort -Vr | head -1)
-(cd "${VK_HEADERS_SANDBOX}" && git -c advice.detachedHead=false checkout "${VK_HEADERS_TAG}")
+
+if [[ "${VK_SDK_VER}" == "0.0.0" ]]; then
+  VK_HEADERS_TAG="v0.0.0"
+else
+  VK_HEADERS_TAG=$(cd "${VK_HEADERS_SANDBOX}" && git tag | grep -e "${VK_SDK_VER//\./\\.}" | sort -Vr | head -1)
+  (cd "${VK_HEADERS_SANDBOX}" && git -c advice.detachedHead=false checkout "${VK_HEADERS_TAG}")
+fi
 
 test -r "${VK_XML}" || (echo "${VK_XML} missing." 1>&2 && false)
+
 # normalize tags (vulkan-sdk-M.m.p.f and vM.m.p become vM.m.p)
 # just the digits and dots
 VK_VERSION="${VK_HEADERS_TAG//[^0-9.]/}"

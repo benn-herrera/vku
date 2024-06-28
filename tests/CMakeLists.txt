@@ -8,11 +8,10 @@ project(integration_test LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 if(NOT VK_VERSION)
-    set(VK_VERSION "v1.2.3")
-    set(VKU_INCLUDE "${PROJECT_SOURCE_DIR}/tmp/${VK_VERSION}/include")
- else()
-    set(VKU_INCLUDE "${PROJECT_SOURCE_DIR}/../${VK_VERSION}/include")
+    message(FATAL_ERROR "-DVK_VERSION=M.m.p must be specified on the cmake command line.")
 endif()
+
+set(VKU_INCLUDE "${PROJECT_SOURCE_DIR}/../${VK_VERSION}/include")
 
 include_directories(
   ${VKU_INCLUDE}

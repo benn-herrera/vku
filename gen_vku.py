@@ -144,7 +144,7 @@ FLAGS_SECTION = [
     using UType = Flags;
     using VkType = VkFlags;
     
-    FlagsT(VkType i=(VkType)0) : v(i) {}""",
+    Flags(VkType i=(VkType)0) : v(i) {}""",
     PRIM_ASSIGN_OPS,
     BOOL_OPS,
     CAST_OPS,
@@ -156,8 +156,6 @@ FLAGS_SECTION = [
     VkType v;
   };
   
-  using Flags = FlagsT<VkFlags>;
-
   template<typename T>
   struct FlagBitsT {
     using UType = FlagBitsT;
@@ -301,7 +299,17 @@ def protect(macro: str, block: str) -> str:
 
 def gen_type_wrappers():
     platform_macros = {}
-    platform_for_type = {}
+    platform_by_type = {}
+    platform_names = set()
+
+    def platform_for_type(name: str):
+        plat = platform_by_type.get(name)
+        if plat is None:
+            for pn in platform_names:
+                if pn.lower() in name.lower():
+                    plat = pn
+                    break
+        return plat
 
     for platform in REGISTRY.find("./platforms"):
         platform_macros[platform.attrib['name']] = platform.attrib['protect']
@@ -311,7 +319,9 @@ def gen_type_wrappers():
         if 'platform' in e.attrib
     ]:
         for plat_type in [pt for pt in extension.find('./require') if 'name' in pt.attrib]:
-            platform_for_type[plat_type.attrib['name']] = extension.attrib['platform']
+            platform = extension.attrib['platform']
+            platform_by_type[plat_type.attrib['name']] = platform
+            platform_names.add(platform)
 
     for type_entry in [
         t for t in  REGISTRY.find("./types")
@@ -324,7 +334,7 @@ def gen_type_wrappers():
             if (type_name := type_entry.find("./name")) is None:
                 continue
             type_name = type_name.text
-        platform = platform_for_type.get(type_name)
+        platform = platform_for_type(type_name)
 
         if category  == "handle":
             if "objtypeenum" not in type_entry.attrib:

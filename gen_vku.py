@@ -344,9 +344,41 @@ def version_macro_for_type(name: str) -> str | None:
     return version
 
 
+def add_grouped_to_section(section: [str], blocks:[dict]):
+    cur_plat = None
+    cur_version = None
+    for block in blocks:
+        plat = block["platform"]
+        version = block["version"]
+        if plat != cur_plat:
+            if cur_plat is not None:
+                section.append(f"#endif // {cur_plat}")
+        if version != cur_version:
+            if cur_version is not None:
+                section.append(f"#endif // {cur_version}")
+        if plat != cur_plat:
+            cur_plat = plat
+            if cur_plat:
+                section.append(f"#if defined({cur_plat})")
+        if version != cur_version:
+            cur_version = version
+            if cur_version:
+                section.append(f"#if defined({cur_version})")
+        section.append(block["block"])
+
+    if cur_plat is not None:
+        section.append(f"#endif // {cur_plat}")
+    if cur_version is not None:
+        section.append(f"#endif // {cur_version}")
+
+
 def gen_type_wrappers():
 
     init_platforms_and_versions()
+
+    enums = []
+    flags = []
+    handles = []
 
     for enum in (
             e for e in REGISTRY.findall("./enums")
@@ -355,12 +387,11 @@ def gen_type_wrappers():
     ):
         is_flags = enum.attrib["type"] == "bitmask"
         type_name = enum.attrib["name"]
-        section = FLAGS_SECTION if is_flags else ENUMS_SECTION
+        section = flags if is_flags else enums
         platform_macro = platform_macro_for_type(type_name)
         version_macro = version_macro_for_type(type_name)
-        macros = [m for m in (platform_macro, version_macro) if m is not None]
-        block = protect(macros, enum_type(type_name, is_flags=is_flags))
-        section.append(block)
+        block = enum_type(type_name, is_flags=is_flags)
+        section.append(dict(block=block, platform=platform_macro, version=version_macro))
 
     for type_entry in (
         t for t in  REGISTRY.find("./types")
@@ -373,10 +404,21 @@ def gen_type_wrappers():
         type_name = type_name.text
         platform_macro = platform_macro_for_type(type_name)
         version_macro = version_macro_for_type(type_name)
+        block = handle_type(type_name)
+        handles.append(dict(block=block, platform=platform_macro, version=version_macro))
 
-        macros = [m for m in (platform_macro, version_macro) if m is not None]
-        block = protect(macros, handle_type(type_name))
-        HANDLES_SECTION.append(block)
+    def sort_key(blk: dict) -> str:
+        p = blk['platform'] or "0"
+        v = blk['version'] or "0"
+        return f"{p}_{v}"
+
+    enums.sort(key=sort_key)
+    flags.sort(key=sort_key)
+    handles.sort(key=sort_key)
+
+    add_grouped_to_section(ENUMS_SECTION, enums)
+    add_grouped_to_section(FLAGS_SECTION, flags)
+    add_grouped_to_section(HANDLES_SECTION, handles)
 
 
 gen_type_wrappers()

@@ -1,19 +1,8 @@
 #include "vku/vku.h"
-#include <stdio.h>
+#include "test.h"
 
 int checks = 0;
 int failures = 0;
-#define CHECK(V) \
-    do { \
-        ++checks; \
-        if (!(V)) { \
-            fprintf(stderr, "%s(%d): check %s FAILED!\n", __FILE__, __LINE__, #V); \
-            ++failures;\
-        } \
-    } while(0)
-
-void noop() {  
-}
 
 // TODO: generate test cases
 int main() {
@@ -28,6 +17,7 @@ int main() {
   VkFlags vflags = 0;
   vku::Flags uflags;
   CHECK(!uflags);
+
   if (failures) {
     fprintf(stderr, "FAILED %d/%d checks.\n", failures, checks);
   } else {

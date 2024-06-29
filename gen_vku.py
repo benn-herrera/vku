@@ -348,36 +348,36 @@ def gen_type_wrappers():
 
     init_platforms_and_versions()
 
-    for type_entry in [
+    for enum in (
+            e for e in REGISTRY.findall("./enums")
+            if "type" in e.attrib and
+               e.find("./enum") is not None
+    ):
+        is_flags = enum.attrib["type"] == "bitmask"
+        type_name = enum.attrib["name"]
+        section = FLAGS_SECTION if is_flags else ENUMS_SECTION
+        platform_macro = platform_macro_for_type(type_name)
+        version_macro = version_macro_for_type(type_name)
+        macros = [m for m in (platform_macro, version_macro) if m is not None]
+        block = protect(macros, enum_type(type_name, is_flags=is_flags))
+        section.append(block)
+
+    for type_entry in (
         t for t in  REGISTRY.find("./types")
         if t.tag == "type" and
-           "category" in t.attrib
-    ]:
-        category = type_entry.attrib["category"]
-        type_name = type_entry.attrib.get("name")
-        if type_name is None:
-            if (type_name := type_entry.find("./name")) is None:
-                continue
-            type_name = type_name.text
+            t.attrib.get("category") == "handle" and
+            "objtypeenum" in t.attrib
+    ):
+        if (type_name := type_entry.find("./name")) is None:
+            continue
+        type_name = type_name.text
         platform_macro = platform_macro_for_type(type_name)
         version_macro = version_macro_for_type(type_name)
 
-        if category  == "handle":
-            if "objtypeenum" not in type_entry.attrib:
-                continue
-            block = handle_type(type_name)
-            section = HANDLES_SECTION
-        elif category == "enum":
-            is_flags = "FlagBits" in type_name
-            block = enum_type(type_name, is_flags=is_flags)
-            section = FLAGS_SECTION if is_flags else ENUMS_SECTION
-        else:
-            continue
-
         macros = [m for m in (platform_macro, version_macro) if m is not None]
-        block = protect(macros, block)
+        block = protect(macros, handle_type(type_name))
+        HANDLES_SECTION.append(block)
 
-        section.append(block)
 
 gen_type_wrappers()
 write_vku_h()

@@ -291,28 +291,24 @@ def enum_type(type_name: str, *, is_flags: bool) -> str:
     return f"  using {type_name[2:]} = {enum_templ}<{type_name}>;"
 
 
-def protect(macro: str, block: str) -> str:
-    return f"""#if defined({macro})
+def protect(macros: [str], block: str) -> str:
+    macros = ") && defined(".join(macros)
+    return f"""#if defined({macros})
 {block}
-#endif"""
+#endif""" if macros else block
 
 
-def gen_type_wrappers():
-    platform_macros = {}
-    platform_by_type = {}
-    platform_names = set()
+PLATFORM_MACROS = {}
+PLATFORM_BY_TYPE = {}
+PLATFORM_NAMES = set()
 
-    def platform_for_type(name: str):
-        plat = platform_by_type.get(name)
-        if plat is None:
-            for pn in platform_names:
-                if pn.lower() in name.lower():
-                    plat = pn
-                    break
-        return plat
+VERSION_MACROS = set()
+VERSION_MACRO_BY_TYPE = {}
 
+
+def init_platforms_and_versions():
     for platform in REGISTRY.find("./platforms"):
-        platform_macros[platform.attrib['name']] = platform.attrib['protect']
+        PLATFORM_MACROS[platform.attrib['name']] = platform.attrib['protect']
 
     for extension in [
         e for e in REGISTRY.find("./extensions")
@@ -320,8 +316,37 @@ def gen_type_wrappers():
     ]:
         for plat_type in [pt for pt in extension.find('./require') if 'name' in pt.attrib]:
             platform = extension.attrib['platform']
-            platform_by_type[plat_type.attrib['name']] = platform
-            platform_names.add(platform)
+            PLATFORM_BY_TYPE[plat_type.attrib['name']] = platform
+            PLATFORM_NAMES.add(platform)
+
+    for feature in REGISTRY.findall("./feature"):
+        version = feature.attrib["name"]
+        VERSION_MACROS.add(version)
+        for require in feature.findall("./require"):
+            for type_tag in require.findall("./type"):
+                VERSION_MACRO_BY_TYPE[type_tag.attrib["name"]] = version
+
+
+def platform_macro_for_type(name: str) -> str | None:
+    plat = PLATFORM_BY_TYPE.get(name)
+    if plat is None:
+        for pn in PLATFORM_NAMES:
+            if pn.lower() in name.lower():
+                plat = pn
+                break
+    return PLATFORM_MACROS[plat] if plat is not None else None
+
+
+def version_macro_for_type(name: str) -> str | None:
+    version = VERSION_MACRO_BY_TYPE.get(name)
+    if version is None or version == "VK_VERSION_1_0":
+        return None
+    return version
+
+
+def gen_type_wrappers():
+
+    init_platforms_and_versions()
 
     for type_entry in [
         t for t in  REGISTRY.find("./types")
@@ -334,7 +359,8 @@ def gen_type_wrappers():
             if (type_name := type_entry.find("./name")) is None:
                 continue
             type_name = type_name.text
-        platform = platform_for_type(type_name)
+        platform_macro = platform_macro_for_type(type_name)
+        version_macro = version_macro_for_type(type_name)
 
         if category  == "handle":
             if "objtypeenum" not in type_entry.attrib:
@@ -347,9 +373,11 @@ def gen_type_wrappers():
             section = FLAGS_SECTION if is_flags else ENUMS_SECTION
         else:
             continue
-        section.append(
-            block if platform is None else protect(platform_macros[platform], block)
-        )
+
+        macros = [m for m in (platform_macro, version_macro) if m is not None]
+        block = protect(macros, block)
+
+        section.append(block)
 
 gen_type_wrappers()
 write_vku_h()

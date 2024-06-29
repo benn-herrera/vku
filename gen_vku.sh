@@ -73,5 +73,12 @@ VK_VERSION=$(set ${VK_VERSION//\./ }; echo "v${1}.${2}.${3}")
 VKU_H="${THIS_DIR}/${VK_VERSION}/include/vku/vku.h"
 
 "${PYTHON}" "${GEN_VKU_PY}" "${VK_XML}" "${VKU_H}"
-git add "${VKU_H}"
-git commit -m "generated vku.h"
+
+if ${AUTO_COMMIT:-false}; then
+  VK_VERSION="${VK_VERSION}" ./tests/run_test.sh
+  if [[ "${VK_VERSION}" != "v0.0.0" ]]; then
+    git add "${VKU_H}"
+    git commit -m "generated vku.h"
+    echo "git push to finalize new vku.h"
+  fi
+fi

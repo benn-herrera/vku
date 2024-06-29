@@ -291,6 +291,12 @@ def enum_type(type_name: str, *, is_flags: bool) -> str:
     return f"  using {type_name[2:]} = {enum_templ}<{type_name}>;"
 
 
+def struct_type(type_name: str, *, stype_value: str) -> str:
+    struct_templ = "InfoT" if stype_value else "DescriptionT"
+    stype_value = f", {stype_value}" if stype_value else ""
+    return f"  using {type_name[2:]} = {struct_templ}<{type_name}{stype_value}>;"
+
+
 def protect(macros: [str], block: str) -> str:
     macros = ") && defined(".join(macros)
     return f"""#if defined({macros})
@@ -373,12 +379,12 @@ def add_grouped_to_section(section: [str], blocks:[dict]):
 
 
 def gen_type_wrappers():
-
     init_platforms_and_versions()
 
     enums = []
     flags = []
     handles = []
+    structs = []
 
     for enum in (
             e for e in REGISTRY.findall("./enums")
@@ -395,17 +401,30 @@ def gen_type_wrappers():
 
     for type_entry in (
         t for t in  REGISTRY.find("./types")
-        if t.tag == "type" and
-            t.attrib.get("category") == "handle" and
-            "objtypeenum" in t.attrib
+        if t.tag == "type" and "category" in t.attrib
     ):
-        if (type_name := type_entry.find("./name")) is None:
-            continue
-        type_name = type_name.text
-        platform_macro = platform_macro_for_type(type_name)
-        version_macro = version_macro_for_type(type_name)
-        block = handle_type(type_name)
-        handles.append(dict(block=block, platform=platform_macro, version=version_macro))
+        category = type_entry.attrib["category"]
+
+        if category == "handle":
+            if "objtypeenum" not in type_entry.attrib:
+                continue
+            if (type_name := type_entry.find("./name")) is None:
+                continue
+            type_name = type_name.text
+            platform_macro = platform_macro_for_type(type_name)
+            version_macro = version_macro_for_type(type_name)
+            block = handle_type(type_name)
+            handles.append(dict(block=block, platform=platform_macro, version=version_macro))
+        elif category == "struct":
+            type_name = type_entry.attrib["name"]
+            if stype := type_entry.find("./member"):
+                stype = stype.attrib.get("values")
+                if stype and not stype.startswith("VK_STRUCTURE_TYPE"):
+                    stype = None
+            platform_macro = platform_macro_for_type(type_name)
+            version_macro = version_macro_for_type(type_name)
+            block = struct_type(type_name, stype_value=stype)
+            structs.append(dict(block=block, platform=platform_macro, version=version_macro))
 
     def sort_key(blk: dict) -> str:
         p = blk['platform'] or "0"
@@ -415,10 +434,12 @@ def gen_type_wrappers():
     enums.sort(key=sort_key)
     flags.sort(key=sort_key)
     handles.sort(key=sort_key)
+    structs.sort(key=sort_key)
 
     add_grouped_to_section(ENUMS_SECTION, enums)
     add_grouped_to_section(FLAGS_SECTION, flags)
     add_grouped_to_section(HANDLES_SECTION, handles)
+    add_grouped_to_section(STRUCTS_SECTION, structs)
 
 
 gen_type_wrappers()

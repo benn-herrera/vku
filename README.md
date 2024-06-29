@@ -6,7 +6,7 @@
     * Just adds some mercy utility types and simple, useful functions
     * Does not constrain usage of Vulkan
     * None of the Vulkan API functions are wrapped
-* No dependencies beyond vulkan headers
+* No required dependencies beyond vulkan headers
 * No use of std:: strings or containers
 * No heap allocations
 * No boost syndrome
@@ -17,7 +17,7 @@
 ### Types
 * Structs subclassed with default zero initialization
     * sType assigned when present 
-* Enum wrappers with default initialization to invalid values
+* Enum wrappers with default zero initialization and common 'invalid' value
 * Flags type wrappers with default zero initialization
 * Handle type wrappers with default null initialization
 

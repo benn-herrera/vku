@@ -49,6 +49,13 @@ FRIEND_OP_FMT = """
     friend auto operator {OP}(const VkType lhs, const UType& rhs) {{ return lhs {OP} rhs.v; }}
 """[1:-1]
 
+FRIEND_FLAG_OP_FMT = """
+    friend auto operator {OP}(const UType& lhs, const VkFlags rhs) {{ return VkFlags(lhs.v) {OP} rhs; }}
+    friend auto operator {OP}(const VkFlags lhs, const UType& rhs) {{ return lhs {OP} VkFlags(rhs.v); }}
+    friend auto operator {OP}(const UType& lhs, const VkType rhs) {{ return VkFlags(lhs.v) {OP} VkFlags(rhs); }}
+    friend auto operator {OP}(const VkType lhs, const UType& rhs) {{ return VkFlags(lhs) {OP} VkFlags(rhs.v); }}
+"""[1:-1]
+
 PRIM_MOD_OP_FMT = """
     VkType operator {OP}(const VkType rhs) {{ v {OP} rhs; return v; }}
 """[1:-1]
@@ -104,13 +111,23 @@ FRIEND_EXPR_OPS = "\n".join([
     FRIEND_OP_FMT.format(OP='-')
 ])
 
-WRAPPER_TEMPLATES = "\n".join([
-"""template<typename T, uint32_t I>
+# VkFlags return value (maps from enum flag bit to Flags)
+FRIEND_FLAG_OPS = "\n".join([
+    FRIEND_FLAG_OP_FMT.format(OP='|'),
+    FRIEND_FLAG_OP_FMT.format(OP='&'),
+    FRIEND_FLAG_OP_FMT.format(OP='^'),
+    FRIEND_FLAG_OP_FMT.format(OP='+'),
+    FRIEND_FLAG_OP_FMT.format(OP='-')
+])
+
+ENUMS_SECTION = [
+"""  // wrapped enum types
+  template<typename T>
   struct EnumT {
     using UType = EnumT;
     using VkType = T;  
-    static constexpr auto kInitVal = (VkType)I;
-    EnumT(VkType i=kInitVal) : v(i) {}""",
+    static constexpr auto kInvalid = (VkType)~0u;
+    EnumT(VkType i=(VkType)0) : v(i) {}""",
     PRIM_ASSIGN_OPS,
     CAST_OPS,
     FRIEND_COMP_OPS,
@@ -118,11 +135,14 @@ WRAPPER_TEMPLATES = "\n".join([
 """  private:
     VkType v;
   };
+"""
+]
 
-  template<typename T>
-  struct FlagsT {
-    using UType = FlagsT;
-    using VkType = T;
+FLAGS_SECTION = [
+"""  // wrapped flag types
+  struct Flags {
+    using UType = Flags;
+    using VkType = VkFlags;
     
     FlagsT(VkType i=(VkType)0) : v(i) {}""",
     PRIM_ASSIGN_OPS,
@@ -132,11 +152,33 @@ WRAPPER_TEMPLATES = "\n".join([
     FRIEND_COMP_OPS,
     FRIEND_EQ_OPS,
     FRIEND_EXPR_OPS,
-    """  private:
+"""  private:
     VkType v;
   };
+  
+  using Flags = FlagsT<VkFlags>;
 
- template<typename T>
+  template<typename T>
+  struct FlagBitsT {
+    using UType = FlagBitsT;
+    using VkType = T;  
+    FlagBitsT(VkType i=(VkType)0) : v(i) {}""",
+    PRIM_ASSIGN_OPS,
+    CAST_OPS,
+    FRIEND_COMP_OPS,
+    FRIEND_EQ_OPS,
+    FRIEND_FLAG_OPS,
+"""  private:
+    VkType v;
+  };
+"""
+]
+
+HANDLES_SECTION = [
+"""  //
+  // wrapped handle types
+  //
+  template<typename T>
   struct HandleT {
     using UType = HandleT;
     using VkType = T;
@@ -150,6 +192,11 @@ WRAPPER_TEMPLATES = "\n".join([
   private:
     VkType v;
   };
+"""
+]
+
+STRUCTS_SECTION = [
+"""  // wrapped info (type identified) and description (not type identified) structs
   template<class T, int32_t STYPE>
   struct InfoT : public T {
     using UType = InfoT;
@@ -159,7 +206,7 @@ WRAPPER_TEMPLATES = "\n".join([
     InfoT(const VkType& rhs) { (VkType&)*this = rhs; }""",
     STRUCT_ASSIGN_OPS,
 """  };
-
+  
   template<typename T>
   struct DescriptionT : public T {
     using UType = DescriptionT;
@@ -167,25 +214,8 @@ WRAPPER_TEMPLATES = "\n".join([
     DescriptionT() { *this = VkType{}; }
     DescriptionT(const VkType& rhs) { (VkType&)*this = rhs; }""",
     STRUCT_ASSIGN_OPS,
-"  };"
-])
-
-
-ENUMS_SECTION = [
-  "  // wrapped enum types"
-]
-
-FLAGS_SECTION = [
-"""  // wrapped flag types
-  using Flags = FlagsT<VkFlags>;"""
-]
-
-HANDLES_SECTION = [
-  "  // wrapped handle types",
-]
-
-STRUCTS_SECTION = [
-  "  // wrapped info (type identified) and description (not type identified) structs"
+"""  };
+"""
 ]
 
 FUNCTION_PROTOS_HEADER = """
@@ -227,8 +257,6 @@ def write_vku_h():
     # Accumulate the results and write them out
     file_sections = [
         FILE_HEADER,
-        WRAPPER_TEMPLATES,
-        "",
         *ENUMS_SECTION,
         "",
         *FLAGS_SECTION,
@@ -260,6 +288,11 @@ def handle_type(type_name: str) -> str:
     return f"  using {type_name[2:]} = HandleT<{type_name}>;"
 
 
+def enum_type(type_name: str, *, is_flags: bool) -> str:
+    enum_templ = "FlagBitsT" if is_flags else "EnumT"
+    return f"  using {type_name[2:]} = {enum_templ}<{type_name}>;"
+
+
 def protect(macro: str, block: str) -> str:
     return f"""#if defined({macro})
 {block}
@@ -282,15 +315,30 @@ def gen_type_wrappers():
 
     for type_entry in [
         t for t in  REGISTRY.find("./types")
-        if t.tag == 'type' and
-           'objtypeenum' in t.attrib and
-           t.attrib.get('category') == 'handle'
+        if t.tag == "type" and
+           "category" in t.attrib
     ]:
-        type_name = type_entry.find("./name").text
+        category = type_entry.attrib["category"]
+        type_name = type_entry.attrib.get("name")
+        if type_name is None:
+            if (type_name := type_entry.find("./name")) is None:
+                continue
+            type_name = type_name.text
         platform = platform_for_type.get(type_name)
-        handle_line = handle_type(type_name)
-        HANDLES_SECTION.append(
-            handle_line if platform is None else protect(platform_macros[platform], handle_line)
+
+        if category  == "handle":
+            if "objtypeenum" not in type_entry.attrib:
+                continue
+            block = handle_type(type_name)
+            section = HANDLES_SECTION
+        elif category == "enum":
+            is_flags = "FlagBits" in type_name
+            block = enum_type(type_name, is_flags=is_flags)
+            section = FLAGS_SECTION if is_flags else ENUMS_SECTION
+        else:
+            continue
+        section.append(
+            block if platform is None else protect(platform_macros[platform], block)
         )
 
 gen_type_wrappers()

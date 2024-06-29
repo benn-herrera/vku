@@ -9,30 +9,48 @@ VK_HEADERS_NAME="Vulkan-Headers"
 VK_HEADERS_REPO="https://github.com/KhronosGroup/${VK_HEADERS_NAME}.git"
 
 function usage() {
-    echo "usage: ${THIS_SCRIPT} [sdk-version]"
+    echo "usage: ${THIS_SCRIPT} [--help] | [--auto-commit] [sdk-version]"
     echo "    where sdk-version is MAJ.min[.patch][.fix] e.g. 1.3 or 1.3.283 or 1.3.283.0"
     echo "    version must match a tagged version in ${VK_HEADERS_REPO}"
     echo "    when multiple tags match the most recent version is taken."
     echo "    priority is given to sdk release tags (vulkan-sdk-M,m.p.f)"
     echo "    if you need a newer version than the last sdk tagged version use the full M.m.p.f version"
     echo "    default is ${DEFAULT_SDK_VER}"
-    echo "    version 0.0.0 is used for development of vku scripts and tests."
+    echo "    use version 0.0.0 for development iteration of vku scripts and tests."
     exit ${1}
 }
 
-if [[ -n "${2}" ]]; then
-  usage 1
-fi
-case "${1}" in
--*) usage 0;;
+AUTO_COMMIT=false
+VK_SDK_VER=${DEFAULT_SDK_VER}
+
+while [[ -n "${1}" ]]; do
+  opt=${1}
+  shift
+  if [[ "${opt/=/}" != "${opt}" ]]; then
+    arg=${opt%=*}
+    opt=${opt/*=/}
+  else
+    arg=""
+  fi
+  case "${opt}" in
+    [0-9]*\.[0-9]*) VK_SDK_VER=${opt};;
+    --auto-commit|-a) AUTO_COMMIT=true;;
+    -h*|--h*|-u*|--u*) usage 0;;
+    *) usage 1;;
+  esac
+done
+
+case "${VK_SDK_VER}" in
+  0*) VK_SDK_VER="0.0.0"; IS_DEV=true; DEV_MODE="DEV MODE ";;
+  *) IS_DEV=false; DEV_MODE="";;
 esac
 
-VK_SDK_VER=${1:-${DEFAULT_SDK_VER}}
-
-if ! PYTHON=$(which python3 2> /dev/null); then
-  if ! PYTHON=$(which python 2> /dev/null); then
-    echo "python3 or python must be in path with version >= 3.11" 1>&2
-    exit 1
+if [[ ! -x "${PYTHON}" ]]; then
+  if ! PYTHON=$(which python3 2> /dev/null); then
+    if ! PYTHON=$(which python 2> /dev/null); then
+      echo "python3 or python must be in path with version >= 3.11" 1>&2
+      exit 1
+    fi
   fi
 fi
 PY_VER=$(${PYTHON} --version | awk '{print $2;}')
@@ -48,7 +66,7 @@ GEN_VKU_PY="${THIS_DIR}/gen_vku.py"
 VK_HEADERS_SANDBOX="${THIS_DIR}/${VK_HEADERS_NAME}"
 VK_XML="${VK_HEADERS_SANDBOX}/registry/vk.xml"
 
-set -eux
+set -eu
 
 if [[ ! -d "${VK_HEADERS_SANDBOX}" ]]; then
   git clone "${VK_HEADERS_REPO}" "${VK_HEADERS_SANDBOX}"
@@ -56,7 +74,7 @@ fi
 
 (cd "${VK_HEADERS_SANDBOX}" && git fetch --tags)
 
-if [[ "${VK_SDK_VER}" == "0.0.0" ]]; then
+if ${IS_DEV}; then
   VK_HEADERS_TAG="v0.0.0"
 else
   VK_HEADERS_TAG=$(cd "${VK_HEADERS_SANDBOX}" && git tag | grep -e "${VK_SDK_VER//\./\\.}" | sort -Vr | head -1)
@@ -72,13 +90,30 @@ VK_VERSION="${VK_HEADERS_TAG//[^0-9.]/}"
 VK_VERSION=$(set ${VK_VERSION//\./ }; echo "v${1}.${2}.${3}")
 VKU_H="${THIS_DIR}/${VK_VERSION}/include/vku/vku.h"
 
+echo "${DEV_MODE}generating ${VKU_H}..."
 "${PYTHON}" "${GEN_VKU_PY}" "${VK_XML}" "${VKU_H}"
+echo "${DEV_MODE}success."
+
+function noop() {
+    echo > /dev/null
+}
 
 if ${AUTO_COMMIT:-false}; then
+  echo "${DEV_MODE}testing and auto committing."
   VK_VERSION="${VK_VERSION}" ./tests/run_test.sh
-  if [[ "${VK_VERSION}" != "v0.0.0" ]]; then
-    git add "${VKU_H}"
-    git commit -m "generated vku.h"
-    echo "git push to finalize new vku.h"
+  if ${IS_DEV}; then
+    DRY_RUN="echo DRY RUN "
+    SETX=noop
+  else
+    DRY_RUN=
+    SETX="set -x"
   fi
+  (
+    ${SETX} &&
+    ${DRY_RUN} git add "${VKU_H}" &&
+    ${DRY_RUN} git commit -m "generated vku.h"
+  )
+  echo "${DEV_MODE}push changes to finalize new vku.h"
+else
+  echo "${DEV_MODE}done."
 fi

@@ -4,41 +4,42 @@ THIS_DIR=$(dirname "${0}")
 # can't rely on realpath existing
 THIS_DIR=$(cd "${THIS_DIR}"; pwd)
 
+# accept from arg1 or existing envar
+VK_VERSION=${1:-${VK_VERSION:-""}}
+
+function usage() {
+  cat << __EOF 1>&2
+usage: ${THIS_SCRIPT} v<M.m.p>
+  e.g. ${THIS_SCRIPT} v1.3.280
+  use v0.0.0 for development iteration.
+__EOF
+  exit ${1}
+}
+
+case "${VK_VERSION}" in
+  "v0.0.0") IS_DEV=true;;
+  "") usage 1;;
+  *) IS_DEV=false;;
+esac
+
 cd "${THIS_DIR}"
+set -eu
+{
+  test -f "../Vulkan-Headers/include/vulkan/vulkan.h" &&
+  test -f "../${VK_VERSION}/include/vku/vku.h"
+} || (echo "run gen_vku.sh first." 1>&2 && false)
 
-VK_HEADERS_NAME="Vulkan-Headers"
-VK_HEADERS_SANDBOX="${THIS_DIR}/../${VK_HEADERS_NAME}"
-
-test -d "${VK_HEADERS_SANDBOX}" && (echo "run gen_vku.sh first." 1>&2 && false)
-
-if [[ "${1}" == "--dev" ]]; then
-  VK_VERSION="v0.0.0"
-fi
-
-if [[ ! -n "${VK_VERSION}" ]]; then
-  VK_HEADERS_TAG=$(
-    cd "${VK_HEADERS_SANDBOX}" &&
-    git describe --tag | grep -e "${VK_SDK_VER//\./\\.}" | sort -Vr | head -1
-    )
-  VK_VERSION="${VK_HEADERS_TAG//[^0-9.]/}"
-  # prepend v and strip the fix number. most recent fix version should always prevail.
-  VK_VERSION=$(set ${VK_VERSION//\./ }; echo "v${1}.${2}.${3}")
-fi
-
-if [[ "${VK_VERSION}" != "v0.0.0" && -d build ]]; then
+# testing for real start with a clean slate
+if ! ${IS_DEV}; then
   /bin/rm -rf build
 fi
 
-set -eux
-
+set -x
 mkdir -p build
 (cd build && cmake .. -DVK_VERSION="${VK_VERSION}")
-
 (cd build && cmake --build .)
 
 if [[ -d build/bin/Debug ]]; then
-  TEST="./build/bin/Debug/test"
-else
-  TEST="./build/bin//test"
+  CFG_DIR="/Debug"
 fi
-"${TEST}"
+./build/bin${CFG_DIR:-""}/test

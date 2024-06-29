@@ -1,7 +1,7 @@
 # vku
 ## A single header C++ type library for Vulkan
 ### Principles
-* Minimal coding mercy (no RAII)
+* Minimal coding mercy
 * Unopinionated
     * Just adds some mercy utility types and simple, useful functions
     * Does not constrain usage of Vulkan

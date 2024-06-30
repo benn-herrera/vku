@@ -306,7 +306,7 @@ def protect(macros: [str], block: str) -> str:
 
 PLATFORM_MACROS = {}
 PLATFORM_BY_TYPE = {}
-PLATFORM_NAMES = set()
+VULKAN_SC_TYPES = set()
 
 VERSION_MACROS = set()
 VERSION_MACRO_BY_TYPE = {}
@@ -318,12 +318,21 @@ def init_platforms_and_versions():
 
     for extension in [
         e for e in REGISTRY.find("./extensions")
-        if 'platform' in e.attrib
     ]:
-        for plat_type in [pt for pt in extension.find('./require') if 'name' in pt.attrib]:
-            platform = extension.attrib['platform']
-            PLATFORM_BY_TYPE[plat_type.attrib['name']] = platform
-            PLATFORM_NAMES.add(platform)
+        extension_is_sc = (
+                extension.attrib.get("supported") == "vulkansc" or
+                extension.attrib.get("ratified") == "vulkansc"
+        )
+        extension_platform = extension.attrib.get('platform')
+
+        for require in extension.findall("./require"):
+            for plat_type in require.findall("./type"):
+                if type_name := plat_type.attrib.get('name'):
+                    # VulkanSC only
+                    if extension_is_sc or require.attrib.get('api') == "vulkansc":
+                        VULKAN_SC_TYPES.add(type_name)
+                    elif platform := (extension_platform or extension.attrib.get('platform')):
+                        PLATFORM_BY_TYPE[type_name] = platform
 
     for feature in REGISTRY.findall("./feature"):
         version = feature.attrib["name"]
@@ -335,18 +344,11 @@ def init_platforms_and_versions():
 
 def platform_macro_for_type(name: str) -> str | None:
     plat = PLATFORM_BY_TYPE.get(name)
-    if plat is None:
-        for pn in PLATFORM_NAMES:
-            if pn.lower() in name.lower():
-                plat = pn
-                break
     return PLATFORM_MACROS[plat] if plat is not None else None
 
 
 def version_macro_for_type(name: str) -> str | None:
     version = VERSION_MACRO_BY_TYPE.get(name)
-    if version is None or version == "VK_VERSION_1_0":
-        return None
     return version
 
 
@@ -386,19 +388,23 @@ def gen_type_wrappers():
     handles = []
     structs = []
 
+    # wrap enum types (serial and flag bits)
     for enum in (
             e for e in REGISTRY.findall("./enums")
             if "type" in e.attrib and
                e.find("./enum") is not None
     ):
-        is_flags = enum.attrib["type"] == "bitmask"
         type_name = enum.attrib["name"]
+        if type_name in VULKAN_SC_TYPES:
+            continue
+        is_flags = enum.attrib["type"] == "bitmask"
         section = flags if is_flags else enums
         platform_macro = platform_macro_for_type(type_name)
         version_macro = version_macro_for_type(type_name)
         block = enum_type(type_name, is_flags=is_flags)
         section.append(dict(block=block, platform=platform_macro, version=version_macro))
 
+    # wrap handle and struct types
     for type_entry in (
         t for t in  REGISTRY.find("./types")
         if t.tag == "type" and "category" in t.attrib
@@ -411,12 +417,16 @@ def gen_type_wrappers():
             if (type_name := type_entry.find("./name")) is None:
                 continue
             type_name = type_name.text
+            if type_name in VULKAN_SC_TYPES:
+                continue
             platform_macro = platform_macro_for_type(type_name)
             version_macro = version_macro_for_type(type_name)
             block = handle_type(type_name)
             handles.append(dict(block=block, platform=platform_macro, version=version_macro))
         elif category == "struct":
             type_name = type_entry.attrib["name"]
+            if type_name in VULKAN_SC_TYPES:
+                continue
             if stype := type_entry.find("./member"):
                 stype = stype.attrib.get("values")
                 if stype and not stype.startswith("VK_STRUCTURE_TYPE"):

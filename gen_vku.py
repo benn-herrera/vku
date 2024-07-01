@@ -10,6 +10,21 @@ It is intended to be invoked from gen_vku.sh.
 Run that instead.
 """
 
+"""
+TODO: 
+to_string(VkEnumType v)
+
+vk_format metadata utilities - is_srgb, is float, etc
+inline is_srgb(VkFormat f) {
+    return !!strstr("SRGB", to_string(f));
+}
+
+// will need to support dry run to get buffer req
+to_string<FlagBitType>(VkFlags flags)
+
+allow macro gated glm::vec2 glm::uvec2 convenience accessors for ViewPort etc?
+"""
+
 assert len(sys.argv) == 3, "args must be paths to vk.xml vku.h"
 
 VK_XML, VKU_H = Path(sys.argv[1]), Path(sys.argv[2])
@@ -140,11 +155,12 @@ ENUMS_SECTION = [
 
 FLAGS_SECTION = [
 """  // wrapped flag types
-  struct Flags {
-    using UType = Flags;
-    using VkType = VkFlags;
+  template<typename T>
+  struct FlagsT {
+    using UType = FlagsT;
+    using VkType = T;
     
-    Flags(VkType i=(VkType)0) : v(i) {}""",
+    FlagsT(VkType i=(VkType)0) : v(i) {}""",
     PRIM_ASSIGN_OPS,
     BOOL_OPS,
     CAST_OPS,
@@ -155,6 +171,9 @@ FLAGS_SECTION = [
 """  private:
     VkType v;
   };
+  
+  using Flags = FlagsT<VkFlags>;
+  using Flags64 = FlagsT<VkFlags64>;
   
   template<typename T>
   struct FlagBitsT {
@@ -220,7 +239,7 @@ FUNCTION_PROTOS_HEADER = """
 // function prototypes
 #if !defined(VKU_INLINE_ALL)"""[1:]
 
-FUNCTION_PROTOS_SECTION = [
+FUNCTIONS_PROTO_SECTION = [
   "  extern const char* member_to_string_vp(const VkPhysicalDeviceFeatures&, const void* member);"
 ]
 
@@ -264,7 +283,7 @@ def write_vku_h():
         *STRUCTS_SECTION,
         "",
         FUNCTION_PROTOS_HEADER,
-        *FUNCTION_PROTOS_SECTION,
+        *FUNCTIONS_PROTO_SECTION,
         FUNCTION_PROTOS_FOOTER,
         "",
         FUNCTIONS_HEADER,
@@ -282,26 +301,67 @@ DOC = ET.parse(VK_XML)
 REGISTRY = DOC.getroot()
 
 
-def handle_type(type_name: str) -> str:
+def wrap_handle_type(type_name: str) -> str:
     return f"  using {type_name[2:]} = HandleT<{type_name}>;"
 
 
-def enum_type(type_name: str, *, is_flags: bool) -> str:
-    enum_templ = "FlagBitsT" if is_flags else "EnumT"
-    return f"  using {type_name[2:]} = {enum_templ}<{type_name}>;"
+def wrap_enum_type(type_name: str) -> str:
+    return f"  using {type_name[2:]} = EnumT<{type_name}>;"
 
 
-def struct_type(type_name: str, *, stype_value: str) -> str:
+def wrap_flag_bits_type(type_name: str) -> str:
+    return f"  using {type_name[2:]} = FlagBitsT<{type_name}>;"
+
+
+def wrap_struct_type(type_name: str, *, stype_value: str) -> str:
     struct_templ = "InfoT" if stype_value else "DescriptionT"
     stype_value = f", {stype_value}" if stype_value else ""
     return f"  using {type_name[2:]} = {struct_templ}<{type_name}{stype_value}>;"
 
 
-def protect(macros: [str], block: str) -> str:
-    macros = ") && defined(".join(macros)
-    return f"""#if defined({macros})
-{block}
-#endif""" if macros else block
+def to_snake(val: str) -> str:
+    snake = []
+    p = None
+    for v in val:
+        if v.isupper() and p and not p.isupper():
+            snake.append("_")
+        snake.append(v.lower())
+        p = v
+    return "".join(snake)
+
+
+def to_string_decl(*, vk_type: str, decl: str, is_type_named: bool) -> str:
+    end = ';' if decl == "extern" else " {"
+    if decl:
+        decl = f"{decl} "
+    type_pfx = f"{to_snake(vk_type[2:])}_" if is_type_named else ""
+    lines = []
+    if is_type_named:
+        lines.append(f"  // {vk_type} is type aliased. its to_string() must have a unique name.")
+    lines.append(f"  {decl}const char* {type_pfx}to_string(const {vk_type} v){end}")
+    return "\n".join(lines)
+
+
+def to_string_proto(vk_type: str, is_type_named: bool) -> str:
+    return to_string_decl(vk_type=vk_type, decl="extern", is_type_named=is_type_named)
+
+
+def to_string_impl(vk_type: str, enum_vals: [str], is_type_named: bool) -> str:
+    body = [
+        to_string_decl(vk_type=vk_type, decl="VKU_FUNC", is_type_named=is_type_named),
+        "    switch(v) {",
+    ]
+
+    for v in enum_vals:
+        body.append(f"    case {v}: return \"{v}\";")
+
+    body.extend([
+        "    default: break;",
+        "    }",
+        "    return nullptr;",
+        "  }",
+    ])
+    return "\n".join(body)
 
 
 PLATFORM_MACROS = {}
@@ -387,6 +447,9 @@ def gen_type_wrappers():
     flags = []
     handles = []
     structs = []
+    func_protos = []
+    func_impls = []
+    always_inline_impls = []
 
     # wrap enum types (serial and flag bits)
     for enum in (
@@ -397,12 +460,48 @@ def gen_type_wrappers():
         type_name = enum.attrib["name"]
         if type_name in VULKAN_SC_TYPES:
             continue
-        is_flags = enum.attrib["type"] == "bitmask"
-        section = flags if is_flags else enums
         platform_macro = platform_macro_for_type(type_name)
         version_macro = version_macro_for_type(type_name)
-        block = enum_type(type_name, is_flags=is_flags)
-        section.append(dict(block=block, platform=platform_macro, version=version_macro))
+        if enum.attrib["type"] == "bitmask":
+            block = wrap_flag_bits_type(type_name)
+            section = flags
+        else:
+            block = wrap_enum_type(type_name)
+            section = enums
+
+        # enums that are 64 bits wide are implemented as a sequence of static const VkFlags64 values
+        # instead of an actual enum, so attempting to overload to_string via just the type will not work.
+        enum_is_unique_type = enum.attrib.get("bitwidth") != "64"
+        type_name_to_str = not enum_is_unique_type
+
+        section.append(
+            dict(
+                block=block,
+                platform=platform_macro,
+                version=version_macro
+            )
+        )
+        func_protos.append(
+            dict(
+                block=to_string_proto(type_name, is_type_named=type_name_to_str),
+                platform=platform_macro,
+                version=version_macro
+            )
+        )
+
+        def check_enum_val(eattr: dict) -> bool:
+            if "alias" in eattr:
+                return False
+            return bool(eattr.get("value", eattr.get("bitpos")))
+
+        enum_vals = [e.attrib["name"] for e in enum.findall("./enum") if check_enum_val(e.attrib)]
+        func_impls.append(
+            dict(
+                block=to_string_impl(type_name, enum_vals, is_type_named=type_name_to_str),
+                platform=platform_macro,
+                version=version_macro
+            )
+        )
 
     # wrap handle and struct types
     for type_entry in (
@@ -421,7 +520,7 @@ def gen_type_wrappers():
                 continue
             platform_macro = platform_macro_for_type(type_name)
             version_macro = version_macro_for_type(type_name)
-            block = handle_type(type_name)
+            block = wrap_handle_type(type_name)
             handles.append(dict(block=block, platform=platform_macro, version=version_macro))
         elif category == "struct":
             type_name = type_entry.attrib["name"]
@@ -433,7 +532,7 @@ def gen_type_wrappers():
                     stype = None
             platform_macro = platform_macro_for_type(type_name)
             version_macro = version_macro_for_type(type_name)
-            block = struct_type(type_name, stype_value=stype)
+            block = wrap_struct_type(type_name, stype_value=stype)
             structs.append(dict(block=block, platform=platform_macro, version=version_macro))
 
     def sort_key(blk: dict) -> str:
@@ -445,11 +544,17 @@ def gen_type_wrappers():
     flags.sort(key=sort_key)
     handles.sort(key=sort_key)
     structs.sort(key=sort_key)
+    func_protos.sort(key=sort_key)
+    func_impls.sort(key=sort_key)
+    always_inline_impls.sort(key=sort_key)
 
     add_grouped_to_section(ENUMS_SECTION, enums)
     add_grouped_to_section(FLAGS_SECTION, flags)
     add_grouped_to_section(HANDLES_SECTION, handles)
     add_grouped_to_section(STRUCTS_SECTION, structs)
+    add_grouped_to_section(FUNCTIONS_PROTO_SECTION, func_protos)
+    add_grouped_to_section(FUNCTIONS_IMPL_SECTION, func_impls)
+    add_grouped_to_section(ALWAYS_INLINE_FUNCTIONS_SECTION, always_inline_impls)
 
 
 gen_type_wrappers()

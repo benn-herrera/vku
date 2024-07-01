@@ -217,9 +217,9 @@ STRUCTS_SECTION = [
     using VkType = T;
     static constexpr auto kStructType = VkStructureType(STYPE);
     InfoT() { *this = VkType{ kStructType }; }
-    InfoT(const VkType& rhs) { (VkType&)*this = rhs; }""",
-    STRUCT_ASSIGN_OPS,
-"""  };
+    InfoT(const VkType& rhs) { (VkType&)*this = rhs; this->sType = kStructType; }
+    VkType& operator =(const VkType& rhs) { (VkType&)*this = rhs; this->sType = kStructType; return *this; }
+  };
   
   template<typename T>
   struct DescriptionT : public T {
@@ -306,8 +306,9 @@ def wrap_enum_type(type_name: str) -> str:
     return f"  using {type_name[2:]} = EnumT<{type_name}>;"
 
 
-def wrap_flag_bits_type(type_name: str) -> str:
-    return f"  using {type_name[2:]} = FlagBitsT<{type_name}>;"
+def wrap_flag_bits_type(type_name: str, *, bit_width: int) -> str:
+    alias = "Flags64" if bit_width == 64 else f"FlagBitsT<{type_name}>"
+    return f"  using {type_name[2:]} = {alias};"
 
 
 def wrap_struct_type(type_name: str, *, stype_value: str) -> str:
@@ -459,17 +460,17 @@ def gen_type_wrappers():
             continue
         platform_macro = platform_macro_for_type(type_name)
         version_macro = version_macro_for_type(type_name)
+        # enums that are 64 bits wide are implemented as a sequence of static const VkFlags64 values
+        # instead of an actual enum, so attempting to overload to_string via just the type will not work.
+        bit_width = int(enum.attrib.get("bitwidth", "32"))
+        type_name_to_str = bit_width != 32
+
         if enum.attrib["type"] == "bitmask":
-            block = wrap_flag_bits_type(type_name)
+            block = wrap_flag_bits_type(type_name, bit_width=bit_width)
             section = flags
         else:
             block = wrap_enum_type(type_name)
             section = enums
-
-        # enums that are 64 bits wide are implemented as a sequence of static const VkFlags64 values
-        # instead of an actual enum, so attempting to overload to_string via just the type will not work.
-        enum_is_unique_type = enum.attrib.get("bitwidth") != "64"
-        type_name_to_str = not enum_is_unique_type
 
         section.append(
             dict(
@@ -523,7 +524,7 @@ def gen_type_wrappers():
             type_name = type_entry.attrib["name"]
             if type_name in VULKAN_SC_TYPES:
                 continue
-            if stype := type_entry.find("./member"):
+            if (stype := type_entry.find("./member")) is not None:
                 stype = stype.attrib.get("values")
                 if stype and not stype.startswith("VK_STRUCTURE_TYPE"):
                     stype = None

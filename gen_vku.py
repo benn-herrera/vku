@@ -11,16 +11,13 @@ Run that instead.
 """
 
 """
-TODO: 
-to_string(VkEnumType v)
+TODO:
 
-vk_format metadata utilities - is_srgb, is float, etc
+next: vk_format metadata utilities - is_srgb, is float, etc
 inline is_srgb(VkFormat f) {
-    return !!strstr("SRGB", to_string(f));
+    return !!strstr("SRGB", to_string(f)); // ?
+    // generate each function?
 }
-
-// will need to support dry run to get buffer req
-to_string<FlagBitType>(VkFlags flags)
 
 allow macro gated glm::vec2 glm::uvec2 convenience accessors for ViewPort etc?
 """

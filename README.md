@@ -25,12 +25,15 @@ All wrapped types work interchangeably with base types in the base API
 
 ### Metadata Functions
 * const char* vku::to_string(<VkEnumType>) added for all enum types
+    * Enum types that are aliased to VkFlags64 have explicitly named to_string()
+        * e.g. VkEnumTypeFoo -> enum_type_foo_to_string(VkEnumTypeFoo v); 
+        * This was the simplest answer, which is in keeping with the general intent
 * VK_FORMAT property getters and predicates
 * const char* vku::to_string(const VkStructType&, const void* member) for selected classes
 
 ## Usage
-* For Existing Versions
-    * Clone repo and add [vk-sdk-version]/include to your project's include path
+* For Existing Header Versions
+    * Clone repo and add vku/[vk-sdk-version]/include to your project's include path
     * all inline
         * add -DVKU_INLINE_ALL to compiler options
         * #include "vku/vku.h"

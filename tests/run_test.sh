@@ -30,13 +30,20 @@ set -eu
 } || (echo "run gen_vku.sh first." 1>&2 && false)
 
 # testing for real start with a clean slate
-if ! ${IS_DEV}; then
-  /bin/rm -rf build
-fi
 
 set -x
+(/bin/rm -rf build 2>&1 > /dev/null; exit 0)
 mkdir -p build
-(cd build && cmake .. -DVK_VERSION="${VK_VERSION}")
+(cd build && cmake .. -DVK_VERSION="${VK_VERSION}" -DVKU_IMPLEMENTATION_MACRO=VKU_IMPLEMENT)
+if (cd build && cmake --build . 2>&1 > /dev/null); then
+  echo "multiple uses of VKU_IMPLEMENT should not build successfully." 1>&2
+  exit 1
+fi
+echo "Multiple uses of VKU_IMPLEMENT correctly failed to build."
+
+(/bin/rm -rf build 2>&1 > /dev/null; exit 0)
+mkdir -p build
+(cd build && cmake .. -DVK_VERSION="${VK_VERSION}" -DVKU_IMPLEMENTATION_MACRO=VKU_INLINE_ALL)
 (cd build && cmake --build .)
 
 if [[ -d build/bin/Debug ]]; then

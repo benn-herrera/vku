@@ -1,11 +1,7 @@
 #include "vku/vku.h"
 #include "test.h"
 
-int checks = 0;
-int failures = 0;
-
-// TODO: generate test cases
-int main() {
+void module2() {
   VkImage vi = VK_NULL_HANDLE;
   vku::Image ui; (void)ui;
   CHECK(!ui);
@@ -23,13 +19,4 @@ int main() {
   CHECK(!strcmp(vku::to_string(VK_FORMAT_A2B10G10R10_SINT_PACK32), "VK_FORMAT_A2B10G10R10_SINT_PACK32"));
   CHECK(!strcmp(vku::to_string(VK_FORMAT_ASTC_12x12_SRGB_BLOCK), "VK_FORMAT_ASTC_12x12_SRGB_BLOCK"));
   CHECK(!vku::to_string(VkFormat(vku::Format::kInvalid)));
-
-  module2();
-
-  if (failures) {
-    fprintf(stderr, "FAILED %d/%d checks.\n", failures, checks);
-  } else {
-    printf("passed all %d checks.\n", checks);
-  }
-  return failures ? 1 : 0;
 }

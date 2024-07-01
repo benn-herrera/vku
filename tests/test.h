@@ -16,7 +16,4 @@ extern int failures;
 inline void noop() {
 }
 
-extern void test_vk_1_0();
-extern void test_vk_1_1();
-extern void test_vk_1_2();
-extern void test_vk_1_3();
+extern void module2();

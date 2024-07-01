@@ -8,7 +8,7 @@ project(integration_test LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 if(NOT VK_VERSION)
-    message(FATAL_ERROR "-DVK_VERSION=M.m.p must be specified on the cmake command line.")
+    message(FATAL_ERROR "-DVK_VERSION=v<M>.<m>.<p> e.g. v1.2.260 must be specified on the cmake command line.")
 endif()
 
 set(VKU_INCLUDE "${PROJECT_SOURCE_DIR}/../${VK_VERSION}/include")
@@ -27,5 +27,7 @@ add_executable(test
     "${VK_INCLUDE}/vulkan/vulkan.h"
  )
 set_target_properties(test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+add_compile_definitions(${VKU_IMPLEMENTATION_MACRO})
 
 target_link_libraries(test)

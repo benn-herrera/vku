@@ -138,7 +138,7 @@ ENUMS_SECTION = [
   struct EnumT {
     using UType = EnumT;
     using VkType = T;  
-    static constexpr auto kInvalid = (VkType)~0u;
+    static constexpr auto kInvalid = (VkType)0x7fffffff;
     EnumT(VkType i=(VkType)0) : v(i) {}""",
     PRIM_ASSIGN_OPS,
     CAST_OPS,

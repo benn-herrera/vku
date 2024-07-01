@@ -259,6 +259,12 @@ ALWAYS_INLINE_FUNCTIONS_SECTION = [
 """
   // always inlined functions
   template<typename T>
+  inline const char* to_string(const T v, const char* invalidStr) {
+    auto str = to_string(v);
+    return str ? str : invalidStr;
+  }
+  
+  template<typename T>
   inline const char* to_string(const VkPhysicalDeviceFeatures& s, const T& m) {
       return member_to_string_vp(s, &m);
   }"""[1:]

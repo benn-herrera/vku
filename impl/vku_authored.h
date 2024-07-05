@@ -64,7 +64,6 @@ namespace vku {
   // prototypes
   VKU_PROTO unsigned int get_uncompressed_image_sample_count(uvec2 image_size, unsigned int mip_max = ~0u, unsigned int array_len=1);
   VKU_PROTO unsigned int get_uncompressed_image_size_bytes(VkFormat format, const uvec2& image_size, bool mip_mapped, unsigned int array_len=1);
-  VKU_PROTO unsigned int get_uncompressed_sample_size_bytes(VkFormat f);
 
   // implementations
 #if defined(VKU_INLINE_ALL) || defined(VKU_IMPLEMENT)

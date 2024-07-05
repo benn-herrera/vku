@@ -24,7 +24,7 @@ allow macro gated glm::vec2 glm::uvec2 convenience accessors for ViewPort etc?
 
 assert len(sys.argv) == 3, "args must be paths to vk.xml vku.h"
 
-VK_XML, VKU_H = Path(sys.argv[1]), Path(sys.argv[2])
+VK_XML, VKU_H, VKU_AUTHORED_H = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[0]).with_name("vku_authored.h")
 
 assert ((VK_XML.suffix == ".xml") and VK_XML.exists() and (VKU_H.suffix == ".h")), "args must be paths to vk.xml vku.h"
 
@@ -37,12 +37,14 @@ FILE_HEADER = f"""
 // define VKU_IMPLEMENT in exactly on C++ source file before including vku/vku.h
 
 #if defined(VKU_INLINE_ALL)
-# define VKU_FUNC inline
+# define VKU_PROTO inline
+# define VKU_IMPL inline
 # if defined(VKU_IMPLEMENT)
 #   static_assert(false, "only one of VKU_INLINE_ALL, VKU_IMPLEMENT may be defined.");
 # endif
 #elif defined(VKU_IMPLEMENT)
-# define VKU_FUNC
+# define VKU_PROTO extern
+# define VKU_IMPL
 #endif // VKU_INLINE_ALL, VKU_IMPLEMENT
 
 #if !defined(VK_VERSION_1_0)
@@ -232,43 +234,21 @@ STRUCTS_SECTION = [
 """
 ]
 
-FUNCTION_PROTOS_HEADER = """
-// function prototypes
-#if !defined(VKU_INLINE_ALL)"""[1:]
+FUNCTION_PROTOS_HEADER = "// function prototypes"
 
 FUNCTIONS_PROTO_SECTION = [
-  "  extern const char* member_to_string_vp(const VkPhysicalDeviceFeatures&, const void* member);"
 ]
 
-FUNCTION_PROTOS_FOOTER = "#endif // VKU_INLINE_ALL"
+FUNCTION_PROTOS_FOOTER = ""
 
 FUNCTIONS_HEADER = """
   // function implementations
 #if defined(VKU_IMPLEMENT) || defined(VKU_INLINE_ALL)"""[1:]
 
 FUNCTIONS_IMPL_SECTION = [
-"""
-  VKU_FUNC const char* member_to_string_vp(const VkPhysicalDeviceFeatures& s, const void* member) {
-    return nullptr;
-  }"""[1:]
 ]
 
 FUNCTIONS_FOOTER = "#endif // VKU_IMPLEMENT || VKU_INLINE_ALL"
-
-ALWAYS_INLINE_FUNCTIONS_SECTION = [
-"""
-  // always inlined functions
-  template<typename T>
-  inline const char* to_string(const T v, const char* invalidStr) {
-    auto str = to_string(v);
-    return str ? str : invalidStr;
-  }
-  
-  template<typename T>
-  inline const char* to_string(const VkPhysicalDeviceFeatures& s, const T& m) {
-      return member_to_string_vp(s, &m);
-  }"""[1:]
-]
 
 FILE_FOOTER = "} // end namespace vku"
 
@@ -292,9 +272,8 @@ def write_vku_h():
         FUNCTIONS_HEADER,
         *FUNCTIONS_IMPL_SECTION,
         FUNCTIONS_FOOTER,
-        "",
-        *ALWAYS_INLINE_FUNCTIONS_SECTION,
-        FILE_FOOTER
+        FILE_FOOTER,
+        VKU_AUTHORED_H.read_text()
     ]
     os.makedirs(VKU_H.parent.as_posix(), exist_ok=True)
     VKU_H.write_text("\n".join(file_sections))
@@ -335,7 +314,7 @@ def to_snake(val: str) -> str:
 
 
 def to_string_decl(*, vk_type: str, decl: str, is_type_named: bool) -> str:
-    end = ';' if decl == "extern" else " {"
+    end = ';' if decl == "VKU_PROTO" else " {"
     if decl:
         decl = f"{decl} "
     type_pfx = f"{to_snake(vk_type[2:])}_" if is_type_named else ""
@@ -347,12 +326,12 @@ def to_string_decl(*, vk_type: str, decl: str, is_type_named: bool) -> str:
 
 
 def to_string_proto(vk_type: str, is_type_named: bool) -> str:
-    return to_string_decl(vk_type=vk_type, decl="extern", is_type_named=is_type_named)
+    return to_string_decl(vk_type=vk_type, decl="VKU_PROTO", is_type_named=is_type_named)
 
 
 def to_string_impl(vk_type: str, enum_vals: [str], is_type_named: bool) -> str:
     body = [
-        to_string_decl(vk_type=vk_type, decl="VKU_FUNC", is_type_named=is_type_named),
+        to_string_decl(vk_type=vk_type, decl="VKU_IMPL", is_type_named=is_type_named),
         "    switch(v) {",
     ]
 
@@ -453,7 +432,6 @@ def gen_type_wrappers():
     structs = []
     func_protos = []
     func_impls = []
-    always_inline_impls = []
 
     # wrap enum types (serial and flag bits)
     for enum in (
@@ -550,7 +528,6 @@ def gen_type_wrappers():
     structs.sort(key=sort_key)
     func_protos.sort(key=sort_key)
     func_impls.sort(key=sort_key)
-    always_inline_impls.sort(key=sort_key)
 
     add_grouped_to_section(ENUMS_SECTION, enums)
     add_grouped_to_section(FLAGS_SECTION, flags)
@@ -558,8 +535,45 @@ def gen_type_wrappers():
     add_grouped_to_section(STRUCTS_SECTION, structs)
     add_grouped_to_section(FUNCTIONS_PROTO_SECTION, func_protos)
     add_grouped_to_section(FUNCTIONS_IMPL_SECTION, func_impls)
-    add_grouped_to_section(ALWAYS_INLINE_FUNCTIONS_SECTION, always_inline_impls)
+
+
+def format_meta_decl(*, decl: str, name: str, rtype: str, extra_params: str | None) -> str:
+    if extra_params is not None:
+        extra_params = f", {extra_params}"
+    else:
+        extra_params = ""
+    end = ';' if decl == "VKU_PROTO" else " {"
+    return f"  {decl} {rtype} {name}(VkFormat f{extra_params}){end}"
+
+
+def format_meta_proto(*, name: str, rtype: str="unsigned int", extra_params: str | None = None) -> str:
+    return format_meta_decl(name=name, rtype=rtype, extra_params=extra_params, decl="VKU_PROTO")
+
+
+def format_meta_impl(*, name: str, body: str, rtype: str="unsigned int", extra_params: str | None = None) -> str:
+    return "\n".join([
+        format_meta_decl(name=name, rtype=rtype, extra_params=extra_params, decl="VKU_IMPL"),
+        body,
+        "  }\n"
+    ])
+
+
+"""  VKU_PROTO unsigned int get_uncompressed_sample_size_bytes(VkFormat f);"""
+"""  VKU_PROTO unsigned int get_uncompressed_sample_size_bytes(VkFormat f) {
+    // TODO: replace stub with generated version.
+  }"""
+
+
+def gen_format_metadata_functions():
+    meta_name = "get_uncompressed_sample_size_bytes"
+    FUNCTIONS_PROTO_SECTION.append(format_meta_proto(name=meta_name))
+    meta_body = \
+"""    (void)f;
+    // TODO: replace stub with implementation.
+    return 0;"""
+    FUNCTIONS_IMPL_SECTION.append(format_meta_impl(name=meta_name, body=meta_body))
 
 
 gen_type_wrappers()
+gen_format_metadata_functions()
 write_vku_h()

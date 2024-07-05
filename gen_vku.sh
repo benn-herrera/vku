@@ -62,7 +62,7 @@ if [[ ${PY_MAJ_VER:-0} -lt 3 || ${PY_MIN_VER:-0} -lt 11 ]]; then
   exit 1
 fi
 
-GEN_VKU_PY="${THIS_DIR}/gen_vku.py"
+GEN_VKU_PY="${THIS_DIR}/impl/gen_vku.py"
 VK_HEADERS_SANDBOX="${THIS_DIR}/${VK_HEADERS_NAME}"
 VK_XML="${VK_HEADERS_SANDBOX}/registry/vk.xml"
 

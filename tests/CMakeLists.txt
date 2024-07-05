@@ -28,6 +28,8 @@ add_executable(test
  )
 set_target_properties(test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
+set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT test)
+
 add_compile_definitions(${VKU_IMPLEMENTATION_MACRO})
 
 target_link_libraries(test)

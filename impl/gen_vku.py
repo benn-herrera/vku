@@ -70,9 +70,10 @@ FRIEND_FLAG_OP_FMT = """
     friend auto operator {OP}(const VkType lhs, const UType& rhs) {{ return VkFlags(lhs) {OP} VkFlags(rhs.v); }}
 """[1:-1]
 
-PRIM_MOD_OP_FMT = """
-    VkType operator {OP}(const VkType rhs) {{ v {OP} rhs; return v; }}
-"""[1:-1]
+
+def prim_mod_op(op: str) -> str:
+    return f"    VkType operator {op}(const VkType rhs) {{ v = (VkType)((VkFlags)v {op[:1]} (VkFlags)rhs); return v; }}"
+
 
 STRUCT_MOD_OP_FMT = """
     VkType& operator {OP}(const VkType& rhs) {{ (VkType&)*this {OP} rhs; return *this; }}
@@ -89,7 +90,7 @@ CAST_OPS = """
     const VkType* operator&() const { return &v; }
 """[1:-1]
 
-PRIM_ASSIGN_OPS = PRIM_MOD_OP_FMT.format(OP='=')
+PRIM_ASSIGN_OPS = "    VkType operator =(const VkType rhs) { v = rhs; return v; }"
 STRUCT_ASSIGN_OPS = STRUCT_MOD_OP_FMT.format(OP='=')
 
 BOOL_OPS = "\n".join([
@@ -98,11 +99,11 @@ BOOL_OPS = "\n".join([
 ])
 
 RMW_MOD_OPS = "\n".join([
-    PRIM_MOD_OP_FMT.format(OP='|='),
-    PRIM_MOD_OP_FMT.format(OP='&='),
-    PRIM_MOD_OP_FMT.format(OP='^='),
-    PRIM_MOD_OP_FMT.format(OP='+='),
-    PRIM_MOD_OP_FMT.format(OP='-='),
+    prim_mod_op("|="),
+    prim_mod_op("&="),
+    prim_mod_op("^="),
+    prim_mod_op("+="),
+    prim_mod_op("-="),
 ])
 
 FRIEND_COMP_OPS = "\n".join([
@@ -181,6 +182,7 @@ FLAGS_SECTION = [
     FlagBitsT(VkType i=(VkType)0) : v(i) {}""",
     PRIM_ASSIGN_OPS,
     CAST_OPS,
+    RMW_MOD_OPS,
     FRIEND_COMP_OPS,
     FRIEND_EQ_OPS,
     FRIEND_FLAG_OPS,
@@ -350,6 +352,7 @@ def to_string_impl(vk_type: str, enum_vals: [str], is_type_named: bool) -> str:
 PLATFORM_MACROS = {}
 PLATFORM_BY_TYPE = {}
 VULKAN_SC_TYPES = set()
+AUTHORED_TYPES = set(t for t in ("VkOffset2D", "VkExtent2D", "VkRect2D", "VkOffset3D", "VkExtent3D", "VkViewport"))
 
 VERSION_MACROS = set()
 VERSION_MACRO_BY_TYPE = {}
@@ -447,7 +450,7 @@ def gen_type_wrappers():
         # enums that are 64 bits wide are implemented as a sequence of static const VkFlags64 values
         # instead of an actual enum, so attempting to overload to_string via just the type will not work.
         bit_width = int(enum.attrib.get("bitwidth", "32"))
-        type_name_to_str = bit_width != 32
+        type_named_to_string = bit_width != 32
 
         if enum.attrib["type"] == "bitmask":
             block = wrap_flag_bits_type(type_name, bit_width=bit_width)
@@ -465,7 +468,7 @@ def gen_type_wrappers():
         )
         func_protos.append(
             dict(
-                block=to_string_proto(type_name, is_type_named=type_name_to_str),
+                block=to_string_proto(type_name, is_type_named=type_named_to_string),
                 platform=platform_macro,
                 version=version_macro
             )
@@ -479,7 +482,7 @@ def gen_type_wrappers():
         enum_vals = [e.attrib["name"] for e in enum.findall("./enum") if check_enum_val(e.attrib)]
         func_impls.append(
             dict(
-                block=to_string_impl(type_name, enum_vals, is_type_named=type_name_to_str),
+                block=to_string_impl(type_name, enum_vals, is_type_named=type_named_to_string),
                 platform=platform_macro,
                 version=version_macro
             )
@@ -506,7 +509,7 @@ def gen_type_wrappers():
             handles.append(dict(block=block, platform=platform_macro, version=version_macro))
         elif category == "struct":
             type_name = type_entry.attrib["name"]
-            if type_name in VULKAN_SC_TYPES:
+            if type_name in VULKAN_SC_TYPES or type_name in AUTHORED_TYPES:
                 continue
             if (stype := type_entry.find("./member")) is not None:
                 stype = stype.attrib.get("values")
@@ -516,6 +519,19 @@ def gen_type_wrappers():
             version_macro = version_macro_for_type(type_name)
             block = wrap_struct_type(type_name, stype_value=stype)
             structs.append(dict(block=block, platform=platform_macro, version=version_macro))
+        elif category == "bitmask":
+            if (type_def := type_entry.find("./type")) is None:
+                continue
+            if (type_name := type_entry.find("./name")) is None:
+                continue
+            if (requires := type_entry.attrib.get("requires")) is None:
+                continue
+            type_name = type_name.text
+            type_def = type_def.text
+            platform_macro = platform_macro_for_type(requires)
+            version_macro = version_macro_for_type(requires)
+            block = f"  using {type_name[2:]} = {type_def[2:]};"
+            flags.append(dict(block=block, platform=platform_macro, version=version_macro))
 
     def sort_key(blk: dict) -> str:
         p = blk['platform'] or "0"
@@ -546,11 +562,11 @@ def format_meta_decl(*, decl: str, name: str, rtype: str, extra_params: str | No
     return f"  {decl} {rtype} {name}(VkFormat f{extra_params}){end}"
 
 
-def format_meta_proto(*, name: str, rtype: str="unsigned int", extra_params: str | None = None) -> str:
+def format_meta_proto(*, name: str, rtype: str="uint32_t", extra_params: str | None = None) -> str:
     return format_meta_decl(name=name, rtype=rtype, extra_params=extra_params, decl="VKU_PROTO")
 
 
-def format_meta_impl(*, name: str, body: str, rtype: str="unsigned int", extra_params: str | None = None) -> str:
+def format_meta_impl(*, name: str, body: str, rtype: str="uint32_t", extra_params: str | None = None) -> str:
     return "\n".join([
         format_meta_decl(name=name, rtype=rtype, extra_params=extra_params, decl="VKU_IMPL"),
         body,
@@ -558,8 +574,8 @@ def format_meta_impl(*, name: str, body: str, rtype: str="unsigned int", extra_p
     ])
 
 
-"""  VKU_PROTO unsigned int get_uncompressed_sample_size_bytes(VkFormat f);"""
-"""  VKU_PROTO unsigned int get_uncompressed_sample_size_bytes(VkFormat f) {
+"""  VKU_PROTO uint32_t get_uncompressed_sample_size_bytes(VkFormat f);"""
+"""  VKU_PROTO uint32_t get_uncompressed_sample_size_bytes(VkFormat f) {
     // TODO: replace stub with generated version.
   }"""
 

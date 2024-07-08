@@ -317,7 +317,7 @@ namespace vku {
   }
 
   inline VkFormatFeatureFlags image_usage_to_format_feature_flags(VkImageUsageFlags usage) {
-    FormatFeatureFlagBits features;
+    VkFormatFeatureFlags features = VkFormatFeatureFlags(0);
     if (usage & VK_IMAGE_USAGE_TRANSFER_SRC_BIT) { features |= VK_FORMAT_FEATURE_TRANSFER_SRC_BIT; }
     if (usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT) { features |= VK_FORMAT_FEATURE_TRANSFER_DST_BIT; }
     if (usage & VK_IMAGE_USAGE_SAMPLED_BIT) { features |= VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT; }

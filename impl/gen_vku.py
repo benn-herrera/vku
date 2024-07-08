@@ -12,14 +12,7 @@ Run that instead.
 
 """
 TODO:
-
-next: vk_format metadata utilities - is_srgb, is float, etc
-inline is_srgb(VkFormat f) {
-    return !!strstr("SRGB", to_string(f)); // ?
-    // generate each function?
-}
-
-allow macro gated glm::vec2 glm::uvec2 convenience accessors for ViewPort etc?
+fill in stub for uint32_t get_uncompressed_sample_size(VkFormat f);
 """
 
 assert len(sys.argv) == 3, "args must be paths to vk.xml vku.h"
@@ -259,18 +252,13 @@ def write_vku_h():
     # Accumulate the results and write them out
     file_sections = [
         FILE_HEADER,
-        *ENUMS_SECTION,
-        "",
-        *FLAGS_SECTION,
-        "",
-        *HANDLES_SECTION,
-        "",
-        *STRUCTS_SECTION,
-        "",
+        # *ENUMS_SECTION, "",
+        # *FLAGS_SECTION, "",
+        # *HANDLES_SECTION, "",
+        *STRUCTS_SECTION, "",
         FUNCTION_PROTOS_HEADER,
         *FUNCTIONS_PROTO_SECTION,
-        FUNCTION_PROTOS_FOOTER,
-        "",
+        FUNCTION_PROTOS_FOOTER, "",
         FUNCTIONS_HEADER,
         *FUNCTIONS_IMPL_SECTION,
         FUNCTIONS_FOOTER,

@@ -52,15 +52,15 @@ namespace vku {{
 """[1:-1]
 
 FRIEND_OP_FMT = """
-    friend auto operator {OP}(const UType& lhs, const VkType rhs) {{ return lhs.v {OP} rhs; }}
-    friend auto operator {OP}(const VkType lhs, const UType& rhs) {{ return lhs {OP} rhs.v; }}
+    friend {RT} operator {OP}(const UType& lhs, const VkType rhs) {{ return lhs.v {OP} rhs; }}
+    friend {RT} operator {OP}(const VkType lhs, const UType& rhs) {{ return lhs {OP} rhs.v; }}
 """[1:-1]
 
 FRIEND_FLAG_OP_FMT = """
-    friend auto operator {OP}(const UType& lhs, const VkFlags rhs) {{ return VkFlags(lhs.v) {OP} rhs; }}
-    friend auto operator {OP}(const VkFlags lhs, const UType& rhs) {{ return lhs {OP} VkFlags(rhs.v); }}
-    friend auto operator {OP}(const UType& lhs, const VkType rhs) {{ return VkFlags(lhs.v) {OP} VkFlags(rhs); }}
-    friend auto operator {OP}(const VkType lhs, const UType& rhs) {{ return VkFlags(lhs) {OP} VkFlags(rhs.v); }}
+    friend VkFlags operator {OP}(const UType& lhs, const VkFlags rhs) {{ return VkFlags(lhs.v) {OP} rhs; }}
+    friend VkFlags operator {OP}(const VkFlags lhs, const UType& rhs) {{ return lhs {OP} VkFlags(rhs.v); }}
+    friend VkFlags operator {OP}(const UType& lhs, const VkType rhs) {{ return VkFlags(lhs.v) {OP} VkFlags(rhs); }}
+    friend VkFlags operator {OP}(const VkType lhs, const UType& rhs) {{ return VkFlags(lhs) {OP} VkFlags(rhs.v); }}
 """[1:-1]
 
 
@@ -73,7 +73,7 @@ STRUCT_MOD_OP_FMT = """
 """[1:-1]
 
 UNARY_OP_FMT = """
-    {RV}operator {OP}(){{ return {OP}(v); }}
+    {RT}operator {OP}(){{ return {OP}(v); }}
 """[1:-1]
 
 CAST_OPS = """
@@ -87,8 +87,8 @@ PRIM_ASSIGN_OPS = "    VkType operator =(const VkType rhs) { v = rhs; return v; 
 STRUCT_ASSIGN_OPS = STRUCT_MOD_OP_FMT.format(OP='=')
 
 BOOL_OPS = "\n".join([
-    UNARY_OP_FMT.format(RV='', OP='bool'),
-    UNARY_OP_FMT.format(RV='auto ', OP='!'),
+    UNARY_OP_FMT.format(RT='', OP='bool'),
+    UNARY_OP_FMT.format(RT='bool ', OP='!'),
 ])
 
 RMW_MOD_OPS = "\n".join([
@@ -100,23 +100,23 @@ RMW_MOD_OPS = "\n".join([
 ])
 
 FRIEND_COMP_OPS = "\n".join([
-    FRIEND_OP_FMT.format(OP='<'),
-    FRIEND_OP_FMT.format(OP='<='),
-    FRIEND_OP_FMT.format(OP='>'),
-    FRIEND_OP_FMT.format(OP='>=')
+    FRIEND_OP_FMT.format(RT='bool', OP='<'),
+    FRIEND_OP_FMT.format(RT='bool', OP='<='),
+    FRIEND_OP_FMT.format(RT='bool', OP='>'),
+    FRIEND_OP_FMT.format(RT='bool', OP='>=')
 ])
 
 FRIEND_EQ_OPS = "\n".join([
-    FRIEND_OP_FMT.format(OP='=='),
-    FRIEND_OP_FMT.format(OP='!='),
+    FRIEND_OP_FMT.format(RT='bool', OP='=='),
+    FRIEND_OP_FMT.format(RT='bool', OP='!='),
 ])
 
 FRIEND_EXPR_OPS = "\n".join([
-    FRIEND_OP_FMT.format(OP='|'),
-    FRIEND_OP_FMT.format(OP='&'),
-    FRIEND_OP_FMT.format(OP='^'),
-    FRIEND_OP_FMT.format(OP='+'),
-    FRIEND_OP_FMT.format(OP='-')
+    FRIEND_OP_FMT.format(RT='VkType', OP='|'),
+    FRIEND_OP_FMT.format(RT='VkType', OP='&'),
+    FRIEND_OP_FMT.format(RT='VkType', OP='^'),
+    FRIEND_OP_FMT.format(RT='VkType', OP='+'),
+    FRIEND_OP_FMT.format(RT='VkType', OP='-')
 ])
 
 # VkFlags return value (maps from enum flag bit to Flags)

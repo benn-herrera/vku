@@ -28,6 +28,12 @@ add_executable(test
  )
 set_target_properties(test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
+if(CMAKE_CXX_COMPILER MATCHES "cl.exe")
+    add_compile_options(/Wall /WX)
+else()
+    add_compile_options(-Wall -Werror)
+endif()
+
 set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT test)
 
 add_compile_definitions(${VKU_IMPLEMENTATION_MACRO})

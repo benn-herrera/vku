@@ -18,9 +18,6 @@ namespace vku {
     using Coord = T;
     Coord x;
     Coord y;
-
-    // minimum needed for utility functions
-    vec2T operator-(const vec2T& rhs) const { return { x - rhs.x, y - rhs.y }; }
   };
 
   template<typename T>
@@ -48,83 +45,37 @@ namespace vku {
     Offset2D() : VkOffset2D(VkOffset2D{}) {}
     Offset2D(const VkOffset2D& i) : VkOffset2D(i) {}
     Offset2D(const Offset2D&) = default;
-    Offset2D(const ivec2& i) {
-      x = int32_t(i.x);
-      y = int32_t(i.y);
-    }
-    Offset2D(const uvec2& i) {
-      x = int32_t(i.x);
-      y = int32_t(i.y);
-    }
-    Offset2D(const vec2& i) {
-      x = int32_t(i.x);
-      y = int32_t(i.y);
+    Offset2D(const ivec2& i) { *this = i; }
+    Offset2D& operator=(const Offset2D&) = default;
+    Offset2D& operator=(const VkOffset2D& rhs) {
+        ((VkOffset2D&)*this) = rhs;
+        return *this;
     }
     Offset2D& operator=(const ivec2& rhs) {
       x = rhs.x;
       y = rhs.y;
       return *this;
     }
-    Offset2D& operator=(const uvec2& rhs) {
-      x = int32_t(rhs.x);
-      y = int32_t(rhs.y);
-      return *this;
-    }
-    Offset2D& operator=(const vec2& rhs) {
-      x = int32_t(rhs.x);
-      y = int32_t(rhs.y);
-      return *this;
-    }
-    operator ivec2() const {
-      return {x, y};
-    }
-    operator uvec2() const {
-      return {uint32_t(x), uint32_t(y)};
-    }
-    operator vec2() const {
-      return {float(x), float(y)};
-    }
+    operator ivec2() const { return {x, y}; }
   };
 
   struct Extent2D : VkExtent2D {
     Extent2D() : VkExtent2D(VkExtent2D{}) {}
     Extent2D(const VkExtent2D& i) : VkExtent2D(i) {}
     Extent2D(const Extent2D&) = default;
-    Extent2D(const uvec2& i) {
-      width = i.x;
-      height = i.y;
-    }
-    Extent2D(const ivec2& i) {
-      width = uint32_t(i.x);
-      height = uint32_t(i.y);
-    }
-    Extent2D(const vec2& i) {
-      width = uint32_t(i.x);
-      height = uint32_t(i.y);
+    Extent2D(const uvec2& i) { *this = i; }
+    Extent2D& operator=(const Extent2D&) = default;
+    Extent2D& operator=(const VkExtent2D& rhs) {
+      ((VkExtent2D&)*this) = rhs;
+      return *this;
     }
     Extent2D& operator=(const uvec2& rhs) {
       width = rhs.x;
       height = rhs.y;
       return *this;
     }
-    Extent2D& operator=(const ivec2& rhs) {
-      width = uint32_t(rhs.x);
-      height = uint32_t(rhs.y);
-      return *this;
-    }
-    Extent2D& operator=(const vec2& rhs) {
-      width = uint32_t(rhs.x);
-      height = uint32_t(rhs.y);
-      return *this;
-    }
     operator uvec2() const {
       return {width, height};
-    }
-    operator ivec2() const {
-      return {int32_t(width), int32_t(height)};
-    }
-    operator vec2() const {
-      return {float(width), float(height)};
     }
   };
 
@@ -133,37 +84,35 @@ namespace vku {
     Rect2D(const Rect2D&) = default;
     Rect2D(const VkRect2D& i) : VkRect2D(i) {}
     Rect2D(const Offset2D& os, const Extent2D& ex) { offset = os; extent = ex; }
+    Rect2D(const ivec2& os, const uvec2& ex) { vkuOffset() = os; vkuExtent() = ex; }
     explicit Rect2D(const VkViewport& vp);
     explicit Rect2D(const Extent2D& ex) { offset = Offset2D(); extent = ex; }
+    explicit Rect2D(const uvec2& ex) { offset = Offset2D(); vkuExtent() = ex; }
     const Offset2D& vkuOffset() const { return (const Offset2D&)offset; }
     const Extent2D& vkuExtent() const { return (const Extent2D&)extent; }
     Offset2D& vkuOffset() { return (Offset2D&)offset; }
     Extent2D& vkuExtent() { return (Extent2D&)extent; }
+    Rect2D& operator=(const Rect2D&) = default;
+    Rect2D& operator=(const VkRect2D& rhs) {
+      ((VkRect2D&)*this) = rhs;
+      return *this;
+    }
   };
 
   struct Offset3D : VkOffset3D {
     Offset3D() : VkOffset3D(VkOffset3D{}) {}
     Offset3D(const VkOffset3D& i) : VkOffset3D(i) {}
     Offset3D(const Offset3D&) = default;
-    Offset3D(const ivec3& i) {
-      x = i.x;
-      y = i.y;
-      z = i.z;
-    }
-    Offset3D(const uvec3& i) {
-      x = int32_t(i.x);
-      y = int32_t(i.y);
-      z = int32_t(i.x);
-    }
-    Offset3D(const vec3& i) {
-      x = int32_t(i.x);
-      y = int32_t(i.y);
-      z = int32_t(i.x);
-    }
-    Offset3D(const VkOffset2D& i, int32_t iz) {
+    Offset3D(const ivec3& i) { *this = i; }
+    explicit Offset3D(const VkOffset2D& i, int32_t iz=0) {
       x = i.x;
       y = i.y;
       z = iz;
+    }
+    Offset3D& operator=(const Offset3D&) = default;
+    Offset3D& operator=(const VkOffset3D& rhs) {
+      ((VkOffset3D&)*this) = rhs;
+      return *this;
     }
     Offset3D& operator=(const ivec3& rhs) {
       x = rhs.x;
@@ -171,26 +120,8 @@ namespace vku {
       z = rhs.z;
       return *this;
     }
-    Offset3D& operator=(const uvec3& rhs) {
-      x = int32_t(rhs.x);
-      y = int32_t(rhs.y);
-      z = int32_t(rhs.z);
-      return *this;
-    }
-    Offset3D& operator=(const vec3& rhs) {
-      x = int32_t(rhs.x);
-      y = int32_t(rhs.y);
-      z = int32_t(rhs.z);
-      return *this;
-    }
     operator ivec3() const {
       return {x, y, z};
-    }
-    operator uvec3() const {
-      return {uint32_t(x), uint32_t(y), uint32_t(z)};
-    }
-    operator vec3() const {
-      return {float(x), float(y), float(z)};
     }
   };
 
@@ -198,20 +129,16 @@ namespace vku {
     Extent3D() : VkExtent3D(VkExtent3D{}) {}
     Extent3D(const VkExtent3D& i) : VkExtent3D(i) {}
     Extent3D(const Extent3D&) = default;
-    Extent3D(const VkExtent2D& i, uint32_t iz) {
+    explicit Extent3D(const VkExtent2D& i, uint32_t _depth=1) {
       width = i.width;
       height = i.height;
-      depth = iz;
+      depth = _depth;
     }
-    Extent3D(const uvec3& i) {
-      width = i.x;
-      height = i.y;
-      depth = i.z;
-    }
-    Extent3D(const ivec3& i) {
-      width = uint32_t(i.x);
-      height = uint32_t(i.y);
-      depth = uint32_t(i.z);
+    Extent3D(const uvec3& i) { *this = i; }
+    Extent3D& operator=(const Extent3D&) = default;
+    Extent3D& operator=(const VkExtent3D& rhs) {
+      ((VkExtent3D&)*this) = rhs;
+      return *this;
     }
     Extent3D& operator=(const uvec3& rhs) {
       width = rhs.x;
@@ -219,46 +146,36 @@ namespace vku {
       depth = rhs.z;
       return *this;
     }
-    Extent3D& operator=(const ivec3& rhs) {
-      width = uint32_t(rhs.x);
-      height = uint32_t(rhs.y);
-      depth = uint32_t(rhs.z);
-      return *this;
-    }
-    Extent3D& operator=(const vec3& rhs) {
-      width = uint32_t(rhs.x);
-      height = uint32_t(rhs.y);
-      depth = uint32_t(rhs.z);
-      return *this;
-    }
     operator uvec3() const {
       return {width, height, depth};
-    }
-    operator ivec3() const {
-      return {int32_t(width), int32_t(height), int32_t(depth)};
-    }
-    operator vec3() const {
-      return {float(width), float(height), float(depth)};
     }
   };
 
   struct Viewport : VkViewport {
-    Viewport() : VkViewport(VkViewport{}) { maxDepth = 1.0f; }
+    Viewport() : VkViewport(VkViewport{}) {}
     Viewport(const Viewport&) = default;
     Viewport(const VkViewport& i) : VkViewport(i) {}
-    explicit Viewport(const VkRect2D& i) {
-      setOffset(i.offset);
-      setExtent(i.extent);
+    explicit Viewport(const VkRect2D& i, float _maxDepth = 1.0f) {
+      maxDepth = _maxDepth;
+      offset() = { float(i.offset.x), float(i.offset.y) };
+      extent() = { float(i.extent.width), float(i.extent.height) };
     }
-    Viewport(const vec2& offset, const vec2& extent) : Viewport() { setOffset(offset); setExtent(extent); }
-    explicit Viewport(const vec2& extent) : Viewport() { setExtent(extent); }
+    Viewport(const vec2& _offset, const vec2& _extent, float _maxDepth=1.0f) {
+      maxDepth = _maxDepth;
+      offset() = _offset;
+      extent() = _extent;
+    }
+    explicit Viewport(const vec2& _extent) : Viewport() { extent() = _extent; }
 
-    vec2 getOffset() const { return {x, y}; }
-    vec2 getExtent() const { return {width, height}; }
-    void setOffset(const vec2& offset) { x = offset.x; y = offset.y; }
-    void setExtent(const vec2& extent) { width = extent.x; height = extent.y; }
-    void setOffset(const VkOffset2D& offset) { x = float(offset.x); y = float(offset.y); }
-    void setExtent(const VkExtent2D& extent) { width = float(extent.width); height = float(extent.height); }
+    Viewport& operator=(const Viewport&) = default;
+    Viewport& operator=(const VkViewport& rhs) {
+      ((VkViewport&)*this) = rhs;
+      return *this;
+    }
+    const vec2& offset() const { return *((const vec2*) &x); }
+    const vec2& extent() const { return *((const vec2*) &width); }
+    vec2& offset() { return *((vec2*) &x); }
+    vec2& extent() { return *((vec2*) &width); }
   };
 
   inline Rect2D::Rect2D(const VkViewport& vp) {
@@ -293,13 +210,15 @@ namespace vku {
   // implementations
 #if defined(VKU_INLINE_ALL) || defined(VKU_IMPLEMENT)
   VKU_IMPL uint32_t get_uncompressed_image_sample_count(uvec2 image_size, uint32_t mip_max, uint32_t array_len) {
-    for (uint32_t m = 0, c = 0; m < mip_max; ++m, image_size.x >>= 1, image_size.y >>= 1) {
+    uint32_t c = 0;
+    for (uint32_t m = 0; m < mip_max; ++m, image_size.x >>= 1, image_size.y >>= 1) {
       if (auto mip_sample_count = image_size.x * image_size.y) {
         c += mip_sample_count;
         continue;
       }
-      return c * array_len;
+      break;
     }
+    return c * array_len;
   }
 
   VKU_IMPL uint32_t get_uncompressed_image_size_bytes(VkFormat format, const uvec2& image_size, bool mip_mapped, uint32_t array_len) {

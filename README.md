@@ -17,7 +17,22 @@
     * Copy constructor and assignment operators safeguard sType value
 * Some utility functions take or return dimensions
   * If VKU_USE_GLM is defined glm vector types will be used
-  * If not, simple 2 and 3 vector structs are used
+  * If not, simple structs defined.
+  * Whether via GLM or simple structs these types are available
+    * float coords: vec2, vec3
+    * int32_t coords: ivec2, ivec3
+    * uint32_t coords: uvec2, uvec3
+* Several spatial structs subclassed for conversion and assignment convenience
+    * VkOffset2D, VkOffset3D
+      * easy conversion from/to ivec2, ivec3
+    * VkExtent2D, VkExtent3D
+      * easy conversion to/from uvec2, uvec3
+    * VkRect2D
+      * easy construction from ivec2 offset + uvec2 extent
+      * easy conversion to/from VkViewport
+    * VkViewport
+      * easy conversion to/from VkRect2D
+      * easy assignment to offset & extent from vector types
 * Simple zero-init wrappers for enum, flags, and handle types
   * More for completeness of type space than massive utility 
 * All types are mix & match with base API - incremental integration is painless

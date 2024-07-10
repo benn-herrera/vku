@@ -18,8 +18,8 @@ __EOF
 
 case "${VK_VERSION}" in
   "v0.0.0") IS_DEV=true;;
-  "") usage 1;;
-  *) IS_DEV=false;;
+  v*) IS_DEV=false;;
+  *) usage 1;;
 esac
 
 cd "${THIS_DIR}"
@@ -29,24 +29,47 @@ set -eu
   test -f "../${VK_VERSION}/include/vku/vku.h"
 } || (echo "run gen_vku.sh first." 1>&2 && false)
 
-# testing for real start with a clean slate
+function gen() {
+  (/bin/rm -rf build 2> /dev/null; exit 0)
+  mkdir -p build
+  if (cd build && cmake .. -DVK_VERSION="${VK_VERSION}" "${@}" 2>&1) > build/gen.log; then
+    return 0
+  fi
+  cat build/gen.log 1>&2
+  return 1
+}
+
+function build() {
+  if (cd build && cmake --build . 2>&1) > build/build.log; then
+    return 0
+  fi
+  cat build/build.log 1>&2
+  return 1
+}
+
+function run() {
+  local cfg_dir=""
+  if [[ -d build/bin/Debug ]]; then
+    cfg_dir="/Debug"
+  fi
+  ./build/bin${cfg_dir:-""}/test
+}
+
+function gen_build_run() {
+  gen "${@}" && build && run
+}
 
 set -x
-(/bin/rm -rf build 2>&1 > /dev/null; exit 0)
-mkdir -p build
-(cd build && cmake .. -DVK_VERSION="${VK_VERSION}" -DVKU_IMPLEMENTATION_MACRO=VKU_IMPLEMENT)
-if (cd build && cmake --build . 2>&1 > /dev/null); then
+
+gen -DVKU_IMPLEMENTATION_MACRO=VKU_IMPLEMENT
+if (build 2> /dev/null); then
   echo "multiple uses of VKU_IMPLEMENT should not build successfully." 1>&2
   exit 1
 fi
 echo "Multiple uses of VKU_IMPLEMENT correctly failed to build."
 
-(/bin/rm -rf build 2>&1 > /dev/null; exit 0)
-mkdir -p build
-(cd build && cmake .. -DVK_VERSION="${VK_VERSION}" -DVKU_IMPLEMENTATION_MACRO=VKU_INLINE_ALL)
-(cd build && cmake --build .)
+gen_build_run -DVKU_IMPLEMENTATION_MACRO=VKU_INLINE_ALL -DCMAKE_CXX_STANDARD=11
 
-if [[ -d build/bin/Debug ]]; then
-  CFG_DIR="/Debug"
-fi
-./build/bin${CFG_DIR:-""}/test
+gen_build_run -DVKU_IMPLEMENTATION_MACRO=VKU_INLINE_ALL -DCMAKE_CXX_STANDARD=17
+
+gen_build_run -DVKU_IMPLEMENTATION_MACRO=VKU_INLINE_ALL -DCMAKE_CXX_STANDARD=20

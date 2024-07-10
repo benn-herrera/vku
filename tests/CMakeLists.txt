@@ -5,11 +5,11 @@ set(CMAKE_CONFIGURATION_TYPES Debug)
 
 project(integration_test LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
-
 if(NOT VK_VERSION)
     message(FATAL_ERROR "-DVK_VERSION=v<M>.<m>.<p> e.g. v1.2.260 must be specified on the cmake command line.")
 endif()
+
+message("CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}")
 
 set(VKU_INCLUDE "${PROJECT_SOURCE_DIR}/../${VK_VERSION}/include")
 set(VK_INCLUDE "${PROJECT_SOURCE_DIR}/../Vulkan-Headers/include")

@@ -252,9 +252,9 @@ def write_vku_h():
     # Accumulate the results and write them out
     file_sections = [
         FILE_HEADER,
-        # *ENUMS_SECTION, "",
-        # *FLAGS_SECTION, "",
-        # *HANDLES_SECTION, "",
+        *ENUMS_SECTION, "",
+        *FLAGS_SECTION, "",
+        *HANDLES_SECTION, "",
         *STRUCTS_SECTION, "",
         FUNCTION_PROTOS_HEADER,
         *FUNCTIONS_PROTO_SECTION,

@@ -541,20 +541,43 @@ def gen_type_wrappers():
     add_grouped_to_section(FUNCTIONS_IMPL_SECTION, func_impls)
 
 
-def format_meta_decl(*, decl: str, name: str, rtype: str, extra_params: str | None) -> str:
+def format_meta_decl(
+        *,
+        decl: str,
+        name: str,
+        rtype: str,
+        extra_params: str | None = None,
+        doc_line: str | None = None
+) -> str:
     if extra_params is not None:
         extra_params = f", {extra_params}"
     else:
         extra_params = ""
+    if doc_line is not None:
+        doc_line = f"  // {doc_line}\n"
+    else:
+        doc_line = ""
     end = ';' if decl == "VKU_PROTO" else " {"
-    return f"  {decl} {rtype} {name}(VkFormat f{extra_params}){end}"
+    return f"{doc_line}  {decl} {rtype} {name}(VkFormat f{extra_params}){end}"
 
 
-def format_meta_proto(*, name: str, rtype: str="uint32_t", extra_params: str | None = None) -> str:
-    return format_meta_decl(name=name, rtype=rtype, extra_params=extra_params, decl="VKU_PROTO")
+def format_meta_proto(
+        *,
+        name: str,
+        rtype: str="uint32_t",
+        extra_params: str | None = None,
+        doc_line: str | None = None,
+) -> str:
+    return format_meta_decl(name=name, rtype=rtype, extra_params=extra_params, doc_line=doc_line, decl="VKU_PROTO")
 
 
-def format_meta_impl(*, name: str, body: str, rtype: str="uint32_t", extra_params: str | None = None) -> str:
+def format_meta_impl(
+        *,
+        name: str,
+        body: str,
+        rtype: str="uint32_t",
+        extra_params: str | None = None,
+) -> str:
     return "\n".join([
         format_meta_decl(name=name, rtype=rtype, extra_params=extra_params, decl="VKU_IMPL"),
         body,
@@ -562,20 +585,116 @@ def format_meta_impl(*, name: str, body: str, rtype: str="uint32_t", extra_param
     ])
 
 
-"""  VKU_PROTO uint32_t get_uncompressed_sample_size_bytes(VkFormat f);"""
-"""  VKU_PROTO uint32_t get_uncompressed_sample_size_bytes(VkFormat f) {
-    // TODO: replace stub with generated version.
-  }"""
+def collect_format_data():
+    vk_formats = []
+    for format_entry in REGISTRY.find("./formats").findall("./format"):
+        comp_names = []
+        comp_bit_counts = set()
+        comp_num_types = set()
+        for component_entry in format_entry.findall("./component"):
+            comp_name = component_entry.attrib["name"]
+            bits = component_entry.attrib["bits"]
+            bits = int(bits) if bits != "compressed" else None
+            num_type = component_entry.attrib["numericFormat"]
+            comp_names.append(comp_name)
+            comp_bit_counts.add(bits)
+            comp_num_types.add(num_type)
+        name = format_entry.attrib["name"]
+        size_bytes = int(format_entry.attrib["blockSize"])
+        texel_count = int(format_entry.attrib["texelsPerBlock"])
+        if texel_count > 1:
+            block_size = format_entry.attrib["blockExtent"]
+            block_size = tuple(int(d) for d in block_size.split(",")[:2])
+        else:
+            block_size = (1, 1)
+        vk_formats.append({
+            "name": name,
+            "size_bytes": size_bytes,
+            "block_size": block_size,
+            "comp_names": comp_names,
+            "comp_num_types": comp_num_types,
+            "comp_bit_counts": comp_bit_counts
+        })
+    return vk_formats
 
 
 def gen_format_metadata_functions():
-    meta_name = "get_uncompressed_sample_size_bytes"
-    FUNCTIONS_PROTO_SECTION.append(format_meta_proto(name=meta_name))
-    meta_body = \
-"""    (void)f;
-    // TODO: replace stub with implementation.
-    return 0;"""
-    FUNCTIONS_IMPL_SECTION.append(format_meta_impl(name=meta_name, body=meta_body))
+    vk_formats = collect_format_data()
+    STRUCTS_SECTION.append("""
+  enum class CompressionScheme : uint8_t {
+    None,
+    BC1,
+    BC2,
+    BC3,
+    BC4,
+    BC5,
+    BC6H,
+    BC7,    
+    EAC,
+    ETC2,
+    ASTC,
+  };
+  enum class ChannelType : uint8_t {
+    R, G, B, A, D, S
+  };  
+  enum class NumericFormat : uint8_t {
+    UINT,
+    SINT,
+    UNORM,
+    SNORM,    
+    USCALED,
+    SSCALED,    
+    UFLOAT,
+    SFLOAT
+  };
+  struct ChannelMetadata {
+    ChannelType type;
+    NumericFormat numericFormat;
+    uint8_t bitCount;
+    // 0 for non-packed
+    uint8_t bitShift;
+  };
+  struct FormatMetadata {
+    CompressionScheme compression;  
+    uint8_t blockWidth;
+    uint8_t blockHeight;
+    uint8_t blockSizeBytes;
+    uint8_t isPacked;
+    uint8_t isSRGB;
+    uint8_t areChannelsUniform;
+    uint8_t channelCount;
+    ChannelMetadata channels[4];
+  };  
+""")
+    FUNCTIONS_PROTO_SECTION.append("")
+    FUNCTIONS_IMPL_SECTION.append("")
+
+    func_info = {"name": "get_uncompressed_sample_size_bytes", "rtype": "uint32_t"}
+    doc_line = None
+    FUNCTIONS_PROTO_SECTION.append(format_meta_proto(doc_line=doc_line, **func_info))
+    meta_body = [
+        "    switch(f) {"
+    ]
+    for vk_format in vk_formats:
+        if vk_format["block_size"] != (1, 1):
+            continue
+        meta_body.append(f"    case {vk_format['name']}: return {vk_format['size_bytes']};")
+    meta_body.append("    default: break;\n    }\n    return {};")
+    FUNCTIONS_IMPL_SECTION.append(format_meta_impl(body="\n".join(meta_body), **func_info))
+
+    func_info = {"name": "get_compressed_block_size", "rtype": "uvec3"}
+    doc_line = "x,y texel block size, z block size bytes"
+    FUNCTIONS_PROTO_SECTION.append(format_meta_proto(doc_line=doc_line, **func_info))
+    meta_body = [
+        "    switch(f) {"
+    ]
+    for vk_format in vk_formats:
+        if vk_format["block_size"] == (1, 1):
+            continue
+        block_size = f"{{{vk_format['block_size'][0]}, {vk_format['block_size'][1]}, {vk_format['size_bytes']}}}"
+        meta_body.append(f"    case {vk_format['name']}: return {block_size};")
+    meta_body.append("    default: break;\n    }\n    return {};")
+    FUNCTIONS_IMPL_SECTION.append(format_meta_impl(body="\n".join(meta_body), **func_info))
 
 
 gen_type_wrappers()

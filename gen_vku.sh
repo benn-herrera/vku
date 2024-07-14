@@ -75,6 +75,8 @@ fi
 (cd "${VK_HEADERS_SANDBOX}" && git fetch --tags)
 
 if ${IS_DEV}; then
+  VK_HEADERS_TAG=$(cd "${VK_HEADERS_SANDBOX}" && git tag | grep -e "${DEFAULT_SDK_VER//\./\\.}" | sort -Vr | head -1)
+  (cd "${VK_HEADERS_SANDBOX}" && git -c advice.detachedHead=false checkout "${VK_HEADERS_TAG}")
   VK_HEADERS_TAG="v0.0.0"
 else
   VK_HEADERS_TAG=$(cd "${VK_HEADERS_SANDBOX}" && git tag | grep -e "${VK_SDK_VER//\./\\.}" | sort -Vr | head -1)

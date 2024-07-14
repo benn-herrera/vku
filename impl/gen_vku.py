@@ -831,7 +831,7 @@ def collect_format_data():
             compression = None
         if packed is not None:
             packed = int(packed)
-        component_entries = format_entry.findall("./component")
+        channel_entries = format_entry.findall("./component")
 
         # special handling needed.
         if name[len('VK_FORMAT_')] == 'E' and name[len('VK_FORMAT_') + 1] in "123456789":
@@ -840,19 +840,15 @@ def collect_format_data():
             channels.append(
                 dict(name='E', bit_count=bit_count, num_type='SINT', shift=(32 - bit_count))
             )
-        for component_entry in component_entries:
-            comp_name = component_entry.attrib["name"]
-            bits = component_entry.attrib["bits"]
+        for channel_entry in channel_entries:
+            chan_name = channel_entry.attrib["name"]
+            bits = channel_entry.attrib["bits"]
             bits = int(bits) if bits != "compressed" else None
-            num_type = component_entry.attrib["numericFormat"]
-            channels.append(dict(name=comp_name, bit_count=bits, num_type=num_type))
+            num_type = channel_entry.attrib["numericFormat"]
+            channels.append(dict(name=chan_name, bit_count=bits, num_type=num_type))
         size_bytes = int(format_entry.attrib["blockSize"])
-        texel_count = int(format_entry.attrib["texelsPerBlock"])
-        if texel_count > 1:
-            block_size = format_entry.attrib["blockExtent"]
-            block_size = tuple(int(d) for d in block_size.split(",")[:2])
-        else:
-            block_size = (1, 1)
+        block_size = format_entry.attrib.get("blockExtent", "1,1")
+        block_size = tuple(int(d) for d in block_size.split(",")[:2])
         vk_formats.append({
             "name": name,
             "size_bytes": size_bytes,
@@ -945,7 +941,7 @@ def gen_video_metadata(vk_format: dict) -> str:
 
     block_width = vk_format['block_size'][0]
     size_bytes = vk_format['size_bytes']
-    channel_count = len(vk_format['channels'])
+    channel_count = len(set(c['name'] for c in vk_format['channels']))
     num_format = vk_format['channels'][0]['num_type']
 
     meta = [

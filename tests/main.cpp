@@ -14,13 +14,10 @@ void spot_check_format_to_str() {
 }
 
 void spot_check_get_format_metadata() {
-  CHECK(bool(vku::get_uncompressed_format_metadata(VK_FORMAT_BC1_RGB_UNORM_BLOCK)) == false);
-  CHECK(!vku::get_uncompressed_format_metadata(VK_FORMAT_BC1_RGB_UNORM_BLOCK));
-  CHECK(bool(vku::get_video_format_metadata(VK_FORMAT_BC1_RGB_UNORM_BLOCK)) == false);
-  CHECK(!vku::get_video_format_metadata(VK_FORMAT_BC1_RGB_UNORM_BLOCK));
-
   {
     auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_R4G4_UNORM_PACK8);
+    CHECK(!vku::get_compressed_format_metadata(VK_FORMAT_R4G4_UNORM_PACK8));
+    CHECK(!vku::get_video_format_metadata(VK_FORMAT_R4G4_UNORM_PACK8));
     CHECK(md);
     CHECK(!md == false);
     CHECK(md.is_packed());
@@ -50,6 +47,8 @@ void spot_check_get_format_metadata() {
   }
   {   
     auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_R10X6G10X6_UNORM_2PACK16);
+    CHECK(!vku::get_compressed_format_metadata(VK_FORMAT_R10X6G10X6_UNORM_2PACK16));
+    CHECK(!vku::get_video_format_metadata(VK_FORMAT_R10X6G10X6_UNORM_2PACK16));
     CHECK(md);
     CHECK(!md == false);
     CHECK(md.is_packed());
@@ -79,6 +78,8 @@ void spot_check_get_format_metadata() {
   }
   {
     auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_D16_UNORM);
+    CHECK(!vku::get_compressed_format_metadata(VK_FORMAT_D16_UNORM));
+    CHECK(!vku::get_video_format_metadata(VK_FORMAT_D16_UNORM));
     CHECK(md);
     CHECK(!md == false);
     CHECK(!md.is_packed());
@@ -106,6 +107,8 @@ void spot_check_get_format_metadata() {
   }
   {
     auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_S8_UINT);
+    CHECK(!vku::get_compressed_format_metadata(VK_FORMAT_S8_UINT));
+    CHECK(!vku::get_video_format_metadata(VK_FORMAT_S8_UINT));
     CHECK(md);
     CHECK(!md == false);
     CHECK(!md.is_packed());
@@ -133,6 +136,8 @@ void spot_check_get_format_metadata() {
   }
   {
     auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_D16_UNORM_S8_UINT);
+    CHECK(!vku::get_compressed_format_metadata(VK_FORMAT_D16_UNORM_S8_UINT));
+    CHECK(!vku::get_video_format_metadata(VK_FORMAT_D16_UNORM_S8_UINT));
     CHECK(md);
     CHECK(!md == false);
     CHECK(!md.is_packed());
@@ -162,6 +167,8 @@ void spot_check_get_format_metadata() {
   }
   {
     auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_R8G8B8_SRGB);
+    CHECK(!vku::get_compressed_format_metadata(VK_FORMAT_R8G8B8_SRGB));
+    CHECK(!vku::get_video_format_metadata(VK_FORMAT_R8G8B8_SRGB));
     CHECK(md);
     CHECK(!md == false);
     CHECK(!md.is_packed());
@@ -195,6 +202,8 @@ void spot_check_get_format_metadata() {
   }
   {
     auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_B8G8R8A8_SSCALED);
+    CHECK(!vku::get_compressed_format_metadata(VK_FORMAT_B8G8R8A8_SSCALED));
+    CHECK(!vku::get_video_format_metadata(VK_FORMAT_B8G8R8A8_SSCALED));
     CHECK(md);
     CHECK(!md == false);
     CHECK(!md.is_packed());
@@ -229,6 +238,8 @@ void spot_check_get_format_metadata() {
   }
   {
     auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_E5B9G9R9_UFLOAT_PACK32);
+    CHECK(!vku::get_compressed_format_metadata(VK_FORMAT_E5B9G9R9_UFLOAT_PACK32));
+    CHECK(!vku::get_video_format_metadata(VK_FORMAT_E5B9G9R9_UFLOAT_PACK32));
     CHECK(md);
     CHECK(!md == false);
     CHECK(md.is_packed());
@@ -264,6 +275,8 @@ void spot_check_get_format_metadata() {
   }
   {
     auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_R64G64B64A64_SFLOAT);
+    CHECK(!vku::get_compressed_format_metadata(VK_FORMAT_R64G64B64A64_SFLOAT));
+    CHECK(!vku::get_video_format_metadata(VK_FORMAT_R64G64B64A64_SFLOAT));
     CHECK(md);
     CHECK(!md == false);
     CHECK(!md.is_packed());
@@ -296,6 +309,8 @@ void spot_check_get_format_metadata() {
   }
   {
     auto md = vku::get_compressed_format_metadata(VK_FORMAT_BC1_RGB_UNORM_BLOCK);
+    CHECK(!vku::get_uncompressed_format_metadata(VK_FORMAT_BC1_RGB_UNORM_BLOCK));
+    CHECK(!vku::get_video_format_metadata(VK_FORMAT_BC1_RGB_UNORM_BLOCK));
     CHECK(md);
     CHECK(!md == false);
     CHECK(!md.is_hdr());
@@ -308,6 +323,8 @@ void spot_check_get_format_metadata() {
   }
   {
     auto md = vku::get_compressed_format_metadata(VK_FORMAT_ASTC_5x4_SRGB_BLOCK);
+    CHECK(!vku::get_uncompressed_format_metadata(VK_FORMAT_ASTC_5x4_SRGB_BLOCK));
+    CHECK(!vku::get_video_format_metadata(VK_FORMAT_ASTC_5x4_SRGB_BLOCK));
     CHECK(md);
     CHECK(!md == false);
     CHECK(!md.is_hdr());
@@ -320,6 +337,8 @@ void spot_check_get_format_metadata() {
   }
   {
     auto md = vku::get_compressed_format_metadata(VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK);
+    CHECK(!vku::get_uncompressed_format_metadata(VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK));
+    CHECK(!vku::get_video_format_metadata(VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK));
     CHECK(md);
     CHECK(!md == false);
     CHECK(md.is_hdr());
@@ -329,6 +348,24 @@ void spot_check_get_format_metadata() {
     CHECK(md.block_size_bytes == 16);
     CHECK(md.block_width == 12 && md.block_height == 12);
     CHECK(md.numeric_format == vku::NumericFormat::SFLOAT);
+  }
+  {
+    auto md = vku::get_video_format_metadata(VK_FORMAT_G8B8G8R8_422_UNORM);
+    CHECK(!vku::get_compressed_format_metadata(VK_FORMAT_G8B8G8R8_422_UNORM));
+    CHECK(!vku::get_uncompressed_format_metadata(VK_FORMAT_G8B8G8R8_422_UNORM));
+    CHECK(md.block_size_bytes == 4);
+    CHECK(md.block_width == 2);
+    CHECK(md.channel_count == 3);
+    CHECK(md.numeric_format == vku::NumericFormat::UNORM);
+  }
+  {
+    auto md = vku::get_video_format_metadata(VK_FORMAT_B16G16R16G16_422_UNORM);
+    CHECK(!vku::get_compressed_format_metadata(VK_FORMAT_B16G16R16G16_422_UNORM));
+    CHECK(!vku::get_uncompressed_format_metadata(VK_FORMAT_B16G16R16G16_422_UNORM));
+    CHECK(md.block_size_bytes == 8);
+    CHECK(md.block_width == 2);
+    CHECK(md.channel_count == 3);
+    CHECK(md.numeric_format == vku::NumericFormat::UNORM);
   }
 }
 

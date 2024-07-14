@@ -369,6 +369,26 @@ void spot_check_get_format_metadata() {
   }
 }
 
+void spot_check_format_for() {
+  CHECK(vku::vanilla_format_for(3, vku::NumericFormat::SRGB, 10, true) == VK_FORMAT_UNDEFINED);
+  CHECK(vku::vanilla_format_for(3, vku::NumericFormat::SRGB, 8, false) == VK_FORMAT_R8G8B8_SRGB);
+  CHECK(vku::vanilla_format_for(4, vku::NumericFormat::SFLOAT, 16, false) == VK_FORMAT_R16G16B16A16_SFLOAT);
+  CHECK(vku::vanilla_format_for(2, vku::NumericFormat::UINT, 16, false) == VK_FORMAT_R16G16_UINT);
+  CHECK(vku::vanilla_format_for(1, vku::NumericFormat::SFLOAT, 32, false) == VK_FORMAT_R32_SFLOAT);
+  CHECK(vku::vanilla_format_for(2, vku::NumericFormat::SFLOAT, 64, false) == VK_FORMAT_R64G64_SFLOAT);
+  CHECK(vku::vanilla_format_for(4, vku::NumericFormat::SNORM, 8, true) == VK_FORMAT_A8B8G8R8_SNORM_PACK32);
+}
+
+void spot_check_image_size_bytes() {
+  CHECK(vku::get_uncompressed_mip_count(vku::uvec2{ 2, 1 }) == 1);
+  CHECK(vku::get_uncompressed_mip_count(vku::uvec2{ 2, 2 }) == 2);
+  CHECK(vku::get_uncompressed_mip_count(vku::uvec2{ 2, 4 }) == 2);
+  CHECK(vku::get_uncompressed_mip_count(vku::uvec2{ 15, 20 }) == 4);
+  CHECK(vku::get_uncompressed_mip_count(vku::uvec2{ 17, 20 }) == 5);
+  CHECK(vku::get_uncompressed_image_size_bytes(VK_FORMAT_R16G16B16_SFLOAT, vku::uvec2{ 19, 20 }, false, 2) == 4560);
+  CHECK(vku::get_uncompressed_image_size_bytes(VK_FORMAT_R16G16B16_SFLOAT, vku::uvec2{ 19, 20 }, true, 2) == 5940);
+}
+
 
 int main() {
   checks = 0;
@@ -378,6 +398,8 @@ int main() {
 
   spot_check_format_to_str();
   spot_check_get_format_metadata();
+  spot_check_format_for();
+  spot_check_image_size_bytes();
 
   if (failures) {
     fprintf(stderr, "FAILED %d/%d checks.\n", failures, checks);

@@ -54,7 +54,8 @@
 ### General Utility Functions
 * uint32_t get_uncompressed_image_texel_count(uvec2 size, uint32_t mip_max, uint32_t array_len)
 * uint32_t get_uncompressed_image_size_bytes(VkFormat fnt, uvec2 size, bool use_mips, uint32_t array_len)
-* VKU_PROTO VkFormat vanilla_format_for(uint32_t channel_count, NumericFormat nf, uint32_t bit_count, bool packed)
+* VKU_PROTO VkFormat vanilla_format_for(uint32_t channel_count, NumericFormat nf, uint32_t channel_bit_count, bool packed)
+    * For the given channel count, numeric format, channel bit count find a format
     * R, RG, RGB, or RGBA uncompressed, homogenous, base API level format
 
 ## Usage

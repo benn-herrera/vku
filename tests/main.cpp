@@ -32,17 +32,17 @@ void spot_check_get_format_metadata() {
     CHECK(md.is_homogenous());
     CHECK(md.channel_count == 2);
     CHECK(md.size_bytes == 1);
-    CHECK(md.channels[0].type == vku::ChannelType::R);
+    CHECK(md.channels[0].name == vku::ChannelName::R);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::UNORM);
     CHECK(md.channels[0].bit_count == 4);
     CHECK(md.channels[0].bit_shift == 4);
-    CHECK(md.channels[1].type == vku::ChannelType::G);
+    CHECK(md.channels[1].name == vku::ChannelName::G);
     CHECK(md.channels[1].numeric_format == vku::NumericFormat::UNORM);
     CHECK(md.channels[1].bit_count == 4);
     CHECK(md.channels[1].bit_shift == 0);
-    CHECK(md.channels[2].type == vku::ChannelType::Invalid);
+    CHECK(md.channels[2].name == vku::ChannelName::Invalid);
     CHECK(md.channels[2].numeric_format == vku::NumericFormat::Invalid);
-    CHECK(md.channels[3].type == vku::ChannelType::Invalid);
+    CHECK(md.channels[3].name == vku::ChannelName::Invalid);
     CHECK(md.channels[3].numeric_format == vku::NumericFormat::Invalid);
   }
   {   
@@ -63,17 +63,17 @@ void spot_check_get_format_metadata() {
     CHECK(md.is_homogenous());
     CHECK(md.channel_count == 2);
     CHECK(md.size_bytes == 4);
-    CHECK(md.channels[0].type == vku::ChannelType::R);
+    CHECK(md.channels[0].name == vku::ChannelName::R);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::UNORM);
     CHECK(md.channels[0].bit_count == 10);
     CHECK(md.channels[0].bit_shift == 22);
-    CHECK(md.channels[1].type == vku::ChannelType::G);
+    CHECK(md.channels[1].name == vku::ChannelName::G);
     CHECK(md.channels[1].numeric_format == vku::NumericFormat::UNORM);
     CHECK(md.channels[1].bit_count == 10);
     CHECK(md.channels[1].bit_shift == 6);
-    CHECK(md.channels[2].type == vku::ChannelType::Invalid);
+    CHECK(md.channels[2].name == vku::ChannelName::Invalid);
     CHECK(md.channels[2].numeric_format == vku::NumericFormat::Invalid);
-    CHECK(md.channels[3].type == vku::ChannelType::Invalid);
+    CHECK(md.channels[3].name == vku::ChannelName::Invalid);
     CHECK(md.channels[3].numeric_format == vku::NumericFormat::Invalid);
   }
   {
@@ -94,15 +94,15 @@ void spot_check_get_format_metadata() {
     CHECK(md.is_homogenous());
     CHECK(md.channel_count == 1);
     CHECK(md.size_bytes == 2);
-    CHECK(md.channels[0].type == vku::ChannelType::D);
+    CHECK(md.channels[0].name == vku::ChannelName::D);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::UNORM);
     CHECK(md.channels[0].bit_count == 16);
     CHECK(md.channels[0].bit_shift == vku::ChannelMetadata::kNoShift);
-    CHECK(md.channels[1].type == vku::ChannelType::Invalid);
+    CHECK(md.channels[1].name == vku::ChannelName::Invalid);
     CHECK(md.channels[1].numeric_format == vku::NumericFormat::Invalid);
-    CHECK(md.channels[2].type == vku::ChannelType::Invalid);
+    CHECK(md.channels[2].name == vku::ChannelName::Invalid);
     CHECK(md.channels[2].numeric_format == vku::NumericFormat::Invalid);
-    CHECK(md.channels[3].type == vku::ChannelType::Invalid);
+    CHECK(md.channels[3].name == vku::ChannelName::Invalid);
     CHECK(md.channels[3].numeric_format == vku::NumericFormat::Invalid);
   }
   {
@@ -123,15 +123,15 @@ void spot_check_get_format_metadata() {
     CHECK(md.is_homogenous());
     CHECK(md.channel_count == 1);
     CHECK(md.size_bytes == 1);
-    CHECK(md.channels[0].type == vku::ChannelType::S);
+    CHECK(md.channels[0].name == vku::ChannelName::S);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::UINT);
     CHECK(md.channels[0].bit_count == 8);
     CHECK(md.channels[0].bit_shift == vku::ChannelMetadata::kNoShift);
-    CHECK(md.channels[1].type == vku::ChannelType::Invalid);
+    CHECK(md.channels[1].name == vku::ChannelName::Invalid);
     CHECK(md.channels[1].numeric_format == vku::NumericFormat::Invalid);
-    CHECK(md.channels[2].type == vku::ChannelType::Invalid);
+    CHECK(md.channels[2].name == vku::ChannelName::Invalid);
     CHECK(md.channels[2].numeric_format == vku::NumericFormat::Invalid);
-    CHECK(md.channels[3].type == vku::ChannelType::Invalid);
+    CHECK(md.channels[3].name == vku::ChannelName::Invalid);
     CHECK(md.channels[3].numeric_format == vku::NumericFormat::Invalid);
   }
   {
@@ -152,17 +152,17 @@ void spot_check_get_format_metadata() {
     CHECK(!md.is_homogenous());
     CHECK(md.channel_count == 2);
     CHECK(md.size_bytes == 3);
-    CHECK(md.channels[0].type == vku::ChannelType::D);
+    CHECK(md.channels[0].name == vku::ChannelName::D);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::UNORM);
     CHECK(md.channels[0].bit_count == 16);
     CHECK(md.channels[0].bit_shift == vku::ChannelMetadata::kNoShift);
-    CHECK(md.channels[1].type == vku::ChannelType::S);
+    CHECK(md.channels[1].name == vku::ChannelName::S);
     CHECK(md.channels[1].numeric_format == vku::NumericFormat::UINT);
     CHECK(md.channels[1].bit_count == 8);
     CHECK(md.channels[1].bit_shift == vku::ChannelMetadata::kNoShift);
-    CHECK(md.channels[2].type == vku::ChannelType::Invalid);
+    CHECK(md.channels[2].name == vku::ChannelName::Invalid);
     CHECK(md.channels[2].numeric_format == vku::NumericFormat::Invalid);
-    CHECK(md.channels[3].type == vku::ChannelType::Invalid);
+    CHECK(md.channels[3].name == vku::ChannelName::Invalid);
     CHECK(md.channels[3].numeric_format == vku::NumericFormat::Invalid);
   }
   {
@@ -183,19 +183,19 @@ void spot_check_get_format_metadata() {
     CHECK(md.is_homogenous());
     CHECK(md.channel_count == 3);
     CHECK(md.size_bytes == 3);
-    CHECK(md.channels[0].type == vku::ChannelType::R);
+    CHECK(md.channels[0].name == vku::ChannelName::R);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::SRGB);
     CHECK(md.channels[0].bit_count == 8);
     CHECK(md.channels[0].bit_shift == vku::ChannelMetadata::kNoShift);
-    CHECK(md.channels[1].type == vku::ChannelType::G);
+    CHECK(md.channels[1].name == vku::ChannelName::G);
     CHECK(md.channels[1].numeric_format == vku::NumericFormat::SRGB);
     CHECK(md.channels[1].bit_count == 8);
     CHECK(md.channels[1].bit_shift == vku::ChannelMetadata::kNoShift);
-    CHECK(md.channels[2].type == vku::ChannelType::B);
+    CHECK(md.channels[2].name == vku::ChannelName::B);
     CHECK(md.channels[2].numeric_format == vku::NumericFormat::SRGB);
     CHECK(md.channels[2].bit_count == 8);
     CHECK(md.channels[2].bit_shift == vku::ChannelMetadata::kNoShift);
-    CHECK(md.channels[3].type == vku::ChannelType::Invalid);
+    CHECK(md.channels[3].name == vku::ChannelName::Invalid);
     CHECK(md.channels[3].numeric_format == vku::NumericFormat::Invalid);
     CHECK(md.channels[3].bit_count == 0);
   }
@@ -218,19 +218,19 @@ void spot_check_get_format_metadata() {
     CHECK(md.is_homogenous());
     CHECK(md.channel_count == 4);
     CHECK(md.size_bytes == 4);
-    CHECK(md.channels[0].type == vku::ChannelType::B);
+    CHECK(md.channels[0].name == vku::ChannelName::B);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::SSCALED);
     CHECK(md.channels[0].bit_count == 8);
     CHECK(md.channels[0].bit_shift == vku::ChannelMetadata::kNoShift);
-    CHECK(md.channels[1].type == vku::ChannelType::G);
+    CHECK(md.channels[1].name == vku::ChannelName::G);
     CHECK(md.channels[1].numeric_format == vku::NumericFormat::SSCALED);
     CHECK(md.channels[1].bit_count == 8);
     CHECK(md.channels[1].bit_shift == vku::ChannelMetadata::kNoShift);
-    CHECK(md.channels[2].type == vku::ChannelType::R);
+    CHECK(md.channels[2].name == vku::ChannelName::R);
     CHECK(md.channels[2].numeric_format == vku::NumericFormat::SSCALED);
     CHECK(md.channels[2].bit_count == 8);
     CHECK(md.channels[2].bit_shift == vku::ChannelMetadata::kNoShift);
-    CHECK(md.channels[3].type == vku::ChannelType::A);
+    CHECK(md.channels[3].name == vku::ChannelName::A);
     CHECK(md.channels[3].numeric_format == vku::NumericFormat::SSCALED);
     CHECK(md.channels[3].bit_count == 8);
     CHECK(md.channels[3].bit_shift == vku::ChannelMetadata::kNoShift);
@@ -255,19 +255,19 @@ void spot_check_get_format_metadata() {
     CHECK(!md.is_homogenous());
     CHECK(md.channel_count == 4);
     CHECK(md.size_bytes == 4);
-    CHECK(md.channels[0].type == vku::ChannelType::E);
+    CHECK(md.channels[0].name == vku::ChannelName::E);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::SINT);
     CHECK(md.channels[0].bit_count == 5);
     CHECK(md.channels[0].bit_shift == 27);
-    CHECK(md.channels[1].type == vku::ChannelType::B);
+    CHECK(md.channels[1].name == vku::ChannelName::B);
     CHECK(md.channels[1].numeric_format == vku::NumericFormat::UFLOAT);
     CHECK(md.channels[1].bit_count == 9);
     CHECK(md.channels[1].bit_shift == 18);
-    CHECK(md.channels[2].type == vku::ChannelType::G);
+    CHECK(md.channels[2].name == vku::ChannelName::G);
     CHECK(md.channels[2].numeric_format == vku::NumericFormat::UFLOAT);
     CHECK(md.channels[2].bit_count == 9);
     CHECK(md.channels[2].bit_shift == 9);
-    CHECK(md.channels[3].type == vku::ChannelType::R);
+    CHECK(md.channels[3].name == vku::ChannelName::R);
     CHECK(md.channels[3].numeric_format == vku::NumericFormat::UFLOAT);
     CHECK(md.channels[3].bit_count == 9);
     CHECK(md.channels[3].bit_shift == 0);
@@ -289,19 +289,19 @@ void spot_check_get_format_metadata() {
     CHECK(md.is_homogenous());
     CHECK(md.channel_count == 4);
     CHECK(md.size_bytes == 32);
-    CHECK(md.channels[0].type == vku::ChannelType::R);
+    CHECK(md.channels[0].name == vku::ChannelName::R);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::SFLOAT);
     CHECK(md.channels[0].bit_count == 64);
     CHECK(md.channels[0].bit_shift == vku::ChannelMetadata::kNoShift);
-    CHECK(md.channels[1].type == vku::ChannelType::G);
+    CHECK(md.channels[1].name == vku::ChannelName::G);
     CHECK(md.channels[1].numeric_format == vku::NumericFormat::SFLOAT);
     CHECK(md.channels[1].bit_count == 64);
     CHECK(md.channels[1].bit_shift == vku::ChannelMetadata::kNoShift);
-    CHECK(md.channels[2].type == vku::ChannelType::B);
+    CHECK(md.channels[2].name == vku::ChannelName::B);
     CHECK(md.channels[2].numeric_format == vku::NumericFormat::SFLOAT);
     CHECK(md.channels[2].bit_count == 64);
     CHECK(md.channels[2].bit_shift == vku::ChannelMetadata::kNoShift);
-    CHECK(md.channels[3].type == vku::ChannelType::A);
+    CHECK(md.channels[3].name == vku::ChannelName::A);
     CHECK(md.channels[3].numeric_format == vku::NumericFormat::SFLOAT);
     CHECK(md.channels[3].bit_count == 64);
     CHECK(md.channels[3].bit_shift == vku::ChannelMetadata::kNoShift);

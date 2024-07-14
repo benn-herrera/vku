@@ -239,32 +239,31 @@ STRUCTS_SECTION = [
 """
 ]
 
-NUMERIC_FORMATS_ENUMS = [
-
+CHANNEL_NAME_ENUMS = [
 ]
 
-NUMERIC_FORMATS_ENUM_SECTION_FMT = """  //
+NUMERIC_FORMAT_ENUMS = [
+]
+
+FORMAT_METADATA_ENUMS_FMT = """  //
   // format metadata types and structs.
   //
   
+  enum class ChannelName : uint8_t {{
+    Invalid = 0,
+    {NAME_ENUM_VALUES}
+  }};
+
   enum class NumericFormat : uint8_t {{
     Invalid = 0,
-    {ENUM_VALUES}
+    {NUM_FMT_ENUM_VALUES}
   }};
 """
 
 FORMAT_METADATA_TYPES = """
-  enum class ChannelType : uint8_t {
-    Invalid = 0,
-    R, G, B, A,
-    D, // depth
-    S, // stencil
-    E, // exponent
-  };
-
   struct ChannelMetadata {
     static constexpr uint8_t kNoShift = 0xff;
-    ChannelType type;
+    ChannelName name;
     NumericFormat numeric_format;
     uint8_t bit_count;
     uint8_t bit_shift;
@@ -277,10 +276,10 @@ FORMAT_METADATA_TYPES = """
       return fmt == rhs_fmt && bit_count == rhs.bit_count && (!check_shift || bit_shift == rhs.bit_shift);
     }
     operator bool() const {
-      return type != ChannelType::Invalid;
+      return name != ChannelName::Invalid;
     }
     bool operator!() const {
-      return type == ChannelType::Invalid;
+      return name == ChannelName::Invalid;
     }    
   };
   
@@ -298,39 +297,39 @@ FORMAT_METADATA_TYPES = """
       return channels[0].bit_shift != ChannelMetadata::kNoShift;
     }
     bool is_rgb() const {
-      return channels[0].type == ChannelType::R && channels[2].type == ChannelType::B && channel_count == 3;
+      return channels[0].name == ChannelName::R && channels[2].name == ChannelName::B && channel_count == 3;
     }
     bool is_ebgr() const {
-      return channels[0].type == ChannelType::E && channels[1].type == ChannelType::B && channels[3].type == ChannelType::R;
+      return channels[0].name == ChannelName::E && channels[1].name == ChannelName::B && channels[3].name == ChannelName::R;
     }    
     bool is_bgr() const {
-      return channels[0].type == ChannelType::B && channels[2].type == ChannelType::R && channel_count == 3;
+      return channels[0].name == ChannelName::B && channels[2].name == ChannelName::R && channel_count == 3;
     }    
     bool is_rgba() const {
-      return channels[0].type == ChannelType::R && channels[3].type == ChannelType::A;
+      return channels[0].name == ChannelName::R && channels[3].name == ChannelName::A;
     }
     bool is_abgr() const {
-      return channels[0].type == ChannelType::A && channels[3].type == ChannelType::R;
+      return channels[0].name == ChannelName::A && channels[3].name == ChannelName::R;
     }
     bool is_bgra() const {
-      return channels[0].type == ChannelType::B && channels[3].type == ChannelType::A;
+      return channels[0].name == ChannelName::B && channels[3].name == ChannelName::A;
     }        
     bool is_srgb() const {
       return channels[0].numeric_format == NumericFormat::SRGB;
     }
-    bool has_channel(ChannelType ct) const {
+    bool has_channel(ChannelName ct) const {
       for (auto ci = 0; ci < channel_count; ++ci) {
-        if (channels[ci].type == ct) {
+        if (channels[ci].name == ct) {
           return true;
         }
       }
       return false;
     }
     bool has_depth() const {
-      return has_channel(ChannelType::D);
+      return has_channel(ChannelName::D);
     }
     bool has_stencil() const {
-      return has_channel(ChannelType::S);
+      return has_channel(ChannelName::S);
     }    
     bool is_depth_stencil() const {
       return has_depth() && has_stencil();
@@ -453,7 +452,10 @@ def write_vku_h():
         *FLAGS_SECTION, "",
         *HANDLES_SECTION, "",
         *STRUCTS_SECTION, "",
-        NUMERIC_FORMATS_ENUM_SECTION_FMT.format(ENUM_VALUES=",\n    ".join(NUMERIC_FORMATS_ENUMS)),
+        FORMAT_METADATA_ENUMS_FMT.format(
+            NAME_ENUM_VALUES=",\n    ".join(CHANNEL_NAME_ENUMS),
+            NUM_FMT_ENUM_VALUES=",\n    ".join(NUMERIC_FORMAT_ENUMS)
+        ),
         FORMAT_METADATA_TYPES,
         FUNCTION_PROTOS_HEADER,
         f"static constexpr VkFormat kLastBaseFormat = {LAST_BASE_FORMAT[0]};",
@@ -822,6 +824,7 @@ def format_meta_impl(
 def collect_format_data():
     vk_formats = []
     num_types = set()
+    chan_names = set()
 
     for format_entry in REGISTRY.find("./formats").findall("./format"):
         channels = []
@@ -842,6 +845,8 @@ def collect_format_data():
             channels.append(
                 dict(name='E', bit_count=bit_count, num_type='SINT', shift=(32 - bit_count))
             )
+            chan_names.add('E')
+
         for channel_entry in channel_entries:
             chan_name = channel_entry.attrib["name"]
             bits = channel_entry.attrib["bits"]
@@ -849,6 +854,7 @@ def collect_format_data():
             num_type = channel_entry.attrib["numericFormat"]
             channels.append(dict(name=chan_name, bit_count=bits, num_type=num_type))
             num_types.add(num_type)
+            chan_names.add(chan_name)
         size_bytes = int(format_entry.attrib["blockSize"])
         block_size = format_entry.attrib.get("blockExtent", "1,1")
         block_size = tuple(int(d) for d in block_size.split(",")[:2])
@@ -861,10 +867,23 @@ def collect_format_data():
             "channels": channels,
             "chroma": format_entry.attrib.get('chroma')
         })
-    assert not NUMERIC_FORMATS_ENUMS, "already initialized"
+
+    def num_type_key(e) -> str:
+        return e[1:] + e[0] if e != 'SRGB' else 'SRGB'
+
     num_types = list(num_types)
-    num_types.sort(key=lambda e: e[1:] + e[0] if e != 'SRGB' else 'SRGB')
-    NUMERIC_FORMATS_ENUMS.extend(num_types)
+    num_types.sort(key=num_type_key)
+    assert not NUMERIC_FORMAT_ENUMS, "already initialized"
+    NUMERIC_FORMAT_ENUMS.extend(num_types)
+
+    def chan_name_key(e) -> int:
+        return dict(R=0, G=1, B=2, A=3, E=0xff).get(e, ord(e))
+
+    chan_names = list(chan_names)
+    chan_names.sort(key=chan_name_key)
+    assert not CHANNEL_NAME_ENUMS, "already initialized"
+    CHANNEL_NAME_ENUMS.extend(chan_names)
+
     return vk_formats
 
 
@@ -898,14 +917,14 @@ def gen_uncompressed_metadata(vk_format: dict) -> str:
             shift = packed - bit_count
             packed = packed - (bit_count if sub_packed is None else sub_packed)
         # struct ChannelMetadata {
-        #   ChannelType type;
+        #   ChannelName name;
         #   NumericFormat numeric_format;
         #   uint8_t bit_count;
         #   uint8_t bit_shift;
         # };
-        chan_meta.append("{" f"ChannelType::{channel_type}, NumericFormat::{num_format}, {bit_count}, {shift}" "}")
+        chan_meta.append("{" f"ChannelName::{channel_type}, NumericFormat::{num_format}, {bit_count}, {shift}" "}")
     # for _ in range(len(channels), 4):
-    #     chan_meta.append('{ChannelType::Invalid, NumericFormat::Invalid, 0, ChannelMetadata::kNoShift}')
+    #     chan_meta.append('{ChannelName::Invalid, NumericFormat::Invalid, 0, ChannelMetadata::kNoShift}')
     meta.append("{" f"{', '.join(chan_meta)}" "}")
     return "{" f"{', '.join(meta)}" "}"
 

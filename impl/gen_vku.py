@@ -236,11 +236,12 @@ STRUCTS_SECTION = [
     DescriptionT(const VkType& rhs) { (VkType&)*this = rhs; }""",
     STRUCT_ASSIGN_OPS,
 """  };
+"""
+]
 
-  //
+FORMAT_METADATA_TYPES = """  //
   // format metadata types and structs.
-  //
-  
+  //  
   enum class ChannelType : uint8_t {
     Invalid = 0,
     R, G, B, A,
@@ -303,6 +304,9 @@ STRUCTS_SECTION = [
     bool is_rgba() const {
       return channels[3].type == ChannelType::A;
     }
+    bool is_srgb() const {
+        return channels[2].numeric_format == NumericFormat::SRGB;
+    }
     bool has_channel(ChannelType ct) const {
       for (auto ci = 0; ci < channel_count; ++ci) {
         if (channels[ci].type == ct) {
@@ -348,6 +352,7 @@ STRUCTS_SECTION = [
 
   enum class CompressionScheme : uint8_t {
     Invalid,
+    ASTC,
     BC1,
     BC2,
     BC3,
@@ -357,7 +362,8 @@ STRUCTS_SECTION = [
     BC7,    
     EAC,
     ETC2,
-    ASTC,
+    PVRTC1,
+    PVRTC2
   };
 
   struct CompressedFormatMetadata {
@@ -397,7 +403,6 @@ STRUCTS_SECTION = [
     }
   };
 """
-]
 
 FUNCTION_PROTOS_HEADER = "  //\n  // function prototypes\n  "
 
@@ -420,6 +425,9 @@ FUNCTIONS_FOOTER = "#endif // VKU_IMPLEMENT || VKU_INLINE_ALL"
 FILE_FOOTER = "} // end namespace vku"
 
 
+LAST_BASE_FORMAT = []
+
+
 def write_vku_h():
     # Accumulate the results and write them out
     file_sections = [
@@ -428,7 +436,9 @@ def write_vku_h():
         *FLAGS_SECTION, "",
         *HANDLES_SECTION, "",
         *STRUCTS_SECTION, "",
+        FORMAT_METADATA_TYPES,
         FUNCTION_PROTOS_HEADER,
+        f"static constexpr VkFormat kLastBaseFormat = {LAST_BASE_FORMAT[0]};",
         *FUNCTIONS_PROTO_SECTION,
         FUNCTION_PROTOS_FOOTER, "",
         FUNCTIONS_HEADER,
@@ -511,11 +521,13 @@ def to_string_impl(vk_type: str, enum_vals: [str], is_type_named: bool) -> str:
 
 PLATFORM_MACROS = {}
 PLATFORM_BY_TYPE = {}
-VULKAN_SC_TYPES = set()
+IGNORED_TYPES = set()
 AUTHORED_TYPES = set(t for t in ("VkOffset2D", "VkExtent2D", "VkRect2D", "VkOffset3D", "VkExtent3D", "VkViewport"))
 
 VERSION_MACROS = set()
 VERSION_MACRO_BY_TYPE = {}
+
+ENUM_EXTENSIONS = {}
 
 
 def init_platforms_and_versions():
@@ -525,27 +537,43 @@ def init_platforms_and_versions():
     for extension in [
         e for e in REGISTRY.find("./extensions")
     ]:
-        extension_is_sc = (
-                extension.attrib.get("supported") == "vulkansc" or
-                extension.attrib.get("ratified") == "vulkansc"
-        )
         extension_platform = extension.attrib.get('platform')
-
+        extension_is_ignored = (
+                extension.attrib.get("supported") in ["vulkansc", "disabled"] or
+                extension.attrib.get("ratified") == "vulkansc" or
+                extension_platform == "provisional"
+        )
         for require in extension.findall("./require"):
+            require_is_ignored = require.attrib.get('api') == "vulkansc"
             for plat_type in require.findall("./type"):
                 if type_name := plat_type.attrib.get('name'):
-                    # VulkanSC only
-                    if extension_is_sc or require.attrib.get('api') == "vulkansc":
-                        VULKAN_SC_TYPES.add(type_name)
+                    if extension_is_ignored or require_is_ignored:
+                        IGNORED_TYPES.add(type_name)
                     elif platform := (extension_platform or extension.attrib.get('platform')):
                         PLATFORM_BY_TYPE[type_name] = platform
+            if not (extension_is_ignored or require_is_ignored):
+                for enum_tag in [e for e in require.findall("./enum") if 'alias' not in e.attrib]:
+                    extends_enum = enum_tag.attrib.get('extends')
+                    value_name = enum_tag.attrib.get('name')
+                    ENUM_EXTENSIONS.setdefault(extends_enum, []).append(value_name)
 
     for feature in REGISTRY.findall("./feature"):
         version = feature.attrib["name"]
         VERSION_MACROS.add(version)
+        feature_is_ignored = feature.attrib.get("api") == "vulkansc"
         for require in feature.findall("./require"):
+            require_is_ignored = require.attrib.get('api') == "vulkansc"
             for type_tag in require.findall("./type"):
-                VERSION_MACRO_BY_TYPE[type_tag.attrib["name"]] = version
+                type_name = type_tag.attrib["name"]
+                if feature_is_ignored or require_is_ignored:
+                    IGNORED_TYPES.add(type_name)
+                else:
+                    VERSION_MACRO_BY_TYPE[type_name] = version
+            if not (feature_is_ignored or require_is_ignored):
+                for enum_tag in [e for e in require.findall("./enum") if 'alias' not in e.attrib]:
+                    extends_enum = enum_tag.attrib.get('extends')
+                    value_name = enum_tag.attrib.get('name')
+                    ENUM_EXTENSIONS.setdefault(extends_enum, []).append(value_name)
 
 
 def platform_macro_for_type(name: str) -> str | None:
@@ -603,8 +631,13 @@ def gen_type_wrappers():
                e.find("./enum") is not None
     ):
         type_name = enum.attrib["name"]
-        if type_name in VULKAN_SC_TYPES:
+        if type_name in IGNORED_TYPES:
             continue
+
+        if type_name == "VkFormat":
+            assert not LAST_BASE_FORMAT
+            LAST_BASE_FORMAT.append(enum.findall("./enum")[-1].attrib["name"])
+
         platform_macro = platform_macro_for_type(type_name)
         version_macro = version_macro_for_type(type_name)
         # enums that are 64 bits wide are implemented as a sequence of static const VkFlags64 values
@@ -640,6 +673,17 @@ def gen_type_wrappers():
             return bool(eattr.get("value", eattr.get("bitpos")))
 
         enum_vals = [e.attrib["name"] for e in enum.findall("./enum") if check_enum_val(e.attrib)]
+        enum_ext = []
+        # extension values may have duplicates
+        for _ in range(1):
+            enum_ext_used = set()
+            for ee in ENUM_EXTENSIONS.get(type_name, []):
+                if ee not in enum_ext_used:
+                    enum_ext_used.add(ee)
+                    enum_ext.append(ee)
+            del enum_ext_used
+        enum_vals.extend(enum_ext)
+
         func_impls.append(
             dict(
                 block=to_string_impl(type_name, enum_vals, is_type_named=type_named_to_string),
@@ -661,7 +705,7 @@ def gen_type_wrappers():
             if (type_name := type_entry.find("./name")) is None:
                 continue
             type_name = type_name.text
-            if type_name in VULKAN_SC_TYPES:
+            if type_name in IGNORED_TYPES:
                 continue
             platform_macro = platform_macro_for_type(type_name)
             version_macro = version_macro_for_type(type_name)
@@ -669,7 +713,7 @@ def gen_type_wrappers():
             handles.append(dict(block=block, platform=platform_macro, version=version_macro))
         elif category == "struct":
             type_name = type_entry.attrib["name"]
-            if type_name in VULKAN_SC_TYPES or type_name in AUTHORED_TYPES:
+            if type_name in IGNORED_TYPES or type_name in AUTHORED_TYPES:
                 continue
             if (stype := type_entry.find("./member")) is not None:
                 stype = stype.attrib.get("values")
@@ -763,7 +807,10 @@ def collect_format_data():
         channels = []
         name = format_entry.attrib["name"]
         packed = format_entry.get('packed')
-        compressed = 'compressed' in format_entry.attrib
+        if 'compressed' in format_entry.attrib:
+            compression = format_entry.attrib['class'].split('_')[0]
+        else:
+            compression = None
         if packed is not None:
             packed = int(packed)
         component_entries = format_entry.findall("./component")
@@ -792,56 +839,104 @@ def collect_format_data():
             "name": name,
             "size_bytes": size_bytes,
             "packed": packed,
-            "compressed": compressed,
+            "compression": compression,
             "block_size": block_size,
             "channels": channels,
             "chroma": format_entry.attrib.get('chroma')
         })
     return vk_formats
 
-"""
-    ChannelType type = ChannelType::Invalid;
-    NumericFormat numericFormat = NumericFormat::Invalid;
-    uint8_t bitCount = 0;
-    uint8_t bitShift = kNoShift;
-"""
-
 
 def gen_uncompressed_metadata(vk_format: dict) -> str:
-    if vk_format['name'] == 'VK_FORMAT_R10X6G10X6_UNORM_2PACK16':
-        dummy = 0
+    assert ((vk_format['compression'] is None) and (vk_format['chroma'] is None)), f"{vk_format} is not an uncompressed format"
+
     channels = vk_format['channels']
     size_bytes = vk_format['size_bytes']
     shift = "ChannelMetadata::kNoShift"
     size_bits = size_bytes * 8
     sub_packed = None
+
     if (packed := vk_format['packed']) is not None:
         sub_packed = packed if packed < size_bits else None
         packed = size_bits
+
+    # struct UncompressedFormatMetadata {
+    #   uint8_t size_bytes;
+    #   uint8_t channel_count;
+    #   ChannelMetadata channels[4];
+    # };
 
     meta = [str(size_bytes), str(len(channels))]
 
     chan_meta = []
     for c in channels:
         bit_count = c['bit_count']
+        channel_type = c['name']
+        num_format = c['num_type']
         if packed is not None:
             shift = packed - bit_count
             packed = packed - (bit_count if sub_packed is None else sub_packed)
-        chan_meta.append(f"{{ChannelType::{c['name']}, NumericFormat::{c['num_type']}, {bit_count}, {shift}}}")
+        # struct ChannelMetadata {
+        #   ChannelType type;
+        #   NumericFormat numeric_format;
+        #   uint8_t bit_count;
+        #   uint8_t bit_shift;
+        # };
+        chan_meta.append(f"{{ChannelType::{channel_type}, NumericFormat::{num_format}, {bit_count}, {shift}}}")
     meta.append(f"{{{', '.join(chan_meta)}}}")
     return f"{{{', '.join(meta)}}}"
 
 
 def gen_compressed_metadata(vk_format: dict) -> str:
-    meta = ["{"]
-    meta.append("}")
-    return " ".join(meta)
+    assert ((vk_format['compression'] is not None) and (vk_format['chroma'] is None)), f"{vk_format} is not an compressed format"
+
+    # struct CompressedFormatMetadata {
+    #   CompressionScheme compression;
+    #   uint8_t block_width;
+    #   uint8_t block_height;
+    #   uint8_t block_size_bytes;
+    #   uint8_t channel_count;
+    #   NumericFormat numeric_format;
+    # };
+    comp = vk_format['compression']
+    block_size = vk_format['block_size']
+    size_bytes = vk_format['size_bytes']
+    channel_count = len(vk_format['channels'])
+    num_format = vk_format['channels'][0]['num_type']
+
+    meta = [
+        f"CompressionScheme::{comp}",
+        str(block_size[0]),
+        str(block_size[1]),
+        str(size_bytes),
+        str(channel_count),
+        f"NumericFormat::{num_format}"
+    ]
+    return f"{{{', '.join(meta)}}}"
 
 
 def gen_video_metadata(vk_format: dict) -> str:
-    meta = ["{"]
-    meta.append("}")
-    return " ".join(meta)
+    assert ((vk_format['compression'] is None) and (vk_format['chroma'] is not None)), f"{vk_format} is not an video format"
+
+    # struct VideoFormatMetadata {
+    #   uint8_t block_width;
+    #   uint8_t block_size_bytes;
+    #   uint8_t channel_count;
+    #   NumericFormat numeric_format;
+    # };
+
+    block_width = vk_format['block_size'][0]
+    size_bytes = vk_format['size_bytes']
+    channel_count = len(vk_format['channels'])
+    num_format = vk_format['channels'][0]['num_type']
+
+    meta = [
+        str(block_width),
+        str(size_bytes),
+        str(channel_count),
+        f"NumericFormat::{num_format}"
+    ]
+    return f"{{{', '.join(meta)}}}"
 
 
 def gen_format_metadata_functions():
@@ -856,7 +951,7 @@ def gen_format_metadata_functions():
         "    switch(f) {"
     ]
     for vk_format in vk_formats:
-        if vk_format["compressed"] or vk_format["chroma"] is not None:
+        if (vk_format["compression"] is not None) or (vk_format["chroma"] is not None):
             continue
         meta_body.append(f"    case {vk_format['name']}: return {gen_uncompressed_metadata(vk_format)};")
     meta_body.append("    default: break;\n    }\n    return {};")
@@ -869,7 +964,7 @@ def gen_format_metadata_functions():
         "    switch(f) {"
     ]
     for vk_format in vk_formats:
-        if (not vk_format["compressed"]) or vk_format["chroma"] is not None:
+        if (vk_format["compression"] is None) or (vk_format["chroma"] is not None):
             continue
         meta_body.append(f"    case {vk_format['name']}: return {gen_compressed_metadata(vk_format)};")
     meta_body.append("    default: break;\n    }\n    return {};")
@@ -882,7 +977,7 @@ def gen_format_metadata_functions():
         "    switch(f) {"
     ]
     for vk_format in vk_formats:
-        if vk_format["compressed"] or vk_format["chroma"] is not None:
+        if (vk_format["compression"] is not None) or (vk_format["chroma"] is None):
             continue
         meta_body.append(f"    case {vk_format['name']}: return {gen_video_metadata(vk_format)};")
     meta_body.append("    default: break;\n    }\n    return {};")

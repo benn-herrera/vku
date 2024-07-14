@@ -194,7 +194,7 @@ namespace vku {
 
   VKU_PROTO uint32_t get_uncompressed_image_sample_count(uvec2 image_size, uint32_t mip_max = ~0u, uint32_t array_len=1);
   VKU_PROTO uint32_t get_uncompressed_image_size_bytes(VkFormat format, const uvec2& image_size, bool mip_mapped, uint32_t array_len=1);
-  // R, RG, RGB, or RGBA uncompressed, homogenous, non-extension format.
+  // R, RG, RGB, or RGBA uncompressed, homogenous, base API level format.
   VKU_PROTO VkFormat vanilla_format_for(uint32_t channelCount, NumericFormat nf, uint32_t bitCount, bool packed=false);
 
 #if defined(VKU_INLINE_ALL) || defined(VKU_IMPLEMENT)
@@ -220,15 +220,17 @@ namespace vku {
   }
 
   VKU_IMPL VkFormat vanilla_format_for(uint32_t channel_count, NumericFormat nf, uint32_t bit_count, bool packed) {
-    for (uint32_t i = 1; i < 1000; ++i) {
-      if (UncompressedFormatMetadata md = get_uncompressed_format_metadata(VkFormat(i))) {
+    // 0 is VK_FORMAT_UNDEFINED, start at 1
+    for (uint32_t fi = 1, fe = uint32_t(kLastBaseFormat) + 1; fi < fe; ++fi) {
+      const auto f = VkFormat(fi);
+      if (UncompressedFormatMetadata md = get_uncompressed_format_metadata(f)) {
         if ( md.channel_count == channel_count &&
              md.is_homogenous() &&
              md.has_numeric_format(nf) &&
              md.channels[0].bit_count == bit_count &&
              md.is_packed() == packed
         ) {
-          return VkFormat(i);
+          return f;
         }
         continue;
       }

@@ -299,13 +299,22 @@ FORMAT_METADATA_TYPES = """  //
       return channels[0].bit_shift != ChannelMetadata::kNoShift;
     }
     bool is_rgb() const {
-      return channels[2].type == ChannelType::B && channels[3].type == ChannelType::Invalid;
+      return channels[0].type == ChannelType::R && channels[2].type == ChannelType::B && channel_count == 3;
+    }
+    bool is_bgr() const {
+      return channels[0].type == ChannelType::B && channels[2].type == ChannelType::R && channel_count == 3;
     }    
     bool is_rgba() const {
-      return channels[3].type == ChannelType::A;
+      return channels[0].type == ChannelType::R && channels[3].type == ChannelType::A;
     }
+    bool is_abgr() const {
+      return channels[0].type == ChannelType::A && channels[3].type == ChannelType::R;
+    }
+    bool is_argb() const {
+      return channels[0].type == ChannelType::A && channels[3].type == ChannelType::B;
+    }    
     bool is_srgb() const {
-        return channels[2].numeric_format == NumericFormat::SRGB;
+      return channels[0].numeric_format == NumericFormat::SRGB;
     }
     bool has_channel(ChannelType ct) const {
       for (auto ci = 0; ci < channel_count; ++ci) {
@@ -384,6 +393,12 @@ FORMAT_METADATA_TYPES = """  //
     bool operator!() const {
       return compression == CompressionScheme::Invalid;
     }    
+    inline bool is_rgb() const {
+      return channel_count == 3;
+    }
+    inline bool is_rgba() const {
+      return channel_count == 4;
+    }
     inline bool is_hdr() const {
       return numeric_format == NumericFormat::SFLOAT || numeric_format == NumericFormat::UFLOAT;
     }

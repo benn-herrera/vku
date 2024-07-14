@@ -1,0 +1,5 @@
+__pycache__/
+Vulkan-Headers/
+
+build/
+v0.0.0/

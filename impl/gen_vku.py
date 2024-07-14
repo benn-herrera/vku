@@ -301,6 +301,9 @@ FORMAT_METADATA_TYPES = """  //
     bool is_rgb() const {
       return channels[0].type == ChannelType::R && channels[2].type == ChannelType::B && channel_count == 3;
     }
+    bool is_ebgr() const {
+      return channels[0].type == ChannelType::E && channels[1].type == ChannelType::B && channels[3].type == ChannelType::R;
+    }    
     bool is_bgr() const {
       return channels[0].type == ChannelType::B && channels[2].type == ChannelType::R && channel_count == 3;
     }    
@@ -310,9 +313,9 @@ FORMAT_METADATA_TYPES = """  //
     bool is_abgr() const {
       return channels[0].type == ChannelType::A && channels[3].type == ChannelType::R;
     }
-    bool is_argb() const {
-      return channels[0].type == ChannelType::A && channels[3].type == ChannelType::B;
-    }    
+    bool is_bgra() const {
+      return channels[0].type == ChannelType::B && channels[3].type == ChannelType::A;
+    }        
     bool is_srgb() const {
       return channels[0].numeric_format == NumericFormat::SRGB;
     }

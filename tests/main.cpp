@@ -34,6 +34,7 @@ void spot_check_get_format_metadata() {
     CHECK(!md.is_srgb());
     CHECK(md.is_homogenous());
     CHECK(md.channel_count == 2);
+    CHECK(md.size_bytes == 1);
     CHECK(md.channels[0].type == vku::ChannelType::R);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::UNORM);
     CHECK(md.channels[0].bit_count == 4);
@@ -62,6 +63,7 @@ void spot_check_get_format_metadata() {
     CHECK(!md.is_srgb());
     CHECK(md.is_homogenous());
     CHECK(md.channel_count == 2);
+    CHECK(md.size_bytes == 4);
     CHECK(md.channels[0].type == vku::ChannelType::R);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::UNORM);
     CHECK(md.channels[0].bit_count == 10);
@@ -90,6 +92,7 @@ void spot_check_get_format_metadata() {
     CHECK(!md.is_srgb());
     CHECK(md.is_homogenous());
     CHECK(md.channel_count == 1);
+    CHECK(md.size_bytes == 2);
     CHECK(md.channels[0].type == vku::ChannelType::D);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::UNORM);
     CHECK(md.channels[0].bit_count == 16);
@@ -116,6 +119,7 @@ void spot_check_get_format_metadata() {
     CHECK(!md.is_srgb());
     CHECK(md.is_homogenous());
     CHECK(md.channel_count == 1);
+    CHECK(md.size_bytes == 1);
     CHECK(md.channels[0].type == vku::ChannelType::S);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::UINT);
     CHECK(md.channels[0].bit_count == 8);
@@ -142,6 +146,7 @@ void spot_check_get_format_metadata() {
     CHECK(!md.is_srgb());
     CHECK(!md.is_homogenous());
     CHECK(md.channel_count == 2);
+    CHECK(md.size_bytes == 3);
     CHECK(md.channels[0].type == vku::ChannelType::D);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::UNORM);
     CHECK(md.channels[0].bit_count == 16);
@@ -170,6 +175,7 @@ void spot_check_get_format_metadata() {
     CHECK(md.is_srgb());
     CHECK(md.is_homogenous());
     CHECK(md.channel_count == 3);
+    CHECK(md.size_bytes == 3);
     CHECK(md.channels[0].type == vku::ChannelType::R);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::SRGB);
     CHECK(md.channels[0].bit_count == 8);
@@ -188,6 +194,75 @@ void spot_check_get_format_metadata() {
     CHECK(md.channels[3].bit_shift == vku::ChannelMetadata::kNoShift);
   }
   {
+    auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_B8G8R8A8_SSCALED);
+    CHECK(md);
+    CHECK(!md == false);
+    CHECK(!md.is_packed());
+    CHECK(!md.is_depth_stencil());
+    CHECK(!md.has_depth());
+    CHECK(!md.has_stencil());
+    CHECK(md.has_numeric_format(vku::NumericFormat::SSCALED));
+    CHECK(!md.has_numeric_format(vku::NumericFormat::USCALED));
+    CHECK(!md.is_rgb());
+    CHECK(!md.is_rgba());
+    CHECK(md.is_bgra());
+    CHECK(!md.is_srgb());
+    CHECK(md.is_homogenous());
+    CHECK(md.channel_count == 4);
+    CHECK(md.size_bytes == 4);
+    CHECK(md.channels[0].type == vku::ChannelType::B);
+    CHECK(md.channels[0].numeric_format == vku::NumericFormat::SSCALED);
+    CHECK(md.channels[0].bit_count == 8);
+    CHECK(md.channels[0].bit_shift == vku::ChannelMetadata::kNoShift);
+    CHECK(md.channels[1].type == vku::ChannelType::G);
+    CHECK(md.channels[1].numeric_format == vku::NumericFormat::SSCALED);
+    CHECK(md.channels[1].bit_count == 8);
+    CHECK(md.channels[1].bit_shift == vku::ChannelMetadata::kNoShift);
+    CHECK(md.channels[2].type == vku::ChannelType::R);
+    CHECK(md.channels[2].numeric_format == vku::NumericFormat::SSCALED);
+    CHECK(md.channels[2].bit_count == 8);
+    CHECK(md.channels[2].bit_shift == vku::ChannelMetadata::kNoShift);
+    CHECK(md.channels[3].type == vku::ChannelType::A);
+    CHECK(md.channels[3].numeric_format == vku::NumericFormat::SSCALED);
+    CHECK(md.channels[3].bit_count == 8);
+    CHECK(md.channels[3].bit_shift == vku::ChannelMetadata::kNoShift);
+  }
+  {
+    auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_E5B9G9R9_UFLOAT_PACK32);
+    CHECK(md);
+    CHECK(!md == false);
+    CHECK(md.is_packed());
+    CHECK(!md.is_depth_stencil());
+    CHECK(!md.has_depth());
+    CHECK(!md.has_stencil());
+    CHECK(md.has_numeric_format(vku::NumericFormat::UFLOAT));
+    CHECK(md.has_numeric_format(vku::NumericFormat::SINT));
+    CHECK(!md.has_numeric_format(vku::NumericFormat::SFLOAT));
+    CHECK(md.is_ebgr());
+    CHECK(!md.is_rgb());
+    CHECK(!md.is_rgba());
+    CHECK(!md.is_srgb());
+    CHECK(!md.is_homogenous());
+    CHECK(md.channel_count == 4);
+    CHECK(md.size_bytes == 4);
+    CHECK(md.channels[0].type == vku::ChannelType::E);
+    CHECK(md.channels[0].numeric_format == vku::NumericFormat::SINT);
+    CHECK(md.channels[0].bit_count == 5);
+    CHECK(md.channels[0].bit_shift == 27);
+    CHECK(md.channels[1].type == vku::ChannelType::B);
+    CHECK(md.channels[1].numeric_format == vku::NumericFormat::UFLOAT);
+    CHECK(md.channels[1].bit_count == 9);
+    CHECK(md.channels[1].bit_shift == 18);
+    CHECK(md.channels[2].type == vku::ChannelType::G);
+    CHECK(md.channels[2].numeric_format == vku::NumericFormat::UFLOAT);
+    CHECK(md.channels[2].bit_count == 9);
+    CHECK(md.channels[2].bit_shift == 9);
+    CHECK(md.channels[3].type == vku::ChannelType::R);
+    CHECK(md.channels[3].numeric_format == vku::NumericFormat::UFLOAT);
+    CHECK(md.channels[3].bit_count == 9);
+    CHECK(md.channels[3].bit_shift == 0);
+  }
+  {
     auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_R64G64B64A64_SFLOAT);
     CHECK(md);
     CHECK(!md == false);
@@ -201,6 +276,7 @@ void spot_check_get_format_metadata() {
     CHECK(!md.is_srgb());
     CHECK(md.is_homogenous());
     CHECK(md.channel_count == 4);
+    CHECK(md.size_bytes == 32);
     CHECK(md.channels[0].type == vku::ChannelType::R);
     CHECK(md.channels[0].numeric_format == vku::NumericFormat::SFLOAT);
     CHECK(md.channels[0].bit_count == 64);
@@ -222,8 +298,37 @@ void spot_check_get_format_metadata() {
     auto md = vku::get_compressed_format_metadata(VK_FORMAT_BC1_RGB_UNORM_BLOCK);
     CHECK(md);
     CHECK(!md == false);
+    CHECK(!md.is_hdr());
+    CHECK(!md.is_rgba());
+    CHECK(md.is_rgb());
     CHECK(md.channel_count == 3);
+    CHECK(md.block_size_bytes == 8);
+    CHECK(md.block_width == 4 && md.block_height == 4);
     CHECK(md.numeric_format == vku::NumericFormat::UNORM);
+  }
+  {
+    auto md = vku::get_compressed_format_metadata(VK_FORMAT_ASTC_5x4_SRGB_BLOCK);
+    CHECK(md);
+    CHECK(!md == false);
+    CHECK(!md.is_hdr());
+    CHECK(md.is_rgba());
+    CHECK(!md.is_rgb());
+    CHECK(md.channel_count == 4);
+    CHECK(md.block_size_bytes == 16);
+    CHECK(md.block_width == 5 && md.block_height == 4);
+    CHECK(md.numeric_format == vku::NumericFormat::SRGB);
+  }
+  {
+    auto md = vku::get_compressed_format_metadata(VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK);
+    CHECK(md);
+    CHECK(!md == false);
+    CHECK(md.is_hdr());
+    CHECK(md.is_rgba());
+    CHECK(!md.is_rgb());
+    CHECK(md.channel_count == 4);
+    CHECK(md.block_size_bytes == 16);
+    CHECK(md.block_width == 12 && md.block_height == 12);
+    CHECK(md.numeric_format == vku::NumericFormat::SFLOAT);
   }
 }
 

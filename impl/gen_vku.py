@@ -129,7 +129,10 @@ FRIEND_FLAG_OPS = "\n".join([
 ])
 
 ENUMS_SECTION = [
-"""  // wrapped enum types
+"""  //
+  // wrapped enum types
+  //
+  
   template<typename T>
   struct EnumT {
     using UType = EnumT;
@@ -147,7 +150,10 @@ ENUMS_SECTION = [
 ]
 
 FLAGS_SECTION = [
-"""  // wrapped flag types
+"""  //
+  // wrapped flag types
+  //
+  
   template<typename T>
   struct FlagsT {
     using UType = FlagsT;
@@ -189,6 +195,7 @@ HANDLES_SECTION = [
 """  //
   // wrapped handle types
   //
+  
   template<typename T>
   struct HandleT {
     using UType = HandleT;
@@ -207,7 +214,10 @@ HANDLES_SECTION = [
 ]
 
 STRUCTS_SECTION = [
-"""  // wrapped info (type identified) and description (not type identified) structs
+"""  //
+  // wrapped info (type identified) and description (not type identified) structs
+  //
+  
   template<class T, int32_t STYPE>
   struct InfoT : public T {
     using UType = InfoT;
@@ -226,6 +236,166 @@ STRUCTS_SECTION = [
     DescriptionT(const VkType& rhs) { (VkType&)*this = rhs; }""",
     STRUCT_ASSIGN_OPS,
 """  };
+
+  //
+  // format metadata types and structs.
+  //
+  
+  enum class ChannelType : uint8_t {
+    Invalid = 0,
+    R, G, B, A,
+    D, // depth
+    S, // stencil
+    E, // exponent
+  };
+
+  enum class NumericFormat : uint8_t {
+    Invalid = 0,
+    UINT,
+    SINT,
+    UNORM,
+    SNORM,
+    USCALED,
+    SSCALED,    
+    UFLOAT,
+    SFLOAT,
+    SRGB
+  };
+
+  struct ChannelMetadata {
+    static constexpr uint8_t kNoShift = 0xff;
+    ChannelType type = ChannelType::Invalid;
+    NumericFormat numericFormat = NumericFormat::Invalid;
+    uint8_t bitCount = 0;
+    uint8_t bitShift = kNoShift;
+    bool isFormatMatch(const ChannelMetadata& rhs, bool checkShift) const {
+      return numericFormat == rhs.numericFormat && bitCount == rhs.bitCount && (!checkShift || bitShift == rhs.bitShift);
+    }
+    bool isFormatCompatible(const ChannelMetadata& rhs, bool checkShift) const {
+      const auto fmt = numericFormat == USCALED ? UINT : numericFormat;
+      const auto rhsFmt = rhs.numericFormat == USCALED ? UINT : rhs.numericFormat;
+      return fmt == rhsFmt && bitCount == rhs.bitCount && (!checkShift || bitShift == rhs.bitShift);
+    }
+    operator bool() const {
+      return type != ChannelType::Invalid;
+    }
+    bool operator!() const {
+      return type == ChannelType::Invalid;
+    }    
+  };
+  
+  struct UncompressedFormatMetadata {
+    uint8_t sampleSizeBytes = 0;
+    uint8_t channelCount = 0;
+    ChannelMetadata channels[4];
+    operator bool() const {
+      return !!sampleSizeBytes;
+    }
+    bool operator!() const {
+      return !sampleSizeBytes;
+    }
+    bool isPacked() const {
+      return channels[0].bitShift != ChannelMetadata::kNoShift;
+    }
+    bool isRGB() const {
+      return channels[2].type = ChannelType::B && channels[3].type = ChannelType::Invalid;
+    }    
+    bool isRGBA() const {
+      return channels[3].type = ChannelType::A;
+    }
+    bool hasChannel(ChannelType ct) const {
+      for (auto ci = 0; ci < channelCount; ++ci) {
+        if (channels[ci].channelType == ct) {
+          return true;
+        }
+      }
+      return false;
+    }
+    bool hasDepth() const {
+      return hasChannel(ChannelType::D);
+    }
+    bool hasStencil() const {
+      return hasChannel(ChannelType::S);
+    }    
+    bool isDepthStencil() const {
+      return hasDepth() && hasStencil();
+    }    
+    bool hasNumericFormat(NumericFormat nf) const {
+      for (auto ci = 0; ci < channelCount; ++ci) {
+        if (channels[ci].numericFormat == nf) {
+          return true;
+        }
+      }
+      return false;
+    }
+    bool isHomogenous() const {
+      for (auto ci = 1; ci < channelCount; ++ci) {
+        if (!channels[0].isFormatMatch(channels[ci], /*checkShift*/false)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    bool isCompatible(const UncompressedFormatMetadata& rhs) const {
+      for (uint32_t ci = 0, cc = channelCount > rhs.channelCount ? channelCount : rhs.channelCount; ci < cc; ++ci) {
+        if (!channels[ci].isFormatCompatible(rhs.channels[ci], /*checkShift*/true)) {
+          return false;
+        }
+      }
+      return true;
+    }    
+  };
+
+  enum class CompressionScheme : uint8_t {
+    None,
+    BC1,
+    BC2,
+    BC3,
+    BC4,
+    BC5,
+    BC6H,
+    BC7,    
+    EAC,
+    ETC2,
+    ASTC,
+  };
+
+  struct CompressedFormatMetadata {
+    CompressionScheme compression;
+    uint8_t blockWidth;
+    uint8_t blockHeight;
+    uint8_t blockSizeBytes;
+    // no need for separate channel metadata.
+    // all block compressed formats are R, RG, RGB, or RGBA
+    // with homogenous numeric formats and opaque bit distribution.
+    // as this utility header is not for writing
+    // compression/decompression libraries, this is sufficient.
+    uint8_t channelCount;
+    NumericFormat numericFormat;
+    operator bool() const {
+      return compression != CompressionScheme::Invalid;
+    }
+    bool operator!() const {
+      return compression == CompressionScheme::Invalid;
+    }    
+    inline bool isHDR() const {
+      return numericFormat == NumericFormat::SFLOAT || numericFormat == NumericFormat::UFLOAT;
+    }
+  };
+
+  struct VideoFormatMetadata {
+    uint8_t blockWidth = 0;
+    uint8_t blockSizeBytes = 0;
+    uint8_t channelCount = 0;
+    NumericFormat numericFormat = NumericFormat::Invalid;
+    // implementation not complete. TBD at need.
+    operator bool() const {
+      return numericFormat != NumericFormat::Invalid;
+    }
+    bool operator!() const {
+      return numericFormat == NumericFormat::Invalid;
+    }    
+  };
 """
 ]
 
@@ -588,18 +758,26 @@ def format_meta_impl(
 def collect_format_data():
     vk_formats = []
     for format_entry in REGISTRY.find("./formats").findall("./format"):
-        comp_names = []
-        comp_bit_counts = set()
-        comp_num_types = set()
-        for component_entry in format_entry.findall("./component"):
+        channels = []
+        name = format_entry.attrib["name"]
+        packed = format_entry.get('packed')
+        if packed is not None:
+            packed = int(packed)
+        component_entries = format_entry.findall("./component")
+
+        # special handling needed.
+        if name[len('VK_FORMAT_')] == 'E' and name[len('VK_FORMAT_') + 1] in "123456789":
+            bit_count = name[len('VK_FORMAT_E'):]
+            bit_count = int(bit_count[:1 + int(bit_count[1] in "0123456789")])
+            channels.append(
+                dict(name='E', bit_count=bit_count, num_type='SINT', shift=(32 - bit_count))
+            )
+        for component_entry in component_entries:
             comp_name = component_entry.attrib["name"]
             bits = component_entry.attrib["bits"]
             bits = int(bits) if bits != "compressed" else None
             num_type = component_entry.attrib["numericFormat"]
-            comp_names.append(comp_name)
-            comp_bit_counts.add(bits)
-            comp_num_types.add(num_type)
-        name = format_entry.attrib["name"]
+            channels.append(dict(name=comp_name, bit_count=bits, num_type=num_type))
         size_bytes = int(format_entry.attrib["blockSize"])
         texel_count = int(format_entry.attrib["texelsPerBlock"])
         if texel_count > 1:
@@ -610,89 +788,97 @@ def collect_format_data():
         vk_formats.append({
             "name": name,
             "size_bytes": size_bytes,
+            "packed": packed,
             "block_size": block_size,
-            "comp_names": comp_names,
-            "comp_num_types": comp_num_types,
-            "comp_bit_counts": comp_bit_counts
+            "channels": channels,
+            "chroma": format_entry.attrib.get('chroma')
         })
     return vk_formats
+
+"""
+    ChannelType type = ChannelType::Invalid;
+    NumericFormat numericFormat = NumericFormat::Invalid;
+    uint8_t bitCount = 0;
+    uint8_t bitShift = kNoShift;
+"""
+
+
+def gen_uncompressed_metadata(vk_format: dict) -> str:
+    channels = vk_format['channels']
+    size_bytes = vk_format['size_bytes']
+    shift = "ChannelMetadata::kNoShift"
+    size_bits = size_bytes * 8
+    sub_packed = None
+    if (packed := vk_format['packed']) is not None:
+        shift = size_bits
+        sub_packed = packed if packed < size_bits else None
+
+    meta = [str(size_bytes), str(len(channels))]
+
+    chan_meta = []
+    for c in channels:
+        bit_count = c['bit_count']
+        if packed is not None:
+            shift = packed - bit_count
+            packed = packed - (bit_count if sub_packed is None else sub_packed)
+        chan_meta.append(f"{{ChannelType::{c['name']}, NumericFormat::{c['num_type']}, {bit_count}, {shift}}}")
+    meta.append(f"{{{', '.join(chan_meta)}}}")
+    return f"{{{', '.join(meta)}}}"
+
+
+def gen_compressed_metadata(vk_format: dict) -> str:
+    meta = ["{"]
+    meta.append("}")
+    return " ".join(meta)
+
+
+def gen_video_metadata(vk_format: dict) -> str:
+    meta = ["{"]
+    meta.append("}")
+    return " ".join(meta)
 
 
 def gen_format_metadata_functions():
     vk_formats = collect_format_data()
-    STRUCTS_SECTION.append("""
-  enum class CompressionScheme : uint8_t {
-    None,
-    BC1,
-    BC2,
-    BC3,
-    BC4,
-    BC5,
-    BC6H,
-    BC7,    
-    EAC,
-    ETC2,
-    ASTC,
-  };
-  enum class ChannelType : uint8_t {
-    R, G, B, A, D, S
-  };  
-  enum class NumericFormat : uint8_t {
-    UINT,
-    SINT,
-    UNORM,
-    SNORM,    
-    USCALED,
-    SSCALED,    
-    UFLOAT,
-    SFLOAT
-  };
-  struct ChannelMetadata {
-    ChannelType type;
-    NumericFormat numericFormat;
-    uint8_t bitCount;
-    // 0 for non-packed
-    uint8_t bitShift;
-  };
-  struct FormatMetadata {
-    CompressionScheme compression;  
-    uint8_t blockWidth;
-    uint8_t blockHeight;
-    uint8_t blockSizeBytes;
-    uint8_t isPacked;
-    uint8_t isSRGB;
-    uint8_t areChannelsUniform;
-    uint8_t channelCount;
-    ChannelMetadata channels[4];
-  };  
-""")
     FUNCTIONS_PROTO_SECTION.append("")
     FUNCTIONS_IMPL_SECTION.append("")
 
-    func_info = {"name": "get_uncompressed_sample_size_bytes", "rtype": "uint32_t"}
-    doc_line = None
+    func_info = {"name": "get_uncompressed_format_metadata", "rtype": "UncompressedFormatMetadata"}
+    doc_line = "returns default initialized metadata for compressed or video formats"
     FUNCTIONS_PROTO_SECTION.append(format_meta_proto(doc_line=doc_line, **func_info))
     meta_body = [
         "    switch(f) {"
     ]
     for vk_format in vk_formats:
-        if vk_format["block_size"] != (1, 1):
+        if vk_format["block_size"] != (1, 1) or vk_format["chroma"] is not None:
             continue
-        meta_body.append(f"    case {vk_format['name']}: return {vk_format['size_bytes']};")
+        meta_body.append(f"    case {vk_format['name']}: return {gen_uncompressed_metadata(vk_format)};")
     meta_body.append("    default: break;\n    }\n    return {};")
     FUNCTIONS_IMPL_SECTION.append(format_meta_impl(body="\n".join(meta_body), **func_info))
 
-    func_info = {"name": "get_compressed_block_size", "rtype": "uvec3"}
-    doc_line = "x,y texel block size, z block size bytes"
+    func_info = {"name": "get_compressed_format_metadata", "rtype": "CompressedFormatMetadata"}
+    doc_line = "returns default initialized metadata for uncompressed or video formats"
     FUNCTIONS_PROTO_SECTION.append(format_meta_proto(doc_line=doc_line, **func_info))
     meta_body = [
         "    switch(f) {"
     ]
     for vk_format in vk_formats:
-        if vk_format["block_size"] == (1, 1):
+        if vk_format["block_size"] == (1, 1) or vk_format["chroma"] is not None:
             continue
-        block_size = f"{{{vk_format['block_size'][0]}, {vk_format['block_size'][1]}, {vk_format['size_bytes']}}}"
-        meta_body.append(f"    case {vk_format['name']}: return {block_size};")
+        meta_body.append(f"    case {vk_format['name']}: return {gen_compressed_metadata(vk_format)};")
+    meta_body.append("    default: break;\n    }\n    return {};")
+    FUNCTIONS_IMPL_SECTION.append(format_meta_impl(body="\n".join(meta_body), **func_info))
+
+    func_info = {"name": "get_video_format_metadata", "rtype": "VideoFormatMetadata"}
+    doc_line = "returns default initialized metadata for non-video formats"
+    FUNCTIONS_PROTO_SECTION.append(format_meta_proto(doc_line=doc_line, **func_info))
+    meta_body = [
+        "    switch(f) {"
+    ]
+    for vk_format in vk_formats:
+        if vk_format["block_size"] == (1, 1) or vk_format["chroma"] is not None:
+            continue
+        meta_body.append(f"    case {vk_format['name']}: return {gen_video_metadata(vk_format)};")
     meta_body.append("    default: break;\n    }\n    return {};")
     FUNCTIONS_IMPL_SECTION.append(format_meta_impl(body="\n".join(meta_body), **func_info))
 

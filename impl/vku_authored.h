@@ -40,7 +40,10 @@ namespace vku {
 
 
 namespace vku {
+  //
   // wrappers with convenience extensions
+  //
+
   struct Offset2D : VkOffset2D {
     Offset2D() : VkOffset2D(VkOffset2D{}) {}
     Offset2D(const VkOffset2D& i) : VkOffset2D(i) {}
@@ -185,7 +188,56 @@ namespace vku {
     extent.height = uint32_t(vp.height);
   }
 
-  // always inlined functions
+  //
+  // prototypes
+  //
+
+  VKU_PROTO uint32_t get_uncompressed_image_sample_count(uvec2 image_size, uint32_t mip_max = ~0u, uint32_t array_len=1);
+  VKU_PROTO uint32_t get_uncompressed_image_size_bytes(VkFormat format, const uvec2& image_size, bool mip_mapped, uint32_t array_len=1);
+  // R, RG, RGB, or RGBA uncompressed, homogenous, non-extension format.
+  VKU_PROTO VkFormat vanilla_format_for(uint32_t channelCount, NumericFormat nf, uint32_t bitCount, bool packed=false);
+
+#if defined(VKU_INLINE_ALL) || defined(VKU_IMPLEMENT)
+  //
+  // implementations
+  //
+
+  VKU_IMPL uint32_t get_uncompressed_image_sample_count(uvec2 image_size, uint32_t mip_max, uint32_t array_len) {
+    uint32_t c = 0;
+    for (uint32_t m = 0; m < mip_max; ++m, image_size.x >>= 1, image_size.y >>= 1) {
+      if (auto mip_sample_count = image_size.x * image_size.y) {
+        c += mip_sample_count;
+        continue;
+      }
+      break;
+    }
+    return c * array_len;
+  }
+
+  VKU_IMPL uint32_t get_uncompressed_image_size_bytes(VkFormat format, const uvec2& image_size, bool mip_mapped, uint32_t array_len) {
+    return get_uncompressed_image_sample_count(image_size, mip_mapped ? ~0u : 1u, array_len) *
+               get_uncompressed_format_metadata(format).sampleSizeBytes;
+  }
+
+  VKU_IMPL VkFormat vanilla_format_for(uint32_t channelCount, NumericFormat nf, uint32_t bitCount, bool packed) {
+    for (uint32_t i = 1; i < 1000; ++i) {
+      if (UncompressedFormatMetadata md = get_uncompressed_format_metadata(VkFormat(i))) {
+        if ( md.channelCount == channelCount &&
+             md.isHomogenous() &&
+             md.hasNumericFormat(nf) &&
+             md.channels[0].bitCount == bitCount &&
+             md.isPacked() == packed
+        ) {
+          return VkFormat(i);
+        }
+        continue;
+      }
+      break;
+    }
+    return VK_FORMAT_INVALID;
+  }
+#endif // VKU_INLINE_ALL || VKU_IMPLEMENT
+
   template<typename T>
   inline const char* to_string(const T v, const char* invalidStr) {
     auto str = to_string(v);
@@ -203,29 +255,13 @@ namespace vku {
     return (image_size.x >> mip) * (image_size.y >> mip) * array_len;
   }
 
-  // prototypes
-  VKU_PROTO uint32_t get_uncompressed_image_sample_count(uvec2 image_size, uint32_t mip_max = ~0u, uint32_t array_len=1);
-  VKU_PROTO uint32_t get_uncompressed_image_size_bytes(VkFormat format, const uvec2& image_size, bool mip_mapped, uint32_t array_len=1);
-
-  // implementations
-#if defined(VKU_INLINE_ALL) || defined(VKU_IMPLEMENT)
-  VKU_IMPL uint32_t get_uncompressed_image_sample_count(uvec2 image_size, uint32_t mip_max, uint32_t array_len) {
-    uint32_t c = 0;
-    for (uint32_t m = 0; m < mip_max; ++m, image_size.x >>= 1, image_size.y >>= 1) {
-      if (auto mip_sample_count = image_size.x * image_size.y) {
-        c += mip_sample_count;
-        continue;
-      }
-      break;
-    }
-    return c * array_len;
+  inline uint32_t get_format_extension(VkFormat f) {
+    return (uin32_t(f) < 1000u) ? 0u : ((uint32_t(f) - 1000000000u) / 1000u) + 1u;
   }
 
-  VKU_IMPL uint32_t get_uncompressed_image_size_bytes(VkFormat format, const uvec2& image_size, bool mip_mapped, uint32_t array_len) {
-    return get_uncompressed_image_sample_count(image_size, mip_mapped ? ~0u : 1u, array_len) *
-               get_uncompressed_sample_size_bytes(format);
+  inline bool is_extended_format(VkFormat f) {
+    return !!get_format_extension(f);
   }
-#endif // VKU_INLINE_ALL || VKU_IMPLEMENT
 
   inline uint32_t get_uncompressed_mip_size_bytes(VkFormat format, uvec2 image_size, uint32_t mip, uint32_t array_len=1) {
     return get_uncompressed_mip_sample_count(image_size, mip, array_len) * get_uncompressed_sample_size_bytes(format);

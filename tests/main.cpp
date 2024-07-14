@@ -4,7 +4,7 @@
 int checks = 0;
 int failures = 0;
 
-void spot_check_format_to_str() {
+void spot_check_to_string() {
   CHECK(!strcmp(vku::to_string(VK_FORMAT_UNDEFINED), "VK_FORMAT_UNDEFINED"));
   CHECK(!strcmp(vku::to_string(VK_FORMAT_R8G8B8A8_SRGB), "VK_FORMAT_R8G8B8A8_SRGB"));
   CHECK(!strcmp(vku::to_string(VK_FORMAT_A2B10G10R10_SINT_PACK32), "VK_FORMAT_A2B10G10R10_SINT_PACK32"));
@@ -389,13 +389,64 @@ void spot_check_image_size_bytes() {
 }
 
 
+void spot_check_wrapped_types() {
+  vku::Device d;
+  CHECK(!d);
+  d = VkDevice(intptr_t(1));
+  CHECK(d);
+  CHECK(d == VkDevice(intptr_t(1)));
+  CHECK(d != VkDevice(intptr_t(2)));
+  d = VK_NULL_HANDLE;
+  CHECK(!d);
+  CHECK(d != VkDevice(intptr_t(1)));
+  CHECK(d != VkDevice(intptr_t(2)));
+
+  vku::Flags f;
+  CHECK(!f);
+  f |= VkFlags(VK_FORMAT_FEATURE_BLIT_DST_BIT);
+  f |= VkFlags(VK_FORMAT_FEATURE_BLIT_SRC_BIT);
+  CHECK(f == VkFlags(VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT));
+
+  VkFlags vkf = f;
+  CHECK(vkf == f);
+}
+
+void spot_check_struct_stype() {
+  vku::BufferCreateInfo bci;
+  
+  CHECK(bci.sType == VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO);
+  CHECK(bci.size == 0);
+
+  VkBufferCreateInfo vk_bci{};
+  vk_bci.size = 1000;
+  bci = vk_bci;
+
+  CHECK(bci.sType == VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO);
+  CHECK(bci.size == 1000);
+
+  vku::SubpassDescription spd;
+  CHECK(spd.pInputAttachments == nullptr);
+  CHECK(spd.colorAttachmentCount == 0);
+
+  VkSubpassDescription vk_spd;
+  vk_spd.colorAttachmentCount = 1;
+
+  spd = vk_spd;
+  CHECK(spd.colorAttachmentCount == 1);
+}
+
+
 int main() {
   checks = 0;
   failures = 0;
+
   // force reference to module2.obj
   module2();
 
-  spot_check_format_to_str();
+  spot_check_wrapped_types();
+  spot_check_struct_stype();
+
+  spot_check_to_string();
   spot_check_get_format_metadata();
   spot_check_format_for();
   spot_check_image_size_bytes();

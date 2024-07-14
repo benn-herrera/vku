@@ -861,7 +861,10 @@ def collect_format_data():
             "channels": channels,
             "chroma": format_entry.attrib.get('chroma')
         })
-    NUMERIC_FORMATS_ENUMS.extend(list(num_types))
+    assert not NUMERIC_FORMATS_ENUMS, "already initialized"
+    num_types = list(num_types)
+    num_types.sort(key=lambda e: e[1:] + e[0] if e != 'SRGB' else 'SRGB')
+    NUMERIC_FORMATS_ENUMS.extend(num_types)
     return vk_formats
 
 

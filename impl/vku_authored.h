@@ -192,7 +192,7 @@ namespace vku {
   // prototypes
   //
 
-  VKU_PROTO uint32_t get_uncompressed_image_sample_count(uvec2 image_size, uint32_t mip_max = ~0u, uint32_t array_len=1);
+  VKU_PROTO uint32_t get_uncompressed_image_texel_count(uvec2 image_size, uint32_t mip_max = ~0u, uint32_t array_len=1);
   VKU_PROTO uint32_t get_uncompressed_image_size_bytes(VkFormat format, const uvec2& image_size, bool mip_mapped, uint32_t array_len=1);
   // R, RG, RGB, or RGBA uncompressed, homogenous, base API level format.
   VKU_PROTO VkFormat vanilla_format_for(uint32_t channelCount, NumericFormat nf, uint32_t bitCount, bool packed=false);
@@ -202,11 +202,11 @@ namespace vku {
   // implementations
   //
 
-  VKU_IMPL uint32_t get_uncompressed_image_sample_count(uvec2 image_size, uint32_t mip_max, uint32_t array_len) {
+  VKU_IMPL uint32_t get_uncompressed_image_texel_count(uvec2 image_size, uint32_t mip_max, uint32_t array_len) {
     uint32_t c = 0;
     for (uint32_t m = 0; m < mip_max; ++m, image_size.x >>= 1, image_size.y >>= 1) {
-      if (auto mip_sample_count = image_size.x * image_size.y) {
-        c += mip_sample_count;
+      if (auto mip_texel_count = image_size.x * image_size.y) {
+        c += mip_texel_count;
         continue;
       }
       break;
@@ -215,7 +215,7 @@ namespace vku {
   }
 
   VKU_IMPL uint32_t get_uncompressed_image_size_bytes(VkFormat format, const uvec2& image_size, bool mip_mapped, uint32_t array_len) {
-    return get_uncompressed_image_sample_count(image_size, mip_mapped ? ~0u : 1u, array_len) *
+    return get_uncompressed_image_texel_count(image_size, mip_mapped ? ~0u : 1u, array_len) *
                get_uncompressed_format_metadata(format).size_bytes;
   }
 
@@ -253,7 +253,7 @@ namespace vku {
     return m;
   }
 
-  inline uint32_t get_uncompressed_mip_sample_count(const uvec2& image_size, uint32_t mip, uint32_t array_len=1) {
+  inline uint32_t get_uncompressed_mip_texel_count(const uvec2& image_size, uint32_t mip, uint32_t array_len=1) {
     return (image_size.x >> mip) * (image_size.y >> mip) * array_len;
   }
 
@@ -266,11 +266,11 @@ namespace vku {
   }
 
   inline uint32_t get_uncompressed_mip_size_bytes(VkFormat format, uvec2 image_size, uint32_t mip, uint32_t array_len=1) {
-    return get_uncompressed_mip_sample_count(image_size, mip, array_len) * get_uncompressed_format_metadata(format).size_bytes;
+    return get_uncompressed_mip_texel_count(image_size, mip, array_len) * get_uncompressed_format_metadata(format).size_bytes;
   }
 
   inline uint32_t get_uncompressed_mip_byte_offset(VkFormat format, const uvec2& image_size, uint32_t mip, uint32_t array_len=1) {
-    return get_uncompressed_image_sample_count(image_size, mip, array_len) * get_uncompressed_format_metadata(format).size_bytes;
+    return get_uncompressed_image_texel_count(image_size, mip, array_len) * get_uncompressed_format_metadata(format).size_bytes;
   }
 
   inline VkFormatFeatureFlags image_usage_to_format_feature_flags(VkImageUsageFlags usage) {

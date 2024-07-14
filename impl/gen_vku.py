@@ -10,11 +10,6 @@ It is intended to be invoked from gen_vku.sh.
 Run that instead.
 """
 
-"""
-TODO:
-fill in stub for uint32_t get_uncompressed_sample_size(VkFormat f);
-"""
-
 assert len(sys.argv) == 3, "args must be paths to vk.xml vku.h"
 
 VK_XML, VKU_H, VKU_AUTHORED_H = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[0]).with_name("vku_authored.h")
@@ -257,8 +252,7 @@ FORMAT_METADATA_ENUMS_FMT = """  //
   enum class NumericFormat : uint8_t {{
     Invalid = 0,
     {NUM_FMT_ENUM_VALUES}
-  }};
-"""
+  }};"""
 
 FORMAT_METADATA_TYPES = """
   struct ChannelMetadata {

@@ -59,7 +59,7 @@ namespace vku {
       y = rhs.y;
       return *this;
     }
-    operator ivec2() const { return {x, y}; }
+    operator ivec2() const { return ivec2{x, y}; }
   };
 
   struct Extent2D : VkExtent2D {
@@ -78,7 +78,7 @@ namespace vku {
       return *this;
     }
     operator uvec2() const {
-      return {width, height};
+      return uvec2{width, height};
     }
   };
 
@@ -124,7 +124,7 @@ namespace vku {
       return *this;
     }
     operator ivec3() const {
-      return {x, y, z};
+      return ivec3{x, y, z};
     }
   };
 
@@ -150,7 +150,7 @@ namespace vku {
       return *this;
     }
     operator uvec3() const {
-      return {width, height, depth};
+      return uvec3{width, height, depth};
     }
   };
 
@@ -160,8 +160,8 @@ namespace vku {
     Viewport(const VkViewport& i) : VkViewport(i) {}
     explicit Viewport(const VkRect2D& i, float _maxDepth = 1.0f) {
       maxDepth = _maxDepth;
-      offset() = { float(i.offset.x), float(i.offset.y) };
-      extent() = { float(i.extent.width), float(i.extent.height) };
+      offset() = vec2{ float(i.offset.x), float(i.offset.y) };
+      extent() = vec2{ float(i.extent.width), float(i.extent.height) };
     }
     Viewport(const vec2& _offset, const vec2& _extent, float _maxDepth=1.0f) {
       maxDepth = _maxDepth;

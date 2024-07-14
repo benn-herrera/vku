@@ -896,9 +896,9 @@ def gen_uncompressed_metadata(vk_format: dict) -> str:
         #   uint8_t bit_count;
         #   uint8_t bit_shift;
         # };
-        chan_meta.append(f"{{ChannelType::{channel_type}, NumericFormat::{num_format}, {bit_count}, {shift}}}")
-    meta.append(f"{{{', '.join(chan_meta)}}}")
-    return f"{{{', '.join(meta)}}}"
+        chan_meta.append("ChannelMetadata{" f"ChannelType::{channel_type}, NumericFormat::{num_format}, {bit_count}, {shift}" "}")
+    meta.append("{" f"{', '.join(chan_meta)}" "}")
+    return "UncompressedFormatMetadata{" f"{', '.join(meta)}" "}"
 
 
 def gen_compressed_metadata(vk_format: dict) -> str:
@@ -926,7 +926,7 @@ def gen_compressed_metadata(vk_format: dict) -> str:
         str(channel_count),
         f"NumericFormat::{num_format}"
     ]
-    return f"{{{', '.join(meta)}}}"
+    return "CompressedFormatMetadata{" f"{', '.join(meta)}" "}"
 
 
 def gen_video_metadata(vk_format: dict) -> str:
@@ -950,7 +950,7 @@ def gen_video_metadata(vk_format: dict) -> str:
         str(channel_count),
         f"NumericFormat::{num_format}"
     ]
-    return f"{{{', '.join(meta)}}}"
+    return "VideoFormatMetadata{" f"{', '.join(meta)}" "}"
 
 
 def gen_format_metadata_functions():

@@ -897,6 +897,8 @@ def gen_uncompressed_metadata(vk_format: dict) -> str:
         #   uint8_t bit_shift;
         # };
         chan_meta.append("ChannelMetadata{" f"ChannelType::{channel_type}, NumericFormat::{num_format}, {bit_count}, {shift}" "}")
+    for _ in range(len(channels), 4):
+        chan_meta.append('ChannelMetadata{ChannelType::Invalid, NumericFormat::Invalid, 0, ChannelMetadata::kNoShift}')
     meta.append("{" f"{', '.join(chan_meta)}" "}")
     return "UncompressedFormatMetadata{" f"{', '.join(meta)}" "}"
 

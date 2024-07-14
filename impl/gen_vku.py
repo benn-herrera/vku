@@ -239,28 +239,27 @@ STRUCTS_SECTION = [
 """
 ]
 
-FORMAT_METADATA_TYPES = """  //
+NUMERIC_FORMATS_ENUMS = [
+
+]
+
+NUMERIC_FORMATS_ENUM_SECTION_FMT = """  //
   // format metadata types and structs.
-  //  
+  //
+  
+  enum class NumericFormat : uint8_t {{
+    Invalid = 0,
+    {ENUM_VALUES}
+  }};
+"""
+
+FORMAT_METADATA_TYPES = """
   enum class ChannelType : uint8_t {
     Invalid = 0,
     R, G, B, A,
     D, // depth
     S, // stencil
     E, // exponent
-  };
-
-  enum class NumericFormat : uint8_t {
-    Invalid = 0,
-    UINT,
-    SINT,
-    UNORM,
-    SNORM,
-    USCALED,
-    SSCALED,    
-    UFLOAT,
-    SFLOAT,
-    SRGB
   };
 
   struct ChannelMetadata {
@@ -454,6 +453,7 @@ def write_vku_h():
         *FLAGS_SECTION, "",
         *HANDLES_SECTION, "",
         *STRUCTS_SECTION, "",
+        NUMERIC_FORMATS_ENUM_SECTION_FMT.format(ENUM_VALUES=",\n    ".join(NUMERIC_FORMATS_ENUMS)),
         FORMAT_METADATA_TYPES,
         FUNCTION_PROTOS_HEADER,
         f"static constexpr VkFormat kLastBaseFormat = {LAST_BASE_FORMAT[0]};",
@@ -821,6 +821,8 @@ def format_meta_impl(
 
 def collect_format_data():
     vk_formats = []
+    num_types = set()
+
     for format_entry in REGISTRY.find("./formats").findall("./format"):
         channels = []
         name = format_entry.attrib["name"]
@@ -846,6 +848,7 @@ def collect_format_data():
             bits = int(bits) if bits != "compressed" else None
             num_type = channel_entry.attrib["numericFormat"]
             channels.append(dict(name=chan_name, bit_count=bits, num_type=num_type))
+            num_types.add(num_type)
         size_bytes = int(format_entry.attrib["blockSize"])
         block_size = format_entry.attrib.get("blockExtent", "1,1")
         block_size = tuple(int(d) for d in block_size.split(",")[:2])
@@ -858,6 +861,7 @@ def collect_format_data():
             "channels": channels,
             "chroma": format_entry.attrib.get('chroma')
         })
+    NUMERIC_FORMATS_ENUMS.extend(list(num_types))
     return vk_formats
 
 

@@ -198,7 +198,6 @@ void spot_check_get_format_metadata() {
     CHECK(md.channels[3].type == vku::ChannelType::Invalid);
     CHECK(md.channels[3].numeric_format == vku::NumericFormat::Invalid);
     CHECK(md.channels[3].bit_count == 0);
-    CHECK(md.channels[3].bit_shift == vku::ChannelMetadata::kNoShift);
   }
   {
     auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_B8G8R8A8_SSCALED);

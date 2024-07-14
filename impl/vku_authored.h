@@ -257,12 +257,13 @@ namespace vku {
     return (image_size.x >> mip) * (image_size.y >> mip) * array_len;
   }
 
-  inline uint32_t get_format_extension(VkFormat f) {
-    return (uint32_t(f) < 1000u) ? 0u : ((uint32_t(f) - 1000000000u) / 1000u) + 1u;
+  inline bool is_extended_format(VkFormat fmt) {
+    return uint32_t(fmt) > 1000000000u;
   }
 
-  inline bool is_extended_format(VkFormat f) {
-    return !!get_format_extension(f);
+  // returns the extension number which introduce the given format
+  inline uint32_t get_format_extension(VkFormat fmt) {
+    return !is_extended_format(fmt) ? 0u : ((uint32_t(fmt) - 1000000000u) / 1000u) + 1u;
   }
 
   inline uint32_t get_uncompressed_mip_size_bytes(VkFormat format, uvec2 image_size, uint32_t mip, uint32_t array_len=1) {
@@ -274,14 +275,14 @@ namespace vku {
   }
 
   inline VkFormatFeatureFlags image_usage_to_format_feature_flags(VkImageUsageFlags usage) {
-    FormatFeatureFlagBits features;
-    if (usage & VK_IMAGE_USAGE_TRANSFER_SRC_BIT) { features |= VK_FORMAT_FEATURE_TRANSFER_SRC_BIT; }
-    if (usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT) { features |= VK_FORMAT_FEATURE_TRANSFER_DST_BIT; }
-    if (usage & VK_IMAGE_USAGE_SAMPLED_BIT) { features |= VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT; }
-    if (usage & VK_IMAGE_USAGE_STORAGE_BIT) { features |= VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT; }
-    if (usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) { features |= VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT; }
-    if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) { features |= VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT; }
-    return features;
+    VkFormatFeatureFlags flags = 0;
+    if (usage & VK_IMAGE_USAGE_TRANSFER_SRC_BIT) { flags |= VK_FORMAT_FEATURE_TRANSFER_SRC_BIT; }
+    if (usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT) { flags |= VK_FORMAT_FEATURE_TRANSFER_DST_BIT; }
+    if (usage & VK_IMAGE_USAGE_SAMPLED_BIT) { flags |= VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT; }
+    if (usage & VK_IMAGE_USAGE_STORAGE_BIT) { flags |= VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT; }
+    if (usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) { flags |= VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT; }
+    if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) { flags |= VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT; }
+    return flags;
   }
 } // namespace vku
 

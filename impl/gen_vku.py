@@ -240,18 +240,26 @@ CHANNEL_NAME_ENUMS = [
 NUMERIC_FORMAT_ENUMS = [
 ]
 
+COMPRESSION_ENUM_VALUES = [
+]
+
 FORMAT_METADATA_ENUMS_FMT = """  //
   // format metadata types and structs.
   //
   
   enum class ChannelName : uint8_t {{
     Invalid = 0,
-    {NAME_ENUM_VALUES}
+    {NAME_VALUES}
   }};
 
   enum class NumericFormat : uint8_t {{
     Invalid = 0,
-    {NUM_FMT_ENUM_VALUES}
+    {NUM_FMT_VALUES}
+  }};
+  
+  enum class CompressionScheme : uint8_t {{
+    Invalid = 0,
+    {COMPRESSION_VALUES}
   }};"""
 
 FORMAT_METADATA_TYPES = """
@@ -354,22 +362,6 @@ FORMAT_METADATA_TYPES = """
     }    
   };
 
-  enum class CompressionScheme : uint8_t {
-    Invalid,
-    ASTC,
-    BC1,
-    BC2,
-    BC3,
-    BC4,
-    BC5,
-    BC6H,
-    BC7,    
-    EAC,
-    ETC2,
-    PVRTC1,
-    PVRTC2
-  };
-
   struct CompressedFormatMetadata {
     CompressionScheme compression;
     uint8_t block_width;
@@ -414,7 +406,7 @@ FORMAT_METADATA_TYPES = """
   };
 """
 
-FUNCTION_PROTOS_HEADER = "  //\n  // function prototypes\n  "
+FUNCTION_PROTOS_HEADER = "  //\n  // function prototypes\n  //\n"
 
 FUNCTIONS_PROTO_SECTION = [
 ]
@@ -447,12 +439,13 @@ def write_vku_h():
         *HANDLES_SECTION, "",
         *STRUCTS_SECTION, "",
         FORMAT_METADATA_ENUMS_FMT.format(
-            NAME_ENUM_VALUES=",\n    ".join(CHANNEL_NAME_ENUMS),
-            NUM_FMT_ENUM_VALUES=",\n    ".join(NUMERIC_FORMAT_ENUMS)
+            NAME_VALUES=",\n    ".join(CHANNEL_NAME_ENUMS),
+            NUM_FMT_VALUES=",\n    ".join(NUMERIC_FORMAT_ENUMS),
+            COMPRESSION_VALUES=",\n    ".join(COMPRESSION_ENUM_VALUES)
         ),
         FORMAT_METADATA_TYPES,
+        f"  static constexpr VkFormat kLastBaseFormat = {LAST_BASE_FORMAT[0]};", "",
         FUNCTION_PROTOS_HEADER,
-        f"static constexpr VkFormat kLastBaseFormat = {LAST_BASE_FORMAT[0]};",
         *FUNCTIONS_PROTO_SECTION,
         FUNCTION_PROTOS_FOOTER, "",
         FUNCTIONS_HEADER,
@@ -819,6 +812,7 @@ def collect_format_data():
     vk_formats = []
     num_types = set()
     chan_names = set()
+    comp_schemes = set()
 
     for format_entry in REGISTRY.find("./formats").findall("./format"):
         channels = []
@@ -826,6 +820,7 @@ def collect_format_data():
         packed = format_entry.get('packed')
         if 'compressed' in format_entry.attrib:
             compression = format_entry.attrib['class'].split('_')[0]
+            comp_schemes.add(compression)
         else:
             compression = None
         if packed is not None:
@@ -877,6 +872,10 @@ def collect_format_data():
     chan_names.sort(key=chan_name_key)
     assert not CHANNEL_NAME_ENUMS, "already initialized"
     CHANNEL_NAME_ENUMS.extend(chan_names)
+
+    comp_schemes = list(comp_schemes)
+    comp_schemes.sort()
+    COMPRESSION_ENUM_VALUES.extend(comp_schemes)
 
     return vk_formats
 

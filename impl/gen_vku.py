@@ -208,9 +208,9 @@ HANDLES_SECTION = [
 """
 ]
 
-STRUCTS_SECTION = [
+INFO_STRUCTS_SECTION = [
 """  //
-  // wrapped info (type identified) and description (not type identified) structs
+  // wrapped info (type identified)
   //
   
   template<class T, int32_t STYPE>
@@ -221,17 +221,24 @@ STRUCTS_SECTION = [
     InfoT() { *this = VkType{ kStructType }; }
     InfoT(const VkType& rhs) { (VkType&)*this = rhs; this->sType = kStructType; }
     VkType& operator =(const VkType& rhs) { (VkType&)*this = rhs; this->sType = kStructType; return *this; }
-  };
-  
-  template<typename T>
-  struct DescriptionT : public T {
-    using UType = DescriptionT;
-    using VkType = T;
-    DescriptionT() { *this = VkType{}; }
-    DescriptionT(const VkType& rhs) { (VkType&)*this = rhs; }""",
-    STRUCT_ASSIGN_OPS,
-"""  };
+  };  
 """
+]
+
+DESC_STRUCTS_SECTION = [
+    """  //
+      // wrapped info description (not type identified) structs
+      //
+
+      template<typename T>
+      struct DescriptionT : public T {
+        using UType = DescriptionT;
+        using VkType = T;
+        DescriptionT() { *this = VkType{}; }
+        DescriptionT(const VkType& rhs) { (VkType&)*this = rhs; }""",
+    STRUCT_ASSIGN_OPS,
+    """  };
+    """
 ]
 
 CHANNEL_NAME_ENUMS = [
@@ -434,10 +441,11 @@ def write_vku_h():
     # Accumulate the results and write them out
     file_sections = [
         FILE_HEADER,
-        *ENUMS_SECTION, "",
-        *FLAGS_SECTION, "",
-        *HANDLES_SECTION, "",
-        *STRUCTS_SECTION, "",
+        # *ENUMS_SECTION, "",
+        # *FLAGS_SECTION, "",
+        # *HANDLES_SECTION, "",
+        # *DESC_STRUCTS_SECTION, "",
+        *INFO_STRUCTS_SECTION, "",
         FORMAT_METADATA_ENUMS_FMT.format(
             NAME_VALUES=",\n    ".join(CHANNEL_NAME_ENUMS),
             NUM_FMT_VALUES=",\n    ".join(NUMERIC_FORMAT_ENUMS),
@@ -627,7 +635,8 @@ def gen_type_wrappers():
     enums = []
     flags = []
     handles = []
-    structs = []
+    info_structs = []
+    desc_structs = []
     func_protos = []
     func_impls = []
 
@@ -729,7 +738,10 @@ def gen_type_wrappers():
             platform_macro = platform_macro_for_type(type_name)
             version_macro = version_macro_for_type(type_name)
             block = wrap_struct_type(type_name, stype_value=stype)
-            structs.append(dict(block=block, platform=platform_macro, version=version_macro))
+            if stype is not None:
+                info_structs.append(dict(block=block, platform=platform_macro, version=version_macro))
+            else:
+                desc_structs.append(dict(block=block, platform=platform_macro, version=version_macro))
         elif category == "bitmask":
             if (type_def := type_entry.find("./type")) is None:
                 continue
@@ -752,14 +764,16 @@ def gen_type_wrappers():
     enums.sort(key=sort_key)
     flags.sort(key=sort_key)
     handles.sort(key=sort_key)
-    structs.sort(key=sort_key)
+    info_structs.sort(key=sort_key)
+    desc_structs.sort(key=sort_key)
     func_protos.sort(key=sort_key)
     func_impls.sort(key=sort_key)
 
     add_grouped_to_section(ENUMS_SECTION, enums)
     add_grouped_to_section(FLAGS_SECTION, flags)
     add_grouped_to_section(HANDLES_SECTION, handles)
-    add_grouped_to_section(STRUCTS_SECTION, structs)
+    add_grouped_to_section(INFO_STRUCTS_SECTION, info_structs)
+    add_grouped_to_section(DESC_STRUCTS_SECTION, desc_structs)
     add_grouped_to_section(FUNCTIONS_PROTO_SECTION, func_protos)
     add_grouped_to_section(FUNCTIONS_IMPL_SECTION, func_impls)
 

@@ -1,6 +1,8 @@
 #include "vku/vku.h"
 #include "test.h"
 
+#undef ENABLE_SIMPLE_WRAPPERS
+
 int checks = 0;
 int failures = 0;
 
@@ -14,6 +16,27 @@ void spot_check_to_string() {
 }
 
 void spot_check_get_format_metadata() {
+  CHECK(!vku::get_uncompressed_format_metadata(VK_FORMAT_UNDEFINED));
+  CHECK(!vku::get_compressed_format_metadata(VK_FORMAT_UNDEFINED));
+  CHECK(!vku::get_video_format_metadata(VK_FORMAT_UNDEFINED));
+
+  CHECK(!vku::get_uncompressed_format_metadata(VkFormat(0x7fffffff)));
+  CHECK(!vku::get_compressed_format_metadata(VkFormat(0x7fffffff)));
+  CHECK(!vku::get_video_format_metadata(VkFormat(0x7fffffff)));
+
+  static_assert(uint32_t(vku::kLastBaseFormat) < 1000u);
+
+  // verify all of the base formats are covered
+  for (uint32_t i = 1; i < 185; ++i) {
+    auto umd = vku::get_uncompressed_format_metadata(VkFormat(i));
+    auto cmd = vku::get_compressed_format_metadata(VkFormat(i));
+    auto vmd = vku::get_video_format_metadata(VkFormat(i));
+    // video formats are all extension formats.
+    CHECK(!vmd);
+    CHECK((uint32_t(!umd) + uint32_t(!cmd) + uint32_t(!vmd)) == 2);
+    CHECK((uint32_t(!!umd) + uint32_t(!!cmd) + uint32_t(!!vmd)) == 1);
+  }
+
   {
     auto md = vku::get_uncompressed_format_metadata(VK_FORMAT_R4G4_UNORM_PACK8);
     CHECK(!vku::get_compressed_format_metadata(VK_FORMAT_R4G4_UNORM_PACK8));
@@ -388,8 +411,8 @@ void spot_check_image_size_bytes() {
   CHECK(vku::get_uncompressed_image_size_bytes(VK_FORMAT_R16G16B16_SFLOAT, vku::uvec2{ 19, 20 }, true, 2) == 5940);
 }
 
-
 void spot_check_wrapped_types() {
+#if defined(ENABLE_SIMPLE_WRAPPERS)
   vku::Device d;
   CHECK(!d);
   d = VkDevice(intptr_t(1));
@@ -409,21 +432,11 @@ void spot_check_wrapped_types() {
 
   VkFlags vkf = f;
   CHECK(vkf == f);
+#endif
 }
 
-void spot_check_struct_stype() {
-  vku::BufferCreateInfo bci;
-  
-  CHECK(bci.sType == VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO);
-  CHECK(bci.size == 0);
-
-  VkBufferCreateInfo vk_bci{};
-  vk_bci.size = 1000;
-  bci = vk_bci;
-
-  CHECK(bci.sType == VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO);
-  CHECK(bci.size == 1000);
-
+void spot_check_desc_struct() {
+#if defined(ENABLE_SIMPLE_WRAPPERS)
   vku::SubpassDescription spd;
   CHECK(spd.pInputAttachments == nullptr);
   CHECK(spd.colorAttachmentCount == 0);
@@ -433,6 +446,21 @@ void spot_check_struct_stype() {
 
   spd = vk_spd;
   CHECK(spd.colorAttachmentCount == 1);
+#endif
+}
+
+void spot_check_info_stype() {
+  vku::BufferCreateInfo bci;
+
+  CHECK(bci.sType == VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO);
+  CHECK(bci.size == 0);
+
+  VkBufferCreateInfo vk_bci{};
+  vk_bci.size = 1000;
+  bci = vk_bci;
+
+  CHECK(bci.sType == VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO);
+  CHECK(bci.size == 1000);
 }
 
 
@@ -444,7 +472,8 @@ int main() {
   module2();
 
   spot_check_wrapped_types();
-  spot_check_struct_stype();
+  spot_check_info_stype();
+  spot_check_desc_struct();
 
   spot_check_to_string();
   spot_check_get_format_metadata();

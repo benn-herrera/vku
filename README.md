@@ -37,8 +37,6 @@
     * VkViewport
       * easy conversion to/from VkRect2D
       * easy assignment to offset & extent from vector and offset types
-* Simple zero-init wrappers for enum, flags, and handle types
-  * More for completeness of type space than massive utility 
 * All types are mix & match with base API - incremental integration is painless
 * Wrapped types work interchangeably with base types in the base Vulkan API
 

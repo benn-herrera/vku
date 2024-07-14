@@ -16,9 +16,10 @@
       * Most of the lines are type aliases and switch cases.
 
 ### Types
-* Structs subclassed with default zero initialization
-    * Info types automatically assign correct sType in construction
+* Info structs subclassed
+    * Automatically assign correct sType in construction, zero initializes the rest.
     * Copy constructor and assignment operators safeguard sType value
+        * Copying to vku::FooInfo from partly initialized VkFooInfo preserves sType 
 * Some utility functions take or return dimensions
   * If VKU_USE_GLM is defined glm vector types will be used
   * If not, simple structs defined.
@@ -28,15 +29,19 @@
     * uint32_t coords: uvec2, uvec3
 * Several spatial structs subclassed for conversion and assignment convenience
     * VkOffset2D, VkOffset3D
+      * zero-initialization constructors 
       * easy conversion from/to ivec2, ivec3
     * VkExtent2D, VkExtent3D
+      * zero-initialization constructors 
       * easy conversion to/from uvec2, uvec3
     * VkRect2D
-      * easy construction from ivec2 offset + uvec2 extent
+      * zero-initialization constructors
+      * easy construction from ivec2 offset and/or uvec2 extent
       * easy conversion to/from VkViewport
     * VkViewport
+      * zero-initialization constructor
       * easy conversion to/from VkRect2D
-      * easy assignment to offset & extent from vector and offset types
+      * easy assignment to offset & extent from vector and VkOffset types
 * All types are mix & match with base API - incremental integration is painless
 * Wrapped types work interchangeably with base types in the base Vulkan API
 

@@ -1,10 +1,10 @@
 # vku
 ## A single header C++ type and utility library for Vulkan
-### Principle
+### Principles
 * Unopinionated
   * Does not constrain usage of Vulkan
   * Does not require wholesale adoption
-* Minimal coding mercy
+* Simple coding mercy
   * Adds utility types and simple, useful functions
   * Vulkan API functions are not wrapped
   * No required dependencies beyond Vulkan headers
@@ -36,7 +36,7 @@
       * easy conversion to/from VkViewport
     * VkViewport
       * easy conversion to/from VkRect2D
-      * easy assignment to offset & extent from vector types
+      * easy assignment to offset & extent from vector and offset types
 * Simple zero-init wrappers for enum, flags, and handle types
   * More for completeness of type space than massive utility 
 * All types are mix & match with base API - incremental integration is painless
@@ -48,9 +48,32 @@
         * e.g. VkEnumTypeFoo -> enum_type_foo_to_string(VkEnumTypeFoo v); 
         * This was the simplest of a set of imperfect options
 * VK_FORMAT metadata getters
-    * UncompressedFormatMetadata get_uncompressed_format_metadata(VkFormat)
+    * UncompressedFormatMetadata get_uncompressed_format_metadata(VkFormat) 
     * CompressedFormatMetadata get_ccompressed_format_metadata(VkFormat)
-    * VideoFormatMetadata get_video_format_metadata(VkFormat fmt)
+    * See vku.h for definitions of ChannelName, NumericFormat, CompressionScheme
+    * See vku.h for ChannelMetadata, UncompressedFormatMetadata utility methods
+```C++ 
+      struct ChannelMetadata {
+        static constexpr uint8_t kNoShift = 0xff;
+        ChannelName name;
+        NumericFormat numeric_format;
+        uint8_t bit_count;
+        uint8_t bit_shift;
+      };
+      
+      struct UncompressedFormatMetadata {
+        uint8_t size_bytes;
+        uint8_t channel_count;
+        ChannelMetadata channels[4];
+      };
+      
+     struct CompressedFormatMetadata {
+       CompressionScheme compression;
+       uint8_t block_width;
+       uint8_t block_height;
+       uint8_t block_size_bytes;
+     };      
+```
 
 ### General Utility Functions
 * uint32_t get_uncompressed_image_texel_count(uvec2 size, uint32_t mip_max, uint32_t array_len)
@@ -58,6 +81,7 @@
 * VKU_PROTO VkFormat vanilla_format_for(uint32_t channel_count, NumericFormat nf, uint32_t channel_bit_count, bool packed)
     * For the given channel count, numeric format, channel bit count find a format
     * R, RG, RGB, or RGBA uncompressed, homogenous, base API level format
+* See end of vku.h for complete list.
 
 ## Usage
 * For Existing Header Versions
@@ -70,7 +94,7 @@
 * Adding a new version
     * Python 3.11+ required (previous versions may work. YMMV.)
         * No additional packages needed
-    * ./gen_vku.sh <MAJ.min.patch> # eg 1.3.280
+    * ./gen_vku.sh -a [MAJ.min.patch] # eg 1.3.280
         * On Windows run from git bash 
     * version must match a tag in https://github.com/KhronosGroup/VulkanHeaders.git
     * ./gen_vku.sh -h for more details.

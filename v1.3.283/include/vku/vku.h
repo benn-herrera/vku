@@ -1,5 +1,5 @@
 #pragma once
-// vku.h v1.3.283 generated 2024-07-14 15:24:18.024287 by gen_vku.py
+// vku.h v1.3.283 generated 2024-07-14 16:36:55.310619 by gen_vku.py
 // see https://github.com/benn-herrera/vku.git LICENSE.md and README.md
 // define VKU_INLINE_ALL for header-only with no compiled functions
 // or 
@@ -26,613 +26,7 @@
 
 namespace vku {
   //
-  // wrapped enum types
-  //
-  
-  template<typename T>
-  struct EnumT {
-    using UType = EnumT;
-    using VkType = T;  
-    static constexpr auto kInvalid = (VkType)0x7fffffff;
-    EnumT(VkType i=(VkType)0) : v(i) {}
-    VkType operator =(const VkType rhs) { v = rhs; return v; }
-    operator const VkType&() const { return v; }
-    operator VkType&() { return v; }
-    VkType* operator&() { return &v; }
-    const VkType* operator&() const { return &v; }
-    friend bool operator <(const UType& lhs, const VkType rhs) { return lhs.v < rhs; }
-    friend bool operator <(const VkType lhs, const UType& rhs) { return lhs < rhs.v; }
-    friend bool operator <=(const UType& lhs, const VkType rhs) { return lhs.v <= rhs; }
-    friend bool operator <=(const VkType lhs, const UType& rhs) { return lhs <= rhs.v; }
-    friend bool operator >(const UType& lhs, const VkType rhs) { return lhs.v > rhs; }
-    friend bool operator >(const VkType lhs, const UType& rhs) { return lhs > rhs.v; }
-    friend bool operator >=(const UType& lhs, const VkType rhs) { return lhs.v >= rhs; }
-    friend bool operator >=(const VkType lhs, const UType& rhs) { return lhs >= rhs.v; }
-    friend bool operator ==(const UType& lhs, const VkType rhs) { return lhs.v == rhs; }
-    friend bool operator ==(const VkType lhs, const UType& rhs) { return lhs == rhs.v; }
-    friend bool operator !=(const UType& lhs, const VkType rhs) { return lhs.v != rhs; }
-    friend bool operator !=(const VkType lhs, const UType& rhs) { return lhs != rhs.v; }
-  private:
-    VkType v;
-  };
-
-  using RayTracingInvocationReorderModeNV = EnumT<VkRayTracingInvocationReorderModeNV>;
-  using DirectDriverLoadingModeLUNARG = EnumT<VkDirectDriverLoadingModeLUNARG>;
-  using PresentModeKHR = EnumT<VkPresentModeKHR>;
-  using ColorSpaceKHR = EnumT<VkColorSpaceKHR>;
-  using TimeDomainKHR = EnumT<VkTimeDomainKHR>;
-  using DebugReportObjectTypeEXT = EnumT<VkDebugReportObjectTypeEXT>;
-  using DeviceMemoryReportEventTypeEXT = EnumT<VkDeviceMemoryReportEventTypeEXT>;
-  using RasterizationOrderAMD = EnumT<VkRasterizationOrderAMD>;
-  using ValidationCheckEXT = EnumT<VkValidationCheckEXT>;
-  using ValidationFeatureEnableEXT = EnumT<VkValidationFeatureEnableEXT>;
-  using ValidationFeatureDisableEXT = EnumT<VkValidationFeatureDisableEXT>;
-  using LayerSettingTypeEXT = EnumT<VkLayerSettingTypeEXT>;
-  using IndirectCommandsTokenTypeNV = EnumT<VkIndirectCommandsTokenTypeNV>;
-  using DisplayPowerStateEXT = EnumT<VkDisplayPowerStateEXT>;
-  using DeviceEventTypeEXT = EnumT<VkDeviceEventTypeEXT>;
-  using DisplayEventTypeEXT = EnumT<VkDisplayEventTypeEXT>;
-  using ViewportCoordinateSwizzleNV = EnumT<VkViewportCoordinateSwizzleNV>;
-  using DiscardRectangleModeEXT = EnumT<VkDiscardRectangleModeEXT>;
-  using BlendOverlapEXT = EnumT<VkBlendOverlapEXT>;
-  using CoverageModulationModeNV = EnumT<VkCoverageModulationModeNV>;
-  using CoverageReductionModeNV = EnumT<VkCoverageReductionModeNV>;
-  using ValidationCacheHeaderVersionEXT = EnumT<VkValidationCacheHeaderVersionEXT>;
-  using ShaderInfoTypeAMD = EnumT<VkShaderInfoTypeAMD>;
-  using QueueGlobalPriorityKHR = EnumT<VkQueueGlobalPriorityKHR>;
-  using ConservativeRasterizationModeEXT = EnumT<VkConservativeRasterizationModeEXT>;
-  using ShadingRatePaletteEntryNV = EnumT<VkShadingRatePaletteEntryNV>;
-  using CoarseSampleOrderTypeNV = EnumT<VkCoarseSampleOrderTypeNV>;
-  using CopyAccelerationStructureModeKHR = EnumT<VkCopyAccelerationStructureModeKHR>;
-  using BuildAccelerationStructureModeKHR = EnumT<VkBuildAccelerationStructureModeKHR>;
-  using AccelerationStructureTypeKHR = EnumT<VkAccelerationStructureTypeKHR>;
-  using GeometryTypeKHR = EnumT<VkGeometryTypeKHR>;
-  using AccelerationStructureMemoryRequirementsTypeNV = EnumT<VkAccelerationStructureMemoryRequirementsTypeNV>;
-  using AccelerationStructureBuildTypeKHR = EnumT<VkAccelerationStructureBuildTypeKHR>;
-  using RayTracingShaderGroupTypeKHR = EnumT<VkRayTracingShaderGroupTypeKHR>;
-  using AccelerationStructureCompatibilityKHR = EnumT<VkAccelerationStructureCompatibilityKHR>;
-  using ShaderGroupShaderKHR = EnumT<VkShaderGroupShaderKHR>;
-  using MemoryOverallocationBehaviorAMD = EnumT<VkMemoryOverallocationBehaviorAMD>;
-  using PerformanceCounterScopeKHR = EnumT<VkPerformanceCounterScopeKHR>;
-  using PerformanceCounterUnitKHR = EnumT<VkPerformanceCounterUnitKHR>;
-  using PerformanceCounterStorageKHR = EnumT<VkPerformanceCounterStorageKHR>;
-  using PerformanceConfigurationTypeINTEL = EnumT<VkPerformanceConfigurationTypeINTEL>;
-  using QueryPoolSamplingModeINTEL = EnumT<VkQueryPoolSamplingModeINTEL>;
-  using PerformanceOverrideTypeINTEL = EnumT<VkPerformanceOverrideTypeINTEL>;
-  using PerformanceParameterTypeINTEL = EnumT<VkPerformanceParameterTypeINTEL>;
-  using PerformanceValueTypeINTEL = EnumT<VkPerformanceValueTypeINTEL>;
-  using PipelineExecutableStatisticFormatKHR = EnumT<VkPipelineExecutableStatisticFormatKHR>;
-  using LineRasterizationModeKHR = EnumT<VkLineRasterizationModeKHR>;
-  using FragmentShadingRateCombinerOpKHR = EnumT<VkFragmentShadingRateCombinerOpKHR>;
-  using FragmentShadingRateNV = EnumT<VkFragmentShadingRateNV>;
-  using FragmentShadingRateTypeNV = EnumT<VkFragmentShadingRateTypeNV>;
-  using SubpassMergeStatusEXT = EnumT<VkSubpassMergeStatusEXT>;
-  using ProvokingVertexModeEXT = EnumT<VkProvokingVertexModeEXT>;
-  using AccelerationStructureMotionInstanceTypeNV = EnumT<VkAccelerationStructureMotionInstanceTypeNV>;
-  using DeviceAddressBindingTypeEXT = EnumT<VkDeviceAddressBindingTypeEXT>;
-  using QueryResultStatusKHR = EnumT<VkQueryResultStatusKHR>;
-  using VideoEncodeTuningModeKHR = EnumT<VkVideoEncodeTuningModeKHR>;
-  using PipelineRobustnessBufferBehaviorEXT = EnumT<VkPipelineRobustnessBufferBehaviorEXT>;
-  using PipelineRobustnessImageBehaviorEXT = EnumT<VkPipelineRobustnessImageBehaviorEXT>;
-  using OpticalFlowPerformanceLevelNV = EnumT<VkOpticalFlowPerformanceLevelNV>;
-  using OpticalFlowSessionBindingPointNV = EnumT<VkOpticalFlowSessionBindingPointNV>;
-  using MicromapTypeEXT = EnumT<VkMicromapTypeEXT>;
-  using CopyMicromapModeEXT = EnumT<VkCopyMicromapModeEXT>;
-  using BuildMicromapModeEXT = EnumT<VkBuildMicromapModeEXT>;
-  using OpacityMicromapFormatEXT = EnumT<VkOpacityMicromapFormatEXT>;
-  using OpacityMicromapSpecialIndexEXT = EnumT<VkOpacityMicromapSpecialIndexEXT>;
-  using DepthBiasRepresentationEXT = EnumT<VkDepthBiasRepresentationEXT>;
-  using DeviceFaultAddressTypeEXT = EnumT<VkDeviceFaultAddressTypeEXT>;
-  using DeviceFaultVendorBinaryHeaderVersionEXT = EnumT<VkDeviceFaultVendorBinaryHeaderVersionEXT>;
-  using ShaderCodeTypeEXT = EnumT<VkShaderCodeTypeEXT>;
-  using ScopeKHR = EnumT<VkScopeKHR>;
-  using ComponentTypeKHR = EnumT<VkComponentTypeKHR>;
-  using CubicFilterWeightsQCOM = EnumT<VkCubicFilterWeightsQCOM>;
-  using BlockMatchWindowCompareModeQCOM = EnumT<VkBlockMatchWindowCompareModeQCOM>;
-  using LayeredDriverUnderlyingApiMSFT = EnumT<VkLayeredDriverUnderlyingApiMSFT>;
-  using LatencyMarkerNV = EnumT<VkLatencyMarkerNV>;
-  using OutOfBandQueueTypeNV = EnumT<VkOutOfBandQueueTypeNV>;
-#if defined(VK_VERSION_1_0)
-  using ImageLayout = EnumT<VkImageLayout>;
-  using AttachmentLoadOp = EnumT<VkAttachmentLoadOp>;
-  using AttachmentStoreOp = EnumT<VkAttachmentStoreOp>;
-  using ImageType = EnumT<VkImageType>;
-  using ImageTiling = EnumT<VkImageTiling>;
-  using ImageViewType = EnumT<VkImageViewType>;
-  using CommandBufferLevel = EnumT<VkCommandBufferLevel>;
-  using ComponentSwizzle = EnumT<VkComponentSwizzle>;
-  using DescriptorType = EnumT<VkDescriptorType>;
-  using QueryType = EnumT<VkQueryType>;
-  using BorderColor = EnumT<VkBorderColor>;
-  using PipelineBindPoint = EnumT<VkPipelineBindPoint>;
-  using PipelineCacheHeaderVersion = EnumT<VkPipelineCacheHeaderVersion>;
-  using PrimitiveTopology = EnumT<VkPrimitiveTopology>;
-  using SharingMode = EnumT<VkSharingMode>;
-  using IndexType = EnumT<VkIndexType>;
-  using Filter = EnumT<VkFilter>;
-  using SamplerMipmapMode = EnumT<VkSamplerMipmapMode>;
-  using SamplerAddressMode = EnumT<VkSamplerAddressMode>;
-  using CompareOp = EnumT<VkCompareOp>;
-  using PolygonMode = EnumT<VkPolygonMode>;
-  using FrontFace = EnumT<VkFrontFace>;
-  using BlendFactor = EnumT<VkBlendFactor>;
-  using BlendOp = EnumT<VkBlendOp>;
-  using StencilOp = EnumT<VkStencilOp>;
-  using LogicOp = EnumT<VkLogicOp>;
-  using InternalAllocationType = EnumT<VkInternalAllocationType>;
-  using SystemAllocationScope = EnumT<VkSystemAllocationScope>;
-  using PhysicalDeviceType = EnumT<VkPhysicalDeviceType>;
-  using VertexInputRate = EnumT<VkVertexInputRate>;
-  using Format = EnumT<VkFormat>;
-  using StructureType = EnumT<VkStructureType>;
-  using SubpassContents = EnumT<VkSubpassContents>;
-  using Result = EnumT<VkResult>;
-  using DynamicState = EnumT<VkDynamicState>;
-  using ObjectType = EnumT<VkObjectType>;
-  using VendorId = EnumT<VkVendorId>;
-#endif // VK_VERSION_1_0
-#if defined(VK_VERSION_1_1)
-  using DescriptorUpdateTemplateType = EnumT<VkDescriptorUpdateTemplateType>;
-  using PointClippingBehavior = EnumT<VkPointClippingBehavior>;
-  using TessellationDomainOrigin = EnumT<VkTessellationDomainOrigin>;
-  using SamplerYcbcrModelConversion = EnumT<VkSamplerYcbcrModelConversion>;
-  using SamplerYcbcrRange = EnumT<VkSamplerYcbcrRange>;
-  using ChromaLocation = EnumT<VkChromaLocation>;
-#endif // VK_VERSION_1_1
-#if defined(VK_VERSION_1_2)
-  using SemaphoreType = EnumT<VkSemaphoreType>;
-  using SamplerReductionMode = EnumT<VkSamplerReductionMode>;
-  using DriverId = EnumT<VkDriverId>;
-  using ShaderFloatControlsIndependence = EnumT<VkShaderFloatControlsIndependence>;
-#endif // VK_VERSION_1_2
-#if defined(VK_USE_PLATFORM_WIN32_KHR)
-  using FullScreenExclusiveEXT = EnumT<VkFullScreenExclusiveEXT>;
-#endif // VK_USE_PLATFORM_WIN32_KHR
-
-  //
-  // wrapped flag types
-  //
-  
-  template<typename T>
-  struct FlagsT {
-    using UType = FlagsT;
-    using VkType = T;
-    
-    FlagsT(VkType i=(VkType)0) : v(i) {}
-    VkType operator =(const VkType rhs) { v = rhs; return v; }
-    operator bool(){ return bool(v); }
-    bool operator !(){ return !(v); }
-    operator const VkType&() const { return v; }
-    operator VkType&() { return v; }
-    VkType* operator&() { return &v; }
-    const VkType* operator&() const { return &v; }
-    VkType operator |=(const VkType rhs) { v = (VkType)((VkFlags)v | (VkFlags)rhs); return v; }
-    VkType operator &=(const VkType rhs) { v = (VkType)((VkFlags)v & (VkFlags)rhs); return v; }
-    VkType operator ^=(const VkType rhs) { v = (VkType)((VkFlags)v ^ (VkFlags)rhs); return v; }
-    VkType operator +=(const VkType rhs) { v = (VkType)((VkFlags)v + (VkFlags)rhs); return v; }
-    VkType operator -=(const VkType rhs) { v = (VkType)((VkFlags)v - (VkFlags)rhs); return v; }
-    friend bool operator <(const UType& lhs, const VkType rhs) { return lhs.v < rhs; }
-    friend bool operator <(const VkType lhs, const UType& rhs) { return lhs < rhs.v; }
-    friend bool operator <=(const UType& lhs, const VkType rhs) { return lhs.v <= rhs; }
-    friend bool operator <=(const VkType lhs, const UType& rhs) { return lhs <= rhs.v; }
-    friend bool operator >(const UType& lhs, const VkType rhs) { return lhs.v > rhs; }
-    friend bool operator >(const VkType lhs, const UType& rhs) { return lhs > rhs.v; }
-    friend bool operator >=(const UType& lhs, const VkType rhs) { return lhs.v >= rhs; }
-    friend bool operator >=(const VkType lhs, const UType& rhs) { return lhs >= rhs.v; }
-    friend bool operator ==(const UType& lhs, const VkType rhs) { return lhs.v == rhs; }
-    friend bool operator ==(const VkType lhs, const UType& rhs) { return lhs == rhs.v; }
-    friend bool operator !=(const UType& lhs, const VkType rhs) { return lhs.v != rhs; }
-    friend bool operator !=(const VkType lhs, const UType& rhs) { return lhs != rhs.v; }
-    friend VkType operator |(const UType& lhs, const VkType rhs) { return lhs.v | rhs; }
-    friend VkType operator |(const VkType lhs, const UType& rhs) { return lhs | rhs.v; }
-    friend VkType operator &(const UType& lhs, const VkType rhs) { return lhs.v & rhs; }
-    friend VkType operator &(const VkType lhs, const UType& rhs) { return lhs & rhs.v; }
-    friend VkType operator ^(const UType& lhs, const VkType rhs) { return lhs.v ^ rhs; }
-    friend VkType operator ^(const VkType lhs, const UType& rhs) { return lhs ^ rhs.v; }
-    friend VkType operator +(const UType& lhs, const VkType rhs) { return lhs.v + rhs; }
-    friend VkType operator +(const VkType lhs, const UType& rhs) { return lhs + rhs.v; }
-    friend VkType operator -(const UType& lhs, const VkType rhs) { return lhs.v - rhs; }
-    friend VkType operator -(const VkType lhs, const UType& rhs) { return lhs - rhs.v; }
-  private:
-    VkType v;
-  };
-  
-  using Flags = FlagsT<VkFlags>;
-  using Flags64 = FlagsT<VkFlags64>;
-  
-  template<typename T>
-  struct FlagBitsT {
-    using UType = FlagBitsT;
-    using VkType = T;  
-    FlagBitsT(VkType i=(VkType)0) : v(i) {}
-    VkType operator =(const VkType rhs) { v = rhs; return v; }
-    operator const VkType&() const { return v; }
-    operator VkType&() { return v; }
-    VkType* operator&() { return &v; }
-    const VkType* operator&() const { return &v; }
-    VkType operator |=(const VkType rhs) { v = (VkType)((VkFlags)v | (VkFlags)rhs); return v; }
-    VkType operator &=(const VkType rhs) { v = (VkType)((VkFlags)v & (VkFlags)rhs); return v; }
-    VkType operator ^=(const VkType rhs) { v = (VkType)((VkFlags)v ^ (VkFlags)rhs); return v; }
-    VkType operator +=(const VkType rhs) { v = (VkType)((VkFlags)v + (VkFlags)rhs); return v; }
-    VkType operator -=(const VkType rhs) { v = (VkType)((VkFlags)v - (VkFlags)rhs); return v; }
-    friend bool operator <(const UType& lhs, const VkType rhs) { return lhs.v < rhs; }
-    friend bool operator <(const VkType lhs, const UType& rhs) { return lhs < rhs.v; }
-    friend bool operator <=(const UType& lhs, const VkType rhs) { return lhs.v <= rhs; }
-    friend bool operator <=(const VkType lhs, const UType& rhs) { return lhs <= rhs.v; }
-    friend bool operator >(const UType& lhs, const VkType rhs) { return lhs.v > rhs; }
-    friend bool operator >(const VkType lhs, const UType& rhs) { return lhs > rhs.v; }
-    friend bool operator >=(const UType& lhs, const VkType rhs) { return lhs.v >= rhs; }
-    friend bool operator >=(const VkType lhs, const UType& rhs) { return lhs >= rhs.v; }
-    friend bool operator ==(const UType& lhs, const VkType rhs) { return lhs.v == rhs; }
-    friend bool operator ==(const VkType lhs, const UType& rhs) { return lhs == rhs.v; }
-    friend bool operator !=(const UType& lhs, const VkType rhs) { return lhs.v != rhs; }
-    friend bool operator !=(const VkType lhs, const UType& rhs) { return lhs != rhs.v; }
-    friend VkFlags operator |(const UType& lhs, const VkFlags rhs) { return VkFlags(lhs.v) | rhs; }
-    friend VkFlags operator |(const VkFlags lhs, const UType& rhs) { return lhs | VkFlags(rhs.v); }
-    friend VkFlags operator |(const UType& lhs, const VkType rhs) { return VkFlags(lhs.v) | VkFlags(rhs); }
-    friend VkFlags operator |(const VkType lhs, const UType& rhs) { return VkFlags(lhs) | VkFlags(rhs.v); }
-    friend VkFlags operator &(const UType& lhs, const VkFlags rhs) { return VkFlags(lhs.v) & rhs; }
-    friend VkFlags operator &(const VkFlags lhs, const UType& rhs) { return lhs & VkFlags(rhs.v); }
-    friend VkFlags operator &(const UType& lhs, const VkType rhs) { return VkFlags(lhs.v) & VkFlags(rhs); }
-    friend VkFlags operator &(const VkType lhs, const UType& rhs) { return VkFlags(lhs) & VkFlags(rhs.v); }
-    friend VkFlags operator ^(const UType& lhs, const VkFlags rhs) { return VkFlags(lhs.v) ^ rhs; }
-    friend VkFlags operator ^(const VkFlags lhs, const UType& rhs) { return lhs ^ VkFlags(rhs.v); }
-    friend VkFlags operator ^(const UType& lhs, const VkType rhs) { return VkFlags(lhs.v) ^ VkFlags(rhs); }
-    friend VkFlags operator ^(const VkType lhs, const UType& rhs) { return VkFlags(lhs) ^ VkFlags(rhs.v); }
-    friend VkFlags operator +(const UType& lhs, const VkFlags rhs) { return VkFlags(lhs.v) + rhs; }
-    friend VkFlags operator +(const VkFlags lhs, const UType& rhs) { return lhs + VkFlags(rhs.v); }
-    friend VkFlags operator +(const UType& lhs, const VkType rhs) { return VkFlags(lhs.v) + VkFlags(rhs); }
-    friend VkFlags operator +(const VkType lhs, const UType& rhs) { return VkFlags(lhs) + VkFlags(rhs.v); }
-    friend VkFlags operator -(const UType& lhs, const VkFlags rhs) { return VkFlags(lhs.v) - rhs; }
-    friend VkFlags operator -(const VkFlags lhs, const UType& rhs) { return lhs - VkFlags(rhs.v); }
-    friend VkFlags operator -(const UType& lhs, const VkType rhs) { return VkFlags(lhs.v) - VkFlags(rhs); }
-    friend VkFlags operator -(const VkType lhs, const UType& rhs) { return VkFlags(lhs) - VkFlags(rhs.v); }
-  private:
-    VkType v;
-  };
-
-  using BufferUsageFlagBits2KHR = Flags64;
-  using PipelineCreateFlagBits2KHR = Flags64;
-  using DisplayPlaneAlphaFlagBitsKHR = FlagBitsT<VkDisplayPlaneAlphaFlagBitsKHR>;
-  using CompositeAlphaFlagBitsKHR = FlagBitsT<VkCompositeAlphaFlagBitsKHR>;
-  using SurfaceTransformFlagBitsKHR = FlagBitsT<VkSurfaceTransformFlagBitsKHR>;
-  using DebugReportFlagBitsEXT = FlagBitsT<VkDebugReportFlagBitsEXT>;
-  using ExternalMemoryHandleTypeFlagBitsNV = FlagBitsT<VkExternalMemoryHandleTypeFlagBitsNV>;
-  using ExternalMemoryFeatureFlagBitsNV = FlagBitsT<VkExternalMemoryFeatureFlagBitsNV>;
-  using IndirectCommandsLayoutUsageFlagBitsNV = FlagBitsT<VkIndirectCommandsLayoutUsageFlagBitsNV>;
-  using IndirectStateFlagBitsNV = FlagBitsT<VkIndirectStateFlagBitsNV>;
-  using SurfaceCounterFlagBitsEXT = FlagBitsT<VkSurfaceCounterFlagBitsEXT>;
-  using DeviceGroupPresentModeFlagBitsKHR = FlagBitsT<VkDeviceGroupPresentModeFlagBitsKHR>;
-  using DebugUtilsMessageSeverityFlagBitsEXT = FlagBitsT<VkDebugUtilsMessageSeverityFlagBitsEXT>;
-  using DebugUtilsMessageTypeFlagBitsEXT = FlagBitsT<VkDebugUtilsMessageTypeFlagBitsEXT>;
-  using ConditionalRenderingFlagBitsEXT = FlagBitsT<VkConditionalRenderingFlagBitsEXT>;
-  using GeometryInstanceFlagBitsKHR = FlagBitsT<VkGeometryInstanceFlagBitsKHR>;
-  using GeometryFlagBitsKHR = FlagBitsT<VkGeometryFlagBitsKHR>;
-  using BuildAccelerationStructureFlagBitsKHR = FlagBitsT<VkBuildAccelerationStructureFlagBitsKHR>;
-  using AccelerationStructureCreateFlagBitsKHR = FlagBitsT<VkAccelerationStructureCreateFlagBitsKHR>;
-  using DeviceDiagnosticsConfigFlagBitsNV = FlagBitsT<VkDeviceDiagnosticsConfigFlagBitsNV>;
-  using MemoryDecompressionMethodFlagBitsNV = Flags64;
-  using PerformanceCounterDescriptionFlagBitsKHR = FlagBitsT<VkPerformanceCounterDescriptionFlagBitsKHR>;
-  using GraphicsPipelineLibraryFlagBitsEXT = FlagBitsT<VkGraphicsPipelineLibraryFlagBitsEXT>;
-  using DeviceAddressBindingFlagBitsEXT = FlagBitsT<VkDeviceAddressBindingFlagBitsEXT>;
-  using FrameBoundaryFlagBitsEXT = FlagBitsT<VkFrameBoundaryFlagBitsEXT>;
-  using PresentScalingFlagBitsEXT = FlagBitsT<VkPresentScalingFlagBitsEXT>;
-  using PresentGravityFlagBitsEXT = FlagBitsT<VkPresentGravityFlagBitsEXT>;
-  using PhysicalDeviceSchedulingControlsFlagBitsARM = Flags64;
-  using VideoCodecOperationFlagBitsKHR = FlagBitsT<VkVideoCodecOperationFlagBitsKHR>;
-  using VideoChromaSubsamplingFlagBitsKHR = FlagBitsT<VkVideoChromaSubsamplingFlagBitsKHR>;
-  using VideoComponentBitDepthFlagBitsKHR = FlagBitsT<VkVideoComponentBitDepthFlagBitsKHR>;
-  using VideoCapabilityFlagBitsKHR = FlagBitsT<VkVideoCapabilityFlagBitsKHR>;
-  using VideoSessionCreateFlagBitsKHR = FlagBitsT<VkVideoSessionCreateFlagBitsKHR>;
-  using VideoDecodeH264PictureLayoutFlagBitsKHR = FlagBitsT<VkVideoDecodeH264PictureLayoutFlagBitsKHR>;
-  using VideoCodingControlFlagBitsKHR = FlagBitsT<VkVideoCodingControlFlagBitsKHR>;
-  using VideoDecodeUsageFlagBitsKHR = FlagBitsT<VkVideoDecodeUsageFlagBitsKHR>;
-  using VideoDecodeCapabilityFlagBitsKHR = FlagBitsT<VkVideoDecodeCapabilityFlagBitsKHR>;
-  using VideoEncodeUsageFlagBitsKHR = FlagBitsT<VkVideoEncodeUsageFlagBitsKHR>;
-  using VideoEncodeContentFlagBitsKHR = FlagBitsT<VkVideoEncodeContentFlagBitsKHR>;
-  using VideoEncodeCapabilityFlagBitsKHR = FlagBitsT<VkVideoEncodeCapabilityFlagBitsKHR>;
-  using VideoEncodeFeedbackFlagBitsKHR = FlagBitsT<VkVideoEncodeFeedbackFlagBitsKHR>;
-  using VideoEncodeRateControlModeFlagBitsKHR = FlagBitsT<VkVideoEncodeRateControlModeFlagBitsKHR>;
-  using VideoEncodeH264CapabilityFlagBitsKHR = FlagBitsT<VkVideoEncodeH264CapabilityFlagBitsKHR>;
-  using VideoEncodeH264StdFlagBitsKHR = FlagBitsT<VkVideoEncodeH264StdFlagBitsKHR>;
-  using VideoEncodeH264RateControlFlagBitsKHR = FlagBitsT<VkVideoEncodeH264RateControlFlagBitsKHR>;
-  using HostImageCopyFlagBitsEXT = FlagBitsT<VkHostImageCopyFlagBitsEXT>;
-  using VideoEncodeH265CapabilityFlagBitsKHR = FlagBitsT<VkVideoEncodeH265CapabilityFlagBitsKHR>;
-  using VideoEncodeH265StdFlagBitsKHR = FlagBitsT<VkVideoEncodeH265StdFlagBitsKHR>;
-  using VideoEncodeH265RateControlFlagBitsKHR = FlagBitsT<VkVideoEncodeH265RateControlFlagBitsKHR>;
-  using VideoEncodeH265CtbSizeFlagBitsKHR = FlagBitsT<VkVideoEncodeH265CtbSizeFlagBitsKHR>;
-  using VideoEncodeH265TransformBlockSizeFlagBitsKHR = FlagBitsT<VkVideoEncodeH265TransformBlockSizeFlagBitsKHR>;
-  using ImageCompressionFlagBitsEXT = FlagBitsT<VkImageCompressionFlagBitsEXT>;
-  using ImageCompressionFixedRateFlagBitsEXT = FlagBitsT<VkImageCompressionFixedRateFlagBitsEXT>;
-  using OpticalFlowGridSizeFlagBitsNV = FlagBitsT<VkOpticalFlowGridSizeFlagBitsNV>;
-  using OpticalFlowUsageFlagBitsNV = FlagBitsT<VkOpticalFlowUsageFlagBitsNV>;
-  using OpticalFlowSessionCreateFlagBitsNV = FlagBitsT<VkOpticalFlowSessionCreateFlagBitsNV>;
-  using OpticalFlowExecuteFlagBitsNV = FlagBitsT<VkOpticalFlowExecuteFlagBitsNV>;
-  using BuildMicromapFlagBitsEXT = FlagBitsT<VkBuildMicromapFlagBitsEXT>;
-  using MicromapCreateFlagBitsEXT = FlagBitsT<VkMicromapCreateFlagBitsEXT>;
-  using ShaderCreateFlagBitsEXT = FlagBitsT<VkShaderCreateFlagBitsEXT>;
-  using PipelineLayoutCreateFlags = Flags;
-  using PipelineCacheCreateFlags = Flags;
-  using PipelineDepthStencilStateCreateFlags = Flags;
-  using PipelineColorBlendStateCreateFlags = Flags;
-  using MemoryUnmapFlagsKHR = Flags;
-  using IndirectCommandsLayoutUsageFlagsNV = Flags;
-  using IndirectStateFlagsNV = Flags;
-  using GeometryFlagsKHR = Flags;
-  using GeometryInstanceFlagsKHR = Flags;
-  using BuildAccelerationStructureFlagsKHR = Flags;
-  using AccelerationStructureCreateFlagsKHR = Flags;
-  using PerformanceCounterDescriptionFlagsKHR = Flags;
-  using AcquireProfilingLockFlagsKHR = Flags;
-  using PipelineCompilerControlFlagsAMD = Flags;
-  using ShaderCorePropertiesFlagsAMD = Flags;
-  using DeviceDiagnosticsConfigFlagsNV = Flags;
-  using RefreshObjectFlagsKHR = Flags;
-  using BuildMicromapFlagsEXT = Flags;
-  using MicromapCreateFlagsEXT = Flags;
-  using CompositeAlphaFlagsKHR = Flags;
-  using DisplayPlaneAlphaFlagsKHR = Flags;
-  using SurfaceTransformFlagsKHR = Flags;
-  using SwapchainCreateFlagsKHR = Flags;
-  using DeviceGroupPresentModeFlagsKHR = Flags;
-  using DebugReportFlagsEXT = Flags;
-  using ExternalMemoryHandleTypeFlagsNV = Flags;
-  using ExternalMemoryFeatureFlagsNV = Flags;
-  using SurfaceCounterFlagsEXT = Flags;
-  using DebugUtilsMessageSeverityFlagsEXT = Flags;
-  using DebugUtilsMessageTypeFlagsEXT = Flags;
-  using ConditionalRenderingFlagsEXT = Flags;
-  using SwapchainImageUsageFlagsANDROID = Flags;
-  using HostImageCopyFlagsEXT = Flags;
-  using GraphicsPipelineLibraryFlagsEXT = Flags;
-  using ImageCompressionFlagsEXT = Flags;
-  using ImageCompressionFixedRateFlagsEXT = Flags;
-  using DeviceAddressBindingFlagsEXT = Flags;
-  using OpticalFlowGridSizeFlagsNV = Flags;
-  using OpticalFlowUsageFlagsNV = Flags;
-  using OpticalFlowSessionCreateFlagsNV = Flags;
-  using OpticalFlowExecuteFlagsNV = Flags;
-  using FrameBoundaryFlagsEXT = Flags;
-  using PresentScalingFlagsEXT = Flags;
-  using PresentGravityFlagsEXT = Flags;
-  using ShaderCreateFlagsEXT = Flags;
-  using VideoCodecOperationFlagsKHR = Flags;
-  using VideoCapabilityFlagsKHR = Flags;
-  using VideoSessionCreateFlagsKHR = Flags;
-  using VideoCodingControlFlagsKHR = Flags;
-  using VideoDecodeUsageFlagsKHR = Flags;
-  using VideoDecodeCapabilityFlagsKHR = Flags;
-  using VideoDecodeH264PictureLayoutFlagsKHR = Flags;
-  using VideoEncodeFlagsKHR = Flags;
-  using VideoEncodeUsageFlagsKHR = Flags;
-  using VideoEncodeContentFlagsKHR = Flags;
-  using VideoEncodeCapabilityFlagsKHR = Flags;
-  using VideoEncodeFeedbackFlagsKHR = Flags;
-  using VideoEncodeRateControlModeFlagsKHR = Flags;
-  using VideoChromaSubsamplingFlagsKHR = Flags;
-  using VideoComponentBitDepthFlagsKHR = Flags;
-  using VideoEncodeH264CapabilityFlagsKHR = Flags;
-  using VideoEncodeH264StdFlagsKHR = Flags;
-  using VideoEncodeH264RateControlFlagsKHR = Flags;
-  using VideoEncodeH265CapabilityFlagsKHR = Flags;
-  using VideoEncodeH265StdFlagsKHR = Flags;
-  using VideoEncodeH265RateControlFlagsKHR = Flags;
-  using VideoEncodeH265CtbSizeFlagsKHR = Flags;
-  using VideoEncodeH265TransformBlockSizeFlagsKHR = Flags;
-#if defined(VK_VERSION_1_0)
-  using QueueFlagBits = FlagBitsT<VkQueueFlagBits>;
-  using CullModeFlagBits = FlagBitsT<VkCullModeFlagBits>;
-  using MemoryPropertyFlagBits = FlagBitsT<VkMemoryPropertyFlagBits>;
-  using MemoryHeapFlagBits = FlagBitsT<VkMemoryHeapFlagBits>;
-  using AccessFlagBits = FlagBitsT<VkAccessFlagBits>;
-  using BufferUsageFlagBits = FlagBitsT<VkBufferUsageFlagBits>;
-  using BufferCreateFlagBits = FlagBitsT<VkBufferCreateFlagBits>;
-  using ShaderStageFlagBits = FlagBitsT<VkShaderStageFlagBits>;
-  using ImageUsageFlagBits = FlagBitsT<VkImageUsageFlagBits>;
-  using ImageCreateFlagBits = FlagBitsT<VkImageCreateFlagBits>;
-  using PipelineCreateFlagBits = FlagBitsT<VkPipelineCreateFlagBits>;
-  using ColorComponentFlagBits = FlagBitsT<VkColorComponentFlagBits>;
-  using FenceCreateFlagBits = FlagBitsT<VkFenceCreateFlagBits>;
-  using FormatFeatureFlagBits = FlagBitsT<VkFormatFeatureFlagBits>;
-  using QueryControlFlagBits = FlagBitsT<VkQueryControlFlagBits>;
-  using QueryResultFlagBits = FlagBitsT<VkQueryResultFlagBits>;
-  using CommandBufferUsageFlagBits = FlagBitsT<VkCommandBufferUsageFlagBits>;
-  using QueryPipelineStatisticFlagBits = FlagBitsT<VkQueryPipelineStatisticFlagBits>;
-  using ImageAspectFlagBits = FlagBitsT<VkImageAspectFlagBits>;
-  using SparseImageFormatFlagBits = FlagBitsT<VkSparseImageFormatFlagBits>;
-  using SparseMemoryBindFlagBits = FlagBitsT<VkSparseMemoryBindFlagBits>;
-  using PipelineStageFlagBits = FlagBitsT<VkPipelineStageFlagBits>;
-  using CommandPoolCreateFlagBits = FlagBitsT<VkCommandPoolCreateFlagBits>;
-  using CommandPoolResetFlagBits = FlagBitsT<VkCommandPoolResetFlagBits>;
-  using CommandBufferResetFlagBits = FlagBitsT<VkCommandBufferResetFlagBits>;
-  using SampleCountFlagBits = FlagBitsT<VkSampleCountFlagBits>;
-  using AttachmentDescriptionFlagBits = FlagBitsT<VkAttachmentDescriptionFlagBits>;
-  using StencilFaceFlagBits = FlagBitsT<VkStencilFaceFlagBits>;
-  using DescriptorPoolCreateFlagBits = FlagBitsT<VkDescriptorPoolCreateFlagBits>;
-  using DependencyFlagBits = FlagBitsT<VkDependencyFlagBits>;
-  using FramebufferCreateFlags = Flags;
-  using RenderPassCreateFlags = Flags;
-  using SamplerCreateFlags = Flags;
-  using PipelineShaderStageCreateFlags = Flags;
-  using DescriptorSetLayoutCreateFlags = Flags;
-  using InstanceCreateFlags = Flags;
-  using QueueFlags = Flags;
-  using MemoryPropertyFlags = Flags;
-  using MemoryHeapFlags = Flags;
-  using AccessFlags = Flags;
-  using BufferUsageFlags = Flags;
-  using BufferCreateFlags = Flags;
-  using ShaderStageFlags = Flags;
-  using ImageUsageFlags = Flags;
-  using ImageCreateFlags = Flags;
-  using ImageViewCreateFlags = Flags;
-  using PipelineCreateFlags = Flags;
-  using ColorComponentFlags = Flags;
-  using FenceCreateFlags = Flags;
-  using FormatFeatureFlags = Flags;
-  using QueryControlFlags = Flags;
-  using QueryResultFlags = Flags;
-  using EventCreateFlags = Flags;
-  using CommandPoolCreateFlags = Flags;
-  using CommandPoolResetFlags = Flags;
-  using CommandBufferResetFlags = Flags;
-  using CommandBufferUsageFlags = Flags;
-  using QueryPipelineStatisticFlags = Flags;
-  using MemoryMapFlags = Flags;
-  using ImageAspectFlags = Flags;
-  using SparseMemoryBindFlags = Flags;
-  using SparseImageFormatFlags = Flags;
-  using SubpassDescriptionFlags = Flags;
-  using PipelineStageFlags = Flags;
-  using SampleCountFlags = Flags;
-  using AttachmentDescriptionFlags = Flags;
-  using StencilFaceFlags = Flags;
-  using CullModeFlags = Flags;
-  using DescriptorPoolCreateFlags = Flags;
-  using DependencyFlags = Flags;
-#endif // VK_VERSION_1_0
-#if defined(VK_VERSION_1_1)
-  using SubgroupFeatureFlagBits = FlagBitsT<VkSubgroupFeatureFlagBits>;
-  using ExternalMemoryHandleTypeFlagBits = FlagBitsT<VkExternalMemoryHandleTypeFlagBits>;
-  using ExternalMemoryFeatureFlagBits = FlagBitsT<VkExternalMemoryFeatureFlagBits>;
-  using ExternalSemaphoreHandleTypeFlagBits = FlagBitsT<VkExternalSemaphoreHandleTypeFlagBits>;
-  using ExternalSemaphoreFeatureFlagBits = FlagBitsT<VkExternalSemaphoreFeatureFlagBits>;
-  using SemaphoreImportFlagBits = FlagBitsT<VkSemaphoreImportFlagBits>;
-  using ExternalFenceHandleTypeFlagBits = FlagBitsT<VkExternalFenceHandleTypeFlagBits>;
-  using ExternalFenceFeatureFlagBits = FlagBitsT<VkExternalFenceFeatureFlagBits>;
-  using FenceImportFlagBits = FlagBitsT<VkFenceImportFlagBits>;
-  using PeerMemoryFeatureFlagBits = FlagBitsT<VkPeerMemoryFeatureFlagBits>;
-  using MemoryAllocateFlagBits = FlagBitsT<VkMemoryAllocateFlagBits>;
-  using DeviceQueueCreateFlags = Flags;
-  using SubgroupFeatureFlags = Flags;
-  using PeerMemoryFeatureFlags = Flags;
-  using MemoryAllocateFlags = Flags;
-  using ExternalMemoryHandleTypeFlags = Flags;
-  using ExternalMemoryFeatureFlags = Flags;
-  using ExternalSemaphoreHandleTypeFlags = Flags;
-  using ExternalSemaphoreFeatureFlags = Flags;
-  using SemaphoreImportFlags = Flags;
-  using ExternalFenceHandleTypeFlags = Flags;
-  using ExternalFenceFeatureFlags = Flags;
-  using FenceImportFlags = Flags;
-#endif // VK_VERSION_1_1
-#if defined(VK_VERSION_1_2)
-  using SemaphoreWaitFlagBits = FlagBitsT<VkSemaphoreWaitFlagBits>;
-  using DescriptorBindingFlagBits = FlagBitsT<VkDescriptorBindingFlagBits>;
-  using ResolveModeFlagBits = FlagBitsT<VkResolveModeFlagBits>;
-  using SemaphoreWaitFlags = Flags;
-  using DescriptorBindingFlags = Flags;
-  using ResolveModeFlags = Flags;
-#endif // VK_VERSION_1_2
-#if defined(VK_VERSION_1_3)
-  using PipelineCreationFeedbackFlagBits = FlagBitsT<VkPipelineCreationFeedbackFlagBits>;
-  using ToolPurposeFlagBits = FlagBitsT<VkToolPurposeFlagBits>;
-  using AccessFlagBits2 = Flags64;
-  using PipelineStageFlagBits2 = Flags64;
-  using SubmitFlagBits = FlagBitsT<VkSubmitFlagBits>;
-  using FormatFeatureFlagBits2 = Flags64;
-  using RenderingFlagBits = FlagBitsT<VkRenderingFlagBits>;
-  using PipelineCreationFeedbackFlags = Flags;
-  using RenderingFlags = Flags;
-  using ToolPurposeFlags = Flags;
-  using SubmitFlags = Flags;
-#endif // VK_VERSION_1_3
-#if defined(VK_USE_PLATFORM_FUCHSIA)
-  using ImageConstraintsInfoFlagBitsFUCHSIA = FlagBitsT<VkImageConstraintsInfoFlagBitsFUCHSIA>;
-  using ImageConstraintsInfoFlagsFUCHSIA = Flags;
-#endif // VK_USE_PLATFORM_FUCHSIA
-#if defined(VK_USE_PLATFORM_METAL_EXT)
-  using ExportMetalObjectTypeFlagBitsEXT = FlagBitsT<VkExportMetalObjectTypeFlagBitsEXT>;
-  using ExportMetalObjectTypeFlagsEXT = Flags;
-#endif // VK_USE_PLATFORM_METAL_EXT
-
-  //
-  // wrapped handle types
-  //
-  
-  template<typename T>
-  struct HandleT {
-    using UType = HandleT;
-    using VkType = T;
-
-    HandleT(VkType i = (VkType)0) : v(i) {}
-    VkType operator =(const VkType rhs) { v = rhs; return v; }
-    operator bool(){ return bool(v); }
-    bool operator !(){ return !(v); }
-    operator const VkType&() const { return v; }
-    operator VkType&() { return v; }
-    VkType* operator&() { return &v; }
-    const VkType* operator&() const { return &v; }
-    friend bool operator ==(const UType& lhs, const VkType rhs) { return lhs.v == rhs; }
-    friend bool operator ==(const VkType lhs, const UType& rhs) { return lhs == rhs.v; }
-    friend bool operator !=(const UType& lhs, const VkType rhs) { return lhs.v != rhs; }
-    friend bool operator !=(const VkType lhs, const UType& rhs) { return lhs != rhs.v; }
-
-  private:
-    VkType v;
-  };
-
-  using IndirectCommandsLayoutNV = HandleT<VkIndirectCommandsLayoutNV>;
-  using ValidationCacheEXT = HandleT<VkValidationCacheEXT>;
-  using AccelerationStructureKHR = HandleT<VkAccelerationStructureKHR>;
-  using AccelerationStructureNV = HandleT<VkAccelerationStructureNV>;
-  using PerformanceConfigurationINTEL = HandleT<VkPerformanceConfigurationINTEL>;
-  using DeferredOperationKHR = HandleT<VkDeferredOperationKHR>;
-  using CuModuleNVX = HandleT<VkCuModuleNVX>;
-  using CuFunctionNVX = HandleT<VkCuFunctionNVX>;
-  using OpticalFlowSessionNV = HandleT<VkOpticalFlowSessionNV>;
-  using MicromapEXT = HandleT<VkMicromapEXT>;
-  using ShaderEXT = HandleT<VkShaderEXT>;
-  using DisplayKHR = HandleT<VkDisplayKHR>;
-  using DisplayModeKHR = HandleT<VkDisplayModeKHR>;
-  using SurfaceKHR = HandleT<VkSurfaceKHR>;
-  using SwapchainKHR = HandleT<VkSwapchainKHR>;
-  using DebugReportCallbackEXT = HandleT<VkDebugReportCallbackEXT>;
-  using DebugUtilsMessengerEXT = HandleT<VkDebugUtilsMessengerEXT>;
-  using VideoSessionKHR = HandleT<VkVideoSessionKHR>;
-  using VideoSessionParametersKHR = HandleT<VkVideoSessionParametersKHR>;
-  using CudaModuleNV = HandleT<VkCudaModuleNV>;
-  using CudaFunctionNV = HandleT<VkCudaFunctionNV>;
-#if defined(VK_VERSION_1_0)
-  using Instance = HandleT<VkInstance>;
-  using PhysicalDevice = HandleT<VkPhysicalDevice>;
-  using Device = HandleT<VkDevice>;
-  using Queue = HandleT<VkQueue>;
-  using CommandBuffer = HandleT<VkCommandBuffer>;
-  using DeviceMemory = HandleT<VkDeviceMemory>;
-  using CommandPool = HandleT<VkCommandPool>;
-  using Buffer = HandleT<VkBuffer>;
-  using BufferView = HandleT<VkBufferView>;
-  using Image = HandleT<VkImage>;
-  using ImageView = HandleT<VkImageView>;
-  using ShaderModule = HandleT<VkShaderModule>;
-  using Pipeline = HandleT<VkPipeline>;
-  using PipelineLayout = HandleT<VkPipelineLayout>;
-  using Sampler = HandleT<VkSampler>;
-  using DescriptorSet = HandleT<VkDescriptorSet>;
-  using DescriptorSetLayout = HandleT<VkDescriptorSetLayout>;
-  using DescriptorPool = HandleT<VkDescriptorPool>;
-  using Fence = HandleT<VkFence>;
-  using Semaphore = HandleT<VkSemaphore>;
-  using Event = HandleT<VkEvent>;
-  using QueryPool = HandleT<VkQueryPool>;
-  using Framebuffer = HandleT<VkFramebuffer>;
-  using RenderPass = HandleT<VkRenderPass>;
-  using PipelineCache = HandleT<VkPipelineCache>;
-#endif // VK_VERSION_1_0
-#if defined(VK_VERSION_1_1)
-  using DescriptorUpdateTemplate = HandleT<VkDescriptorUpdateTemplate>;
-  using SamplerYcbcrConversion = HandleT<VkSamplerYcbcrConversion>;
-#endif // VK_VERSION_1_1
-#if defined(VK_VERSION_1_3)
-  using PrivateDataSlot = HandleT<VkPrivateDataSlot>;
-#endif // VK_VERSION_1_3
-#if defined(VK_USE_PLATFORM_FUCHSIA)
-  using BufferCollectionFUCHSIA = HandleT<VkBufferCollectionFUCHSIA>;
-#endif // VK_USE_PLATFORM_FUCHSIA
-
-  //
-  // wrapped info (type identified) and description (not type identified) structs
+  // wrapped info (type identified)
   //
   
   template<class T, int32_t STYPE>
@@ -643,41 +37,20 @@ namespace vku {
     InfoT() { *this = VkType{ kStructType }; }
     InfoT(const VkType& rhs) { (VkType&)*this = rhs; this->sType = kStructType; }
     VkType& operator =(const VkType& rhs) { (VkType&)*this = rhs; this->sType = kStructType; return *this; }
-  };
-  
-  template<typename T>
-  struct DescriptionT : public T {
-    using UType = DescriptionT;
-    using VkType = T;
-    DescriptionT() { *this = VkType{}; }
-    DescriptionT(const VkType& rhs) { (VkType&)*this = rhs; }
-    VkType& operator =(const VkType& rhs) { (VkType&)*this = rhs; return *this; }
-  };
+  };  
 
   using BufferUsageFlags2CreateInfoKHR = InfoT<VkBufferUsageFlags2CreateInfoKHR, VK_STRUCTURE_TYPE_BUFFER_USAGE_FLAGS_2_CREATE_INFO_KHR>;
-  using CopyMemoryIndirectCommandNV = DescriptionT<VkCopyMemoryIndirectCommandNV>;
-  using CopyMemoryToImageIndirectCommandNV = DescriptionT<VkCopyMemoryToImageIndirectCommandNV>;
   using ComputePipelineIndirectBufferInfoNV = InfoT<VkComputePipelineIndirectBufferInfoNV, VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_INDIRECT_BUFFER_INFO_NV>;
   using PipelineCreateFlags2CreateInfoKHR = InfoT<VkPipelineCreateFlags2CreateInfoKHR, VK_STRUCTURE_TYPE_PIPELINE_CREATE_FLAGS_2_CREATE_INFO_KHR>;
-  using MultiDrawInfoEXT = DescriptionT<VkMultiDrawInfoEXT>;
-  using MultiDrawIndexedInfoEXT = DescriptionT<VkMultiDrawIndexedInfoEXT>;
-  using DisplayPropertiesKHR = DescriptionT<VkDisplayPropertiesKHR>;
-  using DisplayPlanePropertiesKHR = DescriptionT<VkDisplayPlanePropertiesKHR>;
-  using DisplayModeParametersKHR = DescriptionT<VkDisplayModeParametersKHR>;
-  using DisplayModePropertiesKHR = DescriptionT<VkDisplayModePropertiesKHR>;
   using DisplayModeCreateInfoKHR = InfoT<VkDisplayModeCreateInfoKHR, VK_STRUCTURE_TYPE_DISPLAY_MODE_CREATE_INFO_KHR>;
-  using DisplayPlaneCapabilitiesKHR = DescriptionT<VkDisplayPlaneCapabilitiesKHR>;
   using DisplaySurfaceCreateInfoKHR = InfoT<VkDisplaySurfaceCreateInfoKHR, VK_STRUCTURE_TYPE_DISPLAY_SURFACE_CREATE_INFO_KHR>;
   using DisplayPresentInfoKHR = InfoT<VkDisplayPresentInfoKHR, VK_STRUCTURE_TYPE_DISPLAY_PRESENT_INFO_KHR>;
-  using SurfaceCapabilitiesKHR = DescriptionT<VkSurfaceCapabilitiesKHR>;
-  using SurfaceFormatKHR = DescriptionT<VkSurfaceFormatKHR>;
   using SwapchainCreateInfoKHR = InfoT<VkSwapchainCreateInfoKHR, VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR>;
   using PresentInfoKHR = InfoT<VkPresentInfoKHR, VK_STRUCTURE_TYPE_PRESENT_INFO_KHR>;
   using DebugReportCallbackCreateInfoEXT = InfoT<VkDebugReportCallbackCreateInfoEXT, VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT>;
   using ValidationFlagsEXT = InfoT<VkValidationFlagsEXT, VK_STRUCTURE_TYPE_VALIDATION_FLAGS_EXT>;
   using ValidationFeaturesEXT = InfoT<VkValidationFeaturesEXT, VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT>;
   using LayerSettingsCreateInfoEXT = InfoT<VkLayerSettingsCreateInfoEXT, VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT>;
-  using LayerSettingEXT = DescriptionT<VkLayerSettingEXT>;
   using PipelineRasterizationStateRasterizationOrderAMD = InfoT<VkPipelineRasterizationStateRasterizationOrderAMD, VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_RASTERIZATION_ORDER_AMD>;
   using DebugMarkerObjectNameInfoEXT = InfoT<VkDebugMarkerObjectNameInfoEXT, VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT>;
   using DebugMarkerObjectTagInfoEXT = InfoT<VkDebugMarkerObjectTagInfoEXT, VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_TAG_INFO_EXT>;
@@ -685,115 +58,51 @@ namespace vku {
   using DedicatedAllocationImageCreateInfoNV = InfoT<VkDedicatedAllocationImageCreateInfoNV, VK_STRUCTURE_TYPE_DEDICATED_ALLOCATION_IMAGE_CREATE_INFO_NV>;
   using DedicatedAllocationBufferCreateInfoNV = InfoT<VkDedicatedAllocationBufferCreateInfoNV, VK_STRUCTURE_TYPE_DEDICATED_ALLOCATION_BUFFER_CREATE_INFO_NV>;
   using DedicatedAllocationMemoryAllocateInfoNV = InfoT<VkDedicatedAllocationMemoryAllocateInfoNV, VK_STRUCTURE_TYPE_DEDICATED_ALLOCATION_MEMORY_ALLOCATE_INFO_NV>;
-  using ExternalImageFormatPropertiesNV = DescriptionT<VkExternalImageFormatPropertiesNV>;
   using ExternalMemoryImageCreateInfoNV = InfoT<VkExternalMemoryImageCreateInfoNV, VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO_NV>;
   using ExportMemoryAllocateInfoNV = InfoT<VkExportMemoryAllocateInfoNV, VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_NV>;
   using PhysicalDeviceDeviceGeneratedCommandsFeaturesNV = InfoT<VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_FEATURES_NV>;
   using PhysicalDeviceDeviceGeneratedCommandsComputeFeaturesNV = InfoT<VkPhysicalDeviceDeviceGeneratedCommandsComputeFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_COMPUTE_FEATURES_NV>;
-  using DevicePrivateDataCreateInfoEXT = DescriptionT<VkDevicePrivateDataCreateInfoEXT>;
-  using PrivateDataSlotCreateInfoEXT = DescriptionT<VkPrivateDataSlotCreateInfoEXT>;
-  using PhysicalDevicePrivateDataFeaturesEXT = DescriptionT<VkPhysicalDevicePrivateDataFeaturesEXT>;
   using PhysicalDeviceDeviceGeneratedCommandsPropertiesNV = InfoT<VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_PROPERTIES_NV>;
   using PhysicalDeviceMultiDrawPropertiesEXT = InfoT<VkPhysicalDeviceMultiDrawPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_PROPERTIES_EXT>;
   using GraphicsShaderGroupCreateInfoNV = InfoT<VkGraphicsShaderGroupCreateInfoNV, VK_STRUCTURE_TYPE_GRAPHICS_SHADER_GROUP_CREATE_INFO_NV>;
   using GraphicsPipelineShaderGroupsCreateInfoNV = InfoT<VkGraphicsPipelineShaderGroupsCreateInfoNV, VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_SHADER_GROUPS_CREATE_INFO_NV>;
-  using BindShaderGroupIndirectCommandNV = DescriptionT<VkBindShaderGroupIndirectCommandNV>;
-  using BindIndexBufferIndirectCommandNV = DescriptionT<VkBindIndexBufferIndirectCommandNV>;
-  using BindVertexBufferIndirectCommandNV = DescriptionT<VkBindVertexBufferIndirectCommandNV>;
-  using SetStateFlagsIndirectCommandNV = DescriptionT<VkSetStateFlagsIndirectCommandNV>;
-  using IndirectCommandsStreamNV = DescriptionT<VkIndirectCommandsStreamNV>;
   using IndirectCommandsLayoutTokenNV = InfoT<VkIndirectCommandsLayoutTokenNV, VK_STRUCTURE_TYPE_INDIRECT_COMMANDS_LAYOUT_TOKEN_NV>;
   using IndirectCommandsLayoutCreateInfoNV = InfoT<VkIndirectCommandsLayoutCreateInfoNV, VK_STRUCTURE_TYPE_INDIRECT_COMMANDS_LAYOUT_CREATE_INFO_NV>;
   using GeneratedCommandsInfoNV = InfoT<VkGeneratedCommandsInfoNV, VK_STRUCTURE_TYPE_GENERATED_COMMANDS_INFO_NV>;
   using GeneratedCommandsMemoryRequirementsInfoNV = InfoT<VkGeneratedCommandsMemoryRequirementsInfoNV, VK_STRUCTURE_TYPE_GENERATED_COMMANDS_MEMORY_REQUIREMENTS_INFO_NV>;
   using PipelineIndirectDeviceAddressInfoNV = InfoT<VkPipelineIndirectDeviceAddressInfoNV, VK_STRUCTURE_TYPE_PIPELINE_INDIRECT_DEVICE_ADDRESS_INFO_NV>;
-  using BindPipelineIndirectCommandNV = DescriptionT<VkBindPipelineIndirectCommandNV>;
-  using PhysicalDeviceFeatures2KHR = DescriptionT<VkPhysicalDeviceFeatures2KHR>;
-  using PhysicalDeviceProperties2KHR = DescriptionT<VkPhysicalDeviceProperties2KHR>;
-  using FormatProperties2KHR = DescriptionT<VkFormatProperties2KHR>;
-  using ImageFormatProperties2KHR = DescriptionT<VkImageFormatProperties2KHR>;
-  using PhysicalDeviceImageFormatInfo2KHR = DescriptionT<VkPhysicalDeviceImageFormatInfo2KHR>;
-  using QueueFamilyProperties2KHR = DescriptionT<VkQueueFamilyProperties2KHR>;
-  using PhysicalDeviceMemoryProperties2KHR = DescriptionT<VkPhysicalDeviceMemoryProperties2KHR>;
-  using SparseImageFormatProperties2KHR = DescriptionT<VkSparseImageFormatProperties2KHR>;
-  using PhysicalDeviceSparseImageFormatInfo2KHR = DescriptionT<VkPhysicalDeviceSparseImageFormatInfo2KHR>;
   using PhysicalDevicePushDescriptorPropertiesKHR = InfoT<VkPhysicalDevicePushDescriptorPropertiesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR>;
-  using ConformanceVersionKHR = DescriptionT<VkConformanceVersionKHR>;
-  using PhysicalDeviceDriverPropertiesKHR = DescriptionT<VkPhysicalDeviceDriverPropertiesKHR>;
   using PresentRegionsKHR = InfoT<VkPresentRegionsKHR, VK_STRUCTURE_TYPE_PRESENT_REGIONS_KHR>;
-  using PresentRegionKHR = DescriptionT<VkPresentRegionKHR>;
-  using RectLayerKHR = DescriptionT<VkRectLayerKHR>;
-  using PhysicalDeviceVariablePointersFeaturesKHR = DescriptionT<VkPhysicalDeviceVariablePointersFeaturesKHR>;
-  using PhysicalDeviceVariablePointerFeaturesKHR = DescriptionT<VkPhysicalDeviceVariablePointerFeaturesKHR>;
-  using ExternalMemoryPropertiesKHR = DescriptionT<VkExternalMemoryPropertiesKHR>;
-  using PhysicalDeviceExternalImageFormatInfoKHR = DescriptionT<VkPhysicalDeviceExternalImageFormatInfoKHR>;
-  using ExternalImageFormatPropertiesKHR = DescriptionT<VkExternalImageFormatPropertiesKHR>;
-  using PhysicalDeviceExternalBufferInfoKHR = DescriptionT<VkPhysicalDeviceExternalBufferInfoKHR>;
-  using ExternalBufferPropertiesKHR = DescriptionT<VkExternalBufferPropertiesKHR>;
-  using PhysicalDeviceIDPropertiesKHR = DescriptionT<VkPhysicalDeviceIDPropertiesKHR>;
-  using ExternalMemoryImageCreateInfoKHR = DescriptionT<VkExternalMemoryImageCreateInfoKHR>;
-  using ExternalMemoryBufferCreateInfoKHR = DescriptionT<VkExternalMemoryBufferCreateInfoKHR>;
-  using ExportMemoryAllocateInfoKHR = DescriptionT<VkExportMemoryAllocateInfoKHR>;
   using ImportMemoryFdInfoKHR = InfoT<VkImportMemoryFdInfoKHR, VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHR>;
   using MemoryFdPropertiesKHR = InfoT<VkMemoryFdPropertiesKHR, VK_STRUCTURE_TYPE_MEMORY_FD_PROPERTIES_KHR>;
   using MemoryGetFdInfoKHR = InfoT<VkMemoryGetFdInfoKHR, VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR>;
-  using PhysicalDeviceExternalSemaphoreInfoKHR = DescriptionT<VkPhysicalDeviceExternalSemaphoreInfoKHR>;
-  using ExternalSemaphorePropertiesKHR = DescriptionT<VkExternalSemaphorePropertiesKHR>;
-  using ExportSemaphoreCreateInfoKHR = DescriptionT<VkExportSemaphoreCreateInfoKHR>;
   using ImportSemaphoreFdInfoKHR = InfoT<VkImportSemaphoreFdInfoKHR, VK_STRUCTURE_TYPE_IMPORT_SEMAPHORE_FD_INFO_KHR>;
   using SemaphoreGetFdInfoKHR = InfoT<VkSemaphoreGetFdInfoKHR, VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR>;
-  using PhysicalDeviceExternalFenceInfoKHR = DescriptionT<VkPhysicalDeviceExternalFenceInfoKHR>;
-  using ExternalFencePropertiesKHR = DescriptionT<VkExternalFencePropertiesKHR>;
-  using ExportFenceCreateInfoKHR = DescriptionT<VkExportFenceCreateInfoKHR>;
   using ImportFenceFdInfoKHR = InfoT<VkImportFenceFdInfoKHR, VK_STRUCTURE_TYPE_IMPORT_FENCE_FD_INFO_KHR>;
   using FenceGetFdInfoKHR = InfoT<VkFenceGetFdInfoKHR, VK_STRUCTURE_TYPE_FENCE_GET_FD_INFO_KHR>;
-  using PhysicalDeviceMultiviewFeaturesKHR = DescriptionT<VkPhysicalDeviceMultiviewFeaturesKHR>;
-  using PhysicalDeviceMultiviewPropertiesKHR = DescriptionT<VkPhysicalDeviceMultiviewPropertiesKHR>;
-  using RenderPassMultiviewCreateInfoKHR = DescriptionT<VkRenderPassMultiviewCreateInfoKHR>;
   using SurfaceCapabilities2EXT = InfoT<VkSurfaceCapabilities2EXT, VK_STRUCTURE_TYPE_SURFACE_CAPABILITIES_2_EXT>;
   using DisplayPowerInfoEXT = InfoT<VkDisplayPowerInfoEXT, VK_STRUCTURE_TYPE_DISPLAY_POWER_INFO_EXT>;
   using DeviceEventInfoEXT = InfoT<VkDeviceEventInfoEXT, VK_STRUCTURE_TYPE_DEVICE_EVENT_INFO_EXT>;
   using DisplayEventInfoEXT = InfoT<VkDisplayEventInfoEXT, VK_STRUCTURE_TYPE_DISPLAY_EVENT_INFO_EXT>;
   using SwapchainCounterCreateInfoEXT = InfoT<VkSwapchainCounterCreateInfoEXT, VK_STRUCTURE_TYPE_SWAPCHAIN_COUNTER_CREATE_INFO_EXT>;
-  using PhysicalDeviceGroupPropertiesKHR = DescriptionT<VkPhysicalDeviceGroupPropertiesKHR>;
-  using MemoryAllocateFlagsInfoKHR = DescriptionT<VkMemoryAllocateFlagsInfoKHR>;
-  using BindBufferMemoryInfoKHR = DescriptionT<VkBindBufferMemoryInfoKHR>;
-  using BindBufferMemoryDeviceGroupInfoKHR = DescriptionT<VkBindBufferMemoryDeviceGroupInfoKHR>;
-  using BindImageMemoryInfoKHR = DescriptionT<VkBindImageMemoryInfoKHR>;
-  using BindImageMemoryDeviceGroupInfoKHR = DescriptionT<VkBindImageMemoryDeviceGroupInfoKHR>;
-  using DeviceGroupRenderPassBeginInfoKHR = DescriptionT<VkDeviceGroupRenderPassBeginInfoKHR>;
-  using DeviceGroupCommandBufferBeginInfoKHR = DescriptionT<VkDeviceGroupCommandBufferBeginInfoKHR>;
-  using DeviceGroupSubmitInfoKHR = DescriptionT<VkDeviceGroupSubmitInfoKHR>;
-  using DeviceGroupBindSparseInfoKHR = DescriptionT<VkDeviceGroupBindSparseInfoKHR>;
   using DeviceGroupPresentCapabilitiesKHR = InfoT<VkDeviceGroupPresentCapabilitiesKHR, VK_STRUCTURE_TYPE_DEVICE_GROUP_PRESENT_CAPABILITIES_KHR>;
   using ImageSwapchainCreateInfoKHR = InfoT<VkImageSwapchainCreateInfoKHR, VK_STRUCTURE_TYPE_IMAGE_SWAPCHAIN_CREATE_INFO_KHR>;
   using BindImageMemorySwapchainInfoKHR = InfoT<VkBindImageMemorySwapchainInfoKHR, VK_STRUCTURE_TYPE_BIND_IMAGE_MEMORY_SWAPCHAIN_INFO_KHR>;
   using AcquireNextImageInfoKHR = InfoT<VkAcquireNextImageInfoKHR, VK_STRUCTURE_TYPE_ACQUIRE_NEXT_IMAGE_INFO_KHR>;
   using DeviceGroupPresentInfoKHR = InfoT<VkDeviceGroupPresentInfoKHR, VK_STRUCTURE_TYPE_DEVICE_GROUP_PRESENT_INFO_KHR>;
-  using DeviceGroupDeviceCreateInfoKHR = DescriptionT<VkDeviceGroupDeviceCreateInfoKHR>;
   using DeviceGroupSwapchainCreateInfoKHR = InfoT<VkDeviceGroupSwapchainCreateInfoKHR, VK_STRUCTURE_TYPE_DEVICE_GROUP_SWAPCHAIN_CREATE_INFO_KHR>;
-  using DescriptorUpdateTemplateEntryKHR = DescriptionT<VkDescriptorUpdateTemplateEntryKHR>;
-  using DescriptorUpdateTemplateCreateInfoKHR = DescriptionT<VkDescriptorUpdateTemplateCreateInfoKHR>;
-  using XYColorEXT = DescriptionT<VkXYColorEXT>;
   using PhysicalDevicePresentIdFeaturesKHR = InfoT<VkPhysicalDevicePresentIdFeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_ID_FEATURES_KHR>;
   using PresentIdKHR = InfoT<VkPresentIdKHR, VK_STRUCTURE_TYPE_PRESENT_ID_KHR>;
   using PhysicalDevicePresentWaitFeaturesKHR = InfoT<VkPhysicalDevicePresentWaitFeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_WAIT_FEATURES_KHR>;
   using HdrMetadataEXT = InfoT<VkHdrMetadataEXT, VK_STRUCTURE_TYPE_HDR_METADATA_EXT>;
   using DisplayNativeHdrSurfaceCapabilitiesAMD = InfoT<VkDisplayNativeHdrSurfaceCapabilitiesAMD, VK_STRUCTURE_TYPE_DISPLAY_NATIVE_HDR_SURFACE_CAPABILITIES_AMD>;
   using SwapchainDisplayNativeHdrCreateInfoAMD = InfoT<VkSwapchainDisplayNativeHdrCreateInfoAMD, VK_STRUCTURE_TYPE_SWAPCHAIN_DISPLAY_NATIVE_HDR_CREATE_INFO_AMD>;
-  using RefreshCycleDurationGOOGLE = DescriptionT<VkRefreshCycleDurationGOOGLE>;
-  using PastPresentationTimingGOOGLE = DescriptionT<VkPastPresentationTimingGOOGLE>;
   using PresentTimesInfoGOOGLE = InfoT<VkPresentTimesInfoGOOGLE, VK_STRUCTURE_TYPE_PRESENT_TIMES_INFO_GOOGLE>;
-  using PresentTimeGOOGLE = DescriptionT<VkPresentTimeGOOGLE>;
-  using ViewportWScalingNV = DescriptionT<VkViewportWScalingNV>;
   using PipelineViewportWScalingStateCreateInfoNV = InfoT<VkPipelineViewportWScalingStateCreateInfoNV, VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_W_SCALING_STATE_CREATE_INFO_NV>;
-  using ViewportSwizzleNV = DescriptionT<VkViewportSwizzleNV>;
   using PipelineViewportSwizzleStateCreateInfoNV = InfoT<VkPipelineViewportSwizzleStateCreateInfoNV, VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_SWIZZLE_STATE_CREATE_INFO_NV>;
   using PhysicalDeviceDiscardRectanglePropertiesEXT = InfoT<VkPhysicalDeviceDiscardRectanglePropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DISCARD_RECTANGLE_PROPERTIES_EXT>;
   using PipelineDiscardRectangleStateCreateInfoEXT = InfoT<VkPipelineDiscardRectangleStateCreateInfoEXT, VK_STRUCTURE_TYPE_PIPELINE_DISCARD_RECTANGLE_STATE_CREATE_INFO_EXT>;
   using PhysicalDeviceMultiviewPerViewAttributesPropertiesNVX = InfoT<VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PER_VIEW_ATTRIBUTES_PROPERTIES_NVX>;
-  using InputAttachmentAspectReferenceKHR = DescriptionT<VkInputAttachmentAspectReferenceKHR>;
-  using RenderPassInputAttachmentAspectCreateInfoKHR = DescriptionT<VkRenderPassInputAttachmentAspectCreateInfoKHR>;
   using PhysicalDeviceSurfaceInfo2KHR = InfoT<VkPhysicalDeviceSurfaceInfo2KHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR>;
   using SurfaceCapabilities2KHR = InfoT<VkSurfaceCapabilities2KHR, VK_STRUCTURE_TYPE_SURFACE_CAPABILITIES_2_KHR>;
   using SurfaceFormat2KHR = InfoT<VkSurfaceFormat2KHR, VK_STRUCTURE_TYPE_SURFACE_FORMAT_2_KHR>;
@@ -803,73 +112,30 @@ namespace vku {
   using DisplayPlaneInfo2KHR = InfoT<VkDisplayPlaneInfo2KHR, VK_STRUCTURE_TYPE_DISPLAY_PLANE_INFO_2_KHR>;
   using DisplayPlaneCapabilities2KHR = InfoT<VkDisplayPlaneCapabilities2KHR, VK_STRUCTURE_TYPE_DISPLAY_PLANE_CAPABILITIES_2_KHR>;
   using SharedPresentSurfaceCapabilitiesKHR = InfoT<VkSharedPresentSurfaceCapabilitiesKHR, VK_STRUCTURE_TYPE_SHARED_PRESENT_SURFACE_CAPABILITIES_KHR>;
-  using PhysicalDevice16BitStorageFeaturesKHR = DescriptionT<VkPhysicalDevice16BitStorageFeaturesKHR>;
-  using PhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR = DescriptionT<VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR>;
-  using BufferMemoryRequirementsInfo2KHR = DescriptionT<VkBufferMemoryRequirementsInfo2KHR>;
-  using DeviceBufferMemoryRequirementsKHR = DescriptionT<VkDeviceBufferMemoryRequirementsKHR>;
-  using ImageMemoryRequirementsInfo2KHR = DescriptionT<VkImageMemoryRequirementsInfo2KHR>;
-  using ImageSparseMemoryRequirementsInfo2KHR = DescriptionT<VkImageSparseMemoryRequirementsInfo2KHR>;
-  using DeviceImageMemoryRequirementsKHR = DescriptionT<VkDeviceImageMemoryRequirementsKHR>;
-  using MemoryRequirements2KHR = DescriptionT<VkMemoryRequirements2KHR>;
-  using SparseImageMemoryRequirements2KHR = DescriptionT<VkSparseImageMemoryRequirements2KHR>;
-  using PhysicalDevicePointClippingPropertiesKHR = DescriptionT<VkPhysicalDevicePointClippingPropertiesKHR>;
-  using MemoryDedicatedRequirementsKHR = DescriptionT<VkMemoryDedicatedRequirementsKHR>;
-  using MemoryDedicatedAllocateInfoKHR = DescriptionT<VkMemoryDedicatedAllocateInfoKHR>;
   using ImageViewSlicedCreateInfoEXT = InfoT<VkImageViewSlicedCreateInfoEXT, VK_STRUCTURE_TYPE_IMAGE_VIEW_SLICED_CREATE_INFO_EXT>;
-  using ImageViewUsageCreateInfoKHR = DescriptionT<VkImageViewUsageCreateInfoKHR>;
-  using PipelineTessellationDomainOriginStateCreateInfoKHR = DescriptionT<VkPipelineTessellationDomainOriginStateCreateInfoKHR>;
-  using SamplerYcbcrConversionInfoKHR = DescriptionT<VkSamplerYcbcrConversionInfoKHR>;
-  using SamplerYcbcrConversionCreateInfoKHR = DescriptionT<VkSamplerYcbcrConversionCreateInfoKHR>;
-  using BindImagePlaneMemoryInfoKHR = DescriptionT<VkBindImagePlaneMemoryInfoKHR>;
-  using ImagePlaneMemoryRequirementsInfoKHR = DescriptionT<VkImagePlaneMemoryRequirementsInfoKHR>;
-  using PhysicalDeviceSamplerYcbcrConversionFeaturesKHR = DescriptionT<VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR>;
-  using SamplerYcbcrConversionImageFormatPropertiesKHR = DescriptionT<VkSamplerYcbcrConversionImageFormatPropertiesKHR>;
   using TextureLODGatherFormatPropertiesAMD = InfoT<VkTextureLODGatherFormatPropertiesAMD, VK_STRUCTURE_TYPE_TEXTURE_LOD_GATHER_FORMAT_PROPERTIES_AMD>;
   using ConditionalRenderingBeginInfoEXT = InfoT<VkConditionalRenderingBeginInfoEXT, VK_STRUCTURE_TYPE_CONDITIONAL_RENDERING_BEGIN_INFO_EXT>;
   using PipelineCoverageToColorStateCreateInfoNV = InfoT<VkPipelineCoverageToColorStateCreateInfoNV, VK_STRUCTURE_TYPE_PIPELINE_COVERAGE_TO_COLOR_STATE_CREATE_INFO_NV>;
-  using PhysicalDeviceSamplerFilterMinmaxPropertiesEXT = DescriptionT<VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT>;
-  using SampleLocationEXT = DescriptionT<VkSampleLocationEXT>;
   using SampleLocationsInfoEXT = InfoT<VkSampleLocationsInfoEXT, VK_STRUCTURE_TYPE_SAMPLE_LOCATIONS_INFO_EXT>;
-  using AttachmentSampleLocationsEXT = DescriptionT<VkAttachmentSampleLocationsEXT>;
-  using SubpassSampleLocationsEXT = DescriptionT<VkSubpassSampleLocationsEXT>;
   using RenderPassSampleLocationsBeginInfoEXT = InfoT<VkRenderPassSampleLocationsBeginInfoEXT, VK_STRUCTURE_TYPE_RENDER_PASS_SAMPLE_LOCATIONS_BEGIN_INFO_EXT>;
   using PipelineSampleLocationsStateCreateInfoEXT = InfoT<VkPipelineSampleLocationsStateCreateInfoEXT, VK_STRUCTURE_TYPE_PIPELINE_SAMPLE_LOCATIONS_STATE_CREATE_INFO_EXT>;
   using PhysicalDeviceSampleLocationsPropertiesEXT = InfoT<VkPhysicalDeviceSampleLocationsPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLE_LOCATIONS_PROPERTIES_EXT>;
   using MultisamplePropertiesEXT = InfoT<VkMultisamplePropertiesEXT, VK_STRUCTURE_TYPE_MULTISAMPLE_PROPERTIES_EXT>;
-  using SamplerReductionModeCreateInfoEXT = DescriptionT<VkSamplerReductionModeCreateInfoEXT>;
   using PhysicalDeviceBlendOperationAdvancedFeaturesEXT = InfoT<VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_FEATURES_EXT>;
   using PhysicalDeviceMultiDrawFeaturesEXT = InfoT<VkPhysicalDeviceMultiDrawFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_FEATURES_EXT>;
   using PhysicalDeviceBlendOperationAdvancedPropertiesEXT = InfoT<VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_PROPERTIES_EXT>;
   using PipelineColorBlendAdvancedStateCreateInfoEXT = InfoT<VkPipelineColorBlendAdvancedStateCreateInfoEXT, VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_ADVANCED_STATE_CREATE_INFO_EXT>;
-  using PhysicalDeviceInlineUniformBlockFeaturesEXT = DescriptionT<VkPhysicalDeviceInlineUniformBlockFeaturesEXT>;
-  using PhysicalDeviceInlineUniformBlockPropertiesEXT = DescriptionT<VkPhysicalDeviceInlineUniformBlockPropertiesEXT>;
-  using WriteDescriptorSetInlineUniformBlockEXT = DescriptionT<VkWriteDescriptorSetInlineUniformBlockEXT>;
-  using DescriptorPoolInlineUniformBlockCreateInfoEXT = DescriptionT<VkDescriptorPoolInlineUniformBlockCreateInfoEXT>;
   using PipelineCoverageModulationStateCreateInfoNV = InfoT<VkPipelineCoverageModulationStateCreateInfoNV, VK_STRUCTURE_TYPE_PIPELINE_COVERAGE_MODULATION_STATE_CREATE_INFO_NV>;
-  using ImageFormatListCreateInfoKHR = DescriptionT<VkImageFormatListCreateInfoKHR>;
   using ValidationCacheCreateInfoEXT = InfoT<VkValidationCacheCreateInfoEXT, VK_STRUCTURE_TYPE_VALIDATION_CACHE_CREATE_INFO_EXT>;
   using ShaderModuleValidationCacheCreateInfoEXT = InfoT<VkShaderModuleValidationCacheCreateInfoEXT, VK_STRUCTURE_TYPE_SHADER_MODULE_VALIDATION_CACHE_CREATE_INFO_EXT>;
-  using PhysicalDeviceMaintenance3PropertiesKHR = DescriptionT<VkPhysicalDeviceMaintenance3PropertiesKHR>;
-  using PhysicalDeviceMaintenance4FeaturesKHR = DescriptionT<VkPhysicalDeviceMaintenance4FeaturesKHR>;
-  using PhysicalDeviceMaintenance4PropertiesKHR = DescriptionT<VkPhysicalDeviceMaintenance4PropertiesKHR>;
   using PhysicalDeviceMaintenance5FeaturesKHR = InfoT<VkPhysicalDeviceMaintenance5FeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_5_FEATURES_KHR>;
   using PhysicalDeviceMaintenance5PropertiesKHR = InfoT<VkPhysicalDeviceMaintenance5PropertiesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_5_PROPERTIES_KHR>;
   using PhysicalDeviceMaintenance6FeaturesKHR = InfoT<VkPhysicalDeviceMaintenance6FeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_6_FEATURES_KHR>;
   using PhysicalDeviceMaintenance6PropertiesKHR = InfoT<VkPhysicalDeviceMaintenance6PropertiesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_6_PROPERTIES_KHR>;
   using RenderingAreaInfoKHR = InfoT<VkRenderingAreaInfoKHR, VK_STRUCTURE_TYPE_RENDERING_AREA_INFO_KHR>;
-  using DescriptorSetLayoutSupportKHR = DescriptionT<VkDescriptorSetLayoutSupportKHR>;
-  using PhysicalDeviceShaderFloat16Int8FeaturesKHR = DescriptionT<VkPhysicalDeviceShaderFloat16Int8FeaturesKHR>;
-  using PhysicalDeviceFloat16Int8FeaturesKHR = DescriptionT<VkPhysicalDeviceFloat16Int8FeaturesKHR>;
-  using PhysicalDeviceFloatControlsPropertiesKHR = DescriptionT<VkPhysicalDeviceFloatControlsPropertiesKHR>;
-  using PhysicalDeviceHostQueryResetFeaturesEXT = DescriptionT<VkPhysicalDeviceHostQueryResetFeaturesEXT>;
-  using ShaderResourceUsageAMD = DescriptionT<VkShaderResourceUsageAMD>;
-  using ShaderStatisticsInfoAMD = DescriptionT<VkShaderStatisticsInfoAMD>;
   using DeviceQueueGlobalPriorityCreateInfoKHR = InfoT<VkDeviceQueueGlobalPriorityCreateInfoKHR, VK_STRUCTURE_TYPE_DEVICE_QUEUE_GLOBAL_PRIORITY_CREATE_INFO_KHR>;
-  using DeviceQueueGlobalPriorityCreateInfoEXT = DescriptionT<VkDeviceQueueGlobalPriorityCreateInfoEXT>;
   using PhysicalDeviceGlobalPriorityQueryFeaturesKHR = InfoT<VkPhysicalDeviceGlobalPriorityQueryFeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES_KHR>;
-  using PhysicalDeviceGlobalPriorityQueryFeaturesEXT = DescriptionT<VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT>;
   using QueueFamilyGlobalPriorityPropertiesKHR = InfoT<VkQueueFamilyGlobalPriorityPropertiesKHR, VK_STRUCTURE_TYPE_QUEUE_FAMILY_GLOBAL_PRIORITY_PROPERTIES_KHR>;
-  using QueueFamilyGlobalPriorityPropertiesEXT = DescriptionT<VkQueueFamilyGlobalPriorityPropertiesEXT>;
   using DebugUtilsObjectNameInfoEXT = InfoT<VkDebugUtilsObjectNameInfoEXT, VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT>;
   using DebugUtilsObjectTagInfoEXT = InfoT<VkDebugUtilsObjectTagInfoEXT, VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_TAG_INFO_EXT>;
   using DebugUtilsLabelEXT = InfoT<VkDebugUtilsLabelEXT, VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT>;
@@ -883,48 +149,20 @@ namespace vku {
   using PhysicalDeviceExternalMemoryHostPropertiesEXT = InfoT<VkPhysicalDeviceExternalMemoryHostPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT>;
   using PhysicalDeviceConservativeRasterizationPropertiesEXT = InfoT<VkPhysicalDeviceConservativeRasterizationPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONSERVATIVE_RASTERIZATION_PROPERTIES_EXT>;
   using CalibratedTimestampInfoKHR = InfoT<VkCalibratedTimestampInfoKHR, VK_STRUCTURE_TYPE_CALIBRATED_TIMESTAMP_INFO_KHR>;
-  using CalibratedTimestampInfoEXT = DescriptionT<VkCalibratedTimestampInfoEXT>;
   using PhysicalDeviceShaderCorePropertiesAMD = InfoT<VkPhysicalDeviceShaderCorePropertiesAMD, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_PROPERTIES_AMD>;
   using PhysicalDeviceShaderCoreProperties2AMD = InfoT<VkPhysicalDeviceShaderCoreProperties2AMD, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_PROPERTIES_2_AMD>;
   using PipelineRasterizationConservativeStateCreateInfoEXT = InfoT<VkPipelineRasterizationConservativeStateCreateInfoEXT, VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_CONSERVATIVE_STATE_CREATE_INFO_EXT>;
-  using PhysicalDeviceDescriptorIndexingFeaturesEXT = DescriptionT<VkPhysicalDeviceDescriptorIndexingFeaturesEXT>;
-  using PhysicalDeviceDescriptorIndexingPropertiesEXT = DescriptionT<VkPhysicalDeviceDescriptorIndexingPropertiesEXT>;
-  using DescriptorSetLayoutBindingFlagsCreateInfoEXT = DescriptionT<VkDescriptorSetLayoutBindingFlagsCreateInfoEXT>;
-  using DescriptorSetVariableDescriptorCountAllocateInfoEXT = DescriptionT<VkDescriptorSetVariableDescriptorCountAllocateInfoEXT>;
-  using DescriptorSetVariableDescriptorCountLayoutSupportEXT = DescriptionT<VkDescriptorSetVariableDescriptorCountLayoutSupportEXT>;
-  using AttachmentDescription2KHR = DescriptionT<VkAttachmentDescription2KHR>;
-  using AttachmentReference2KHR = DescriptionT<VkAttachmentReference2KHR>;
-  using SubpassDescription2KHR = DescriptionT<VkSubpassDescription2KHR>;
-  using SubpassDependency2KHR = DescriptionT<VkSubpassDependency2KHR>;
-  using RenderPassCreateInfo2KHR = DescriptionT<VkRenderPassCreateInfo2KHR>;
-  using SubpassBeginInfoKHR = DescriptionT<VkSubpassBeginInfoKHR>;
-  using SubpassEndInfoKHR = DescriptionT<VkSubpassEndInfoKHR>;
-  using PhysicalDeviceTimelineSemaphoreFeaturesKHR = DescriptionT<VkPhysicalDeviceTimelineSemaphoreFeaturesKHR>;
-  using PhysicalDeviceTimelineSemaphorePropertiesKHR = DescriptionT<VkPhysicalDeviceTimelineSemaphorePropertiesKHR>;
-  using SemaphoreTypeCreateInfoKHR = DescriptionT<VkSemaphoreTypeCreateInfoKHR>;
-  using TimelineSemaphoreSubmitInfoKHR = DescriptionT<VkTimelineSemaphoreSubmitInfoKHR>;
-  using SemaphoreWaitInfoKHR = DescriptionT<VkSemaphoreWaitInfoKHR>;
-  using SemaphoreSignalInfoKHR = DescriptionT<VkSemaphoreSignalInfoKHR>;
-  using VertexInputBindingDivisorDescriptionKHR = DescriptionT<VkVertexInputBindingDivisorDescriptionKHR>;
-  using VertexInputBindingDivisorDescriptionEXT = DescriptionT<VkVertexInputBindingDivisorDescriptionEXT>;
   using PipelineVertexInputDivisorStateCreateInfoKHR = InfoT<VkPipelineVertexInputDivisorStateCreateInfoKHR, VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_DIVISOR_STATE_CREATE_INFO_KHR>;
-  using PipelineVertexInputDivisorStateCreateInfoEXT = DescriptionT<VkPipelineVertexInputDivisorStateCreateInfoEXT>;
   using PhysicalDeviceVertexAttributeDivisorPropertiesEXT = InfoT<VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT>;
   using PhysicalDeviceVertexAttributeDivisorPropertiesKHR = InfoT<VkPhysicalDeviceVertexAttributeDivisorPropertiesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_KHR>;
   using PhysicalDevicePCIBusInfoPropertiesEXT = InfoT<VkPhysicalDevicePCIBusInfoPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PCI_BUS_INFO_PROPERTIES_EXT>;
   using CommandBufferInheritanceConditionalRenderingInfoEXT = InfoT<VkCommandBufferInheritanceConditionalRenderingInfoEXT, VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_CONDITIONAL_RENDERING_INFO_EXT>;
-  using PhysicalDevice8BitStorageFeaturesKHR = DescriptionT<VkPhysicalDevice8BitStorageFeaturesKHR>;
   using PhysicalDeviceConditionalRenderingFeaturesEXT = InfoT<VkPhysicalDeviceConditionalRenderingFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONDITIONAL_RENDERING_FEATURES_EXT>;
-  using PhysicalDeviceVulkanMemoryModelFeaturesKHR = DescriptionT<VkPhysicalDeviceVulkanMemoryModelFeaturesKHR>;
-  using PhysicalDeviceShaderAtomicInt64FeaturesKHR = DescriptionT<VkPhysicalDeviceShaderAtomicInt64FeaturesKHR>;
   using PhysicalDeviceShaderAtomicFloatFeaturesEXT = InfoT<VkPhysicalDeviceShaderAtomicFloatFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT_FEATURES_EXT>;
   using PhysicalDeviceShaderAtomicFloat2FeaturesEXT = InfoT<VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT_2_FEATURES_EXT>;
   using PhysicalDeviceVertexAttributeDivisorFeaturesKHR = InfoT<VkPhysicalDeviceVertexAttributeDivisorFeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_KHR>;
-  using PhysicalDeviceVertexAttributeDivisorFeaturesEXT = DescriptionT<VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT>;
   using QueueFamilyCheckpointPropertiesNV = InfoT<VkQueueFamilyCheckpointPropertiesNV, VK_STRUCTURE_TYPE_QUEUE_FAMILY_CHECKPOINT_PROPERTIES_NV>;
   using CheckpointDataNV = InfoT<VkCheckpointDataNV, VK_STRUCTURE_TYPE_CHECKPOINT_DATA_NV>;
-  using PhysicalDeviceDepthStencilResolvePropertiesKHR = DescriptionT<VkPhysicalDeviceDepthStencilResolvePropertiesKHR>;
-  using SubpassDescriptionDepthStencilResolveKHR = DescriptionT<VkSubpassDescriptionDepthStencilResolveKHR>;
   using ImageViewASTCDecodeModeEXT = InfoT<VkImageViewASTCDecodeModeEXT, VK_STRUCTURE_TYPE_IMAGE_VIEW_ASTC_DECODE_MODE_EXT>;
   using PhysicalDeviceASTCDecodeFeaturesEXT = InfoT<VkPhysicalDeviceASTCDecodeFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ASTC_DECODE_FEATURES_EXT>;
   using PhysicalDeviceTransformFeedbackFeaturesEXT = InfoT<VkPhysicalDeviceTransformFeedbackFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT>;
@@ -936,34 +174,27 @@ namespace vku {
   using PipelineViewportExclusiveScissorStateCreateInfoNV = InfoT<VkPipelineViewportExclusiveScissorStateCreateInfoNV, VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_EXCLUSIVE_SCISSOR_STATE_CREATE_INFO_NV>;
   using PhysicalDeviceCornerSampledImageFeaturesNV = InfoT<VkPhysicalDeviceCornerSampledImageFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CORNER_SAMPLED_IMAGE_FEATURES_NV>;
   using PhysicalDeviceComputeShaderDerivativesFeaturesNV = InfoT<VkPhysicalDeviceComputeShaderDerivativesFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COMPUTE_SHADER_DERIVATIVES_FEATURES_NV>;
-  using PhysicalDeviceFragmentShaderBarycentricFeaturesNV = DescriptionT<VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV>;
   using PhysicalDeviceShaderImageFootprintFeaturesNV = InfoT<VkPhysicalDeviceShaderImageFootprintFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_IMAGE_FOOTPRINT_FEATURES_NV>;
   using PhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV = InfoT<VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEDICATED_ALLOCATION_IMAGE_ALIASING_FEATURES_NV>;
   using PhysicalDeviceCopyMemoryIndirectFeaturesNV = InfoT<VkPhysicalDeviceCopyMemoryIndirectFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COPY_MEMORY_INDIRECT_FEATURES_NV>;
   using PhysicalDeviceCopyMemoryIndirectPropertiesNV = InfoT<VkPhysicalDeviceCopyMemoryIndirectPropertiesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COPY_MEMORY_INDIRECT_PROPERTIES_NV>;
   using PhysicalDeviceMemoryDecompressionFeaturesNV = InfoT<VkPhysicalDeviceMemoryDecompressionFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_DECOMPRESSION_FEATURES_NV>;
   using PhysicalDeviceMemoryDecompressionPropertiesNV = InfoT<VkPhysicalDeviceMemoryDecompressionPropertiesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_DECOMPRESSION_PROPERTIES_NV>;
-  using ShadingRatePaletteNV = DescriptionT<VkShadingRatePaletteNV>;
   using PipelineViewportShadingRateImageStateCreateInfoNV = InfoT<VkPipelineViewportShadingRateImageStateCreateInfoNV, VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_SHADING_RATE_IMAGE_STATE_CREATE_INFO_NV>;
   using PhysicalDeviceShadingRateImageFeaturesNV = InfoT<VkPhysicalDeviceShadingRateImageFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_FEATURES_NV>;
   using PhysicalDeviceShadingRateImagePropertiesNV = InfoT<VkPhysicalDeviceShadingRateImagePropertiesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_PROPERTIES_NV>;
   using PhysicalDeviceInvocationMaskFeaturesHUAWEI = InfoT<VkPhysicalDeviceInvocationMaskFeaturesHUAWEI, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INVOCATION_MASK_FEATURES_HUAWEI>;
-  using CoarseSampleLocationNV = DescriptionT<VkCoarseSampleLocationNV>;
-  using CoarseSampleOrderCustomNV = DescriptionT<VkCoarseSampleOrderCustomNV>;
   using PipelineViewportCoarseSampleOrderStateCreateInfoNV = InfoT<VkPipelineViewportCoarseSampleOrderStateCreateInfoNV, VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_COARSE_SAMPLE_ORDER_STATE_CREATE_INFO_NV>;
   using PhysicalDeviceMeshShaderFeaturesNV = InfoT<VkPhysicalDeviceMeshShaderFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_NV>;
   using PhysicalDeviceMeshShaderPropertiesNV = InfoT<VkPhysicalDeviceMeshShaderPropertiesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_NV>;
-  using DrawMeshTasksIndirectCommandNV = DescriptionT<VkDrawMeshTasksIndirectCommandNV>;
   using PhysicalDeviceMeshShaderFeaturesEXT = InfoT<VkPhysicalDeviceMeshShaderFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_EXT>;
   using PhysicalDeviceMeshShaderPropertiesEXT = InfoT<VkPhysicalDeviceMeshShaderPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_EXT>;
-  using DrawMeshTasksIndirectCommandEXT = DescriptionT<VkDrawMeshTasksIndirectCommandEXT>;
   using RayTracingShaderGroupCreateInfoNV = InfoT<VkRayTracingShaderGroupCreateInfoNV, VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_NV>;
   using RayTracingShaderGroupCreateInfoKHR = InfoT<VkRayTracingShaderGroupCreateInfoKHR, VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR>;
   using RayTracingPipelineCreateInfoNV = InfoT<VkRayTracingPipelineCreateInfoNV, VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_NV>;
   using RayTracingPipelineCreateInfoKHR = InfoT<VkRayTracingPipelineCreateInfoKHR, VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR>;
   using GeometryTrianglesNV = InfoT<VkGeometryTrianglesNV, VK_STRUCTURE_TYPE_GEOMETRY_TRIANGLES_NV>;
   using GeometryAABBNV = InfoT<VkGeometryAABBNV, VK_STRUCTURE_TYPE_GEOMETRY_AABB_NV>;
-  using GeometryDataNV = DescriptionT<VkGeometryDataNV>;
   using GeometryNV = InfoT<VkGeometryNV, VK_STRUCTURE_TYPE_GEOMETRY_NV>;
   using AccelerationStructureInfoNV = InfoT<VkAccelerationStructureInfoNV, VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_INFO_NV>;
   using AccelerationStructureCreateInfoNV = InfoT<VkAccelerationStructureCreateInfoNV, VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_NV>;
@@ -977,17 +208,12 @@ namespace vku {
   using PhysicalDeviceAccelerationStructurePropertiesKHR = InfoT<VkPhysicalDeviceAccelerationStructurePropertiesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR>;
   using PhysicalDeviceRayTracingPipelinePropertiesKHR = InfoT<VkPhysicalDeviceRayTracingPipelinePropertiesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR>;
   using PhysicalDeviceRayTracingPropertiesNV = InfoT<VkPhysicalDeviceRayTracingPropertiesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PROPERTIES_NV>;
-  using StridedDeviceAddressRegionKHR = DescriptionT<VkStridedDeviceAddressRegionKHR>;
-  using TraceRaysIndirectCommandKHR = DescriptionT<VkTraceRaysIndirectCommandKHR>;
-  using TraceRaysIndirectCommand2KHR = DescriptionT<VkTraceRaysIndirectCommand2KHR>;
   using PhysicalDeviceRayTracingMaintenance1FeaturesKHR = InfoT<VkPhysicalDeviceRayTracingMaintenance1FeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_MAINTENANCE_1_FEATURES_KHR>;
   using DrmFormatModifierPropertiesListEXT = InfoT<VkDrmFormatModifierPropertiesListEXT, VK_STRUCTURE_TYPE_DRM_FORMAT_MODIFIER_PROPERTIES_LIST_EXT>;
-  using DrmFormatModifierPropertiesEXT = DescriptionT<VkDrmFormatModifierPropertiesEXT>;
   using PhysicalDeviceImageDrmFormatModifierInfoEXT = InfoT<VkPhysicalDeviceImageDrmFormatModifierInfoEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_DRM_FORMAT_MODIFIER_INFO_EXT>;
   using ImageDrmFormatModifierListCreateInfoEXT = InfoT<VkImageDrmFormatModifierListCreateInfoEXT, VK_STRUCTURE_TYPE_IMAGE_DRM_FORMAT_MODIFIER_LIST_CREATE_INFO_EXT>;
   using ImageDrmFormatModifierExplicitCreateInfoEXT = InfoT<VkImageDrmFormatModifierExplicitCreateInfoEXT, VK_STRUCTURE_TYPE_IMAGE_DRM_FORMAT_MODIFIER_EXPLICIT_CREATE_INFO_EXT>;
   using ImageDrmFormatModifierPropertiesEXT = InfoT<VkImageDrmFormatModifierPropertiesEXT, VK_STRUCTURE_TYPE_IMAGE_DRM_FORMAT_MODIFIER_PROPERTIES_EXT>;
-  using ImageStencilUsageCreateInfoEXT = DescriptionT<VkImageStencilUsageCreateInfoEXT>;
   using DeviceMemoryOverallocationCreateInfoAMD = InfoT<VkDeviceMemoryOverallocationCreateInfoAMD, VK_STRUCTURE_TYPE_DEVICE_MEMORY_OVERALLOCATION_CREATE_INFO_AMD>;
   using PhysicalDeviceFragmentDensityMapFeaturesEXT = InfoT<VkPhysicalDeviceFragmentDensityMapFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_FEATURES_EXT>;
   using PhysicalDeviceFragmentDensityMap2FeaturesEXT = InfoT<VkPhysicalDeviceFragmentDensityMap2FeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_FEATURES_EXT>;
@@ -997,37 +223,23 @@ namespace vku {
   using PhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM = InfoT<VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_PROPERTIES_QCOM>;
   using RenderPassFragmentDensityMapCreateInfoEXT = InfoT<VkRenderPassFragmentDensityMapCreateInfoEXT, VK_STRUCTURE_TYPE_RENDER_PASS_FRAGMENT_DENSITY_MAP_CREATE_INFO_EXT>;
   using SubpassFragmentDensityMapOffsetEndInfoQCOM = InfoT<VkSubpassFragmentDensityMapOffsetEndInfoQCOM, VK_STRUCTURE_TYPE_SUBPASS_FRAGMENT_DENSITY_MAP_OFFSET_END_INFO_QCOM>;
-  using PhysicalDeviceScalarBlockLayoutFeaturesEXT = DescriptionT<VkPhysicalDeviceScalarBlockLayoutFeaturesEXT>;
   using SurfaceProtectedCapabilitiesKHR = InfoT<VkSurfaceProtectedCapabilitiesKHR, VK_STRUCTURE_TYPE_SURFACE_PROTECTED_CAPABILITIES_KHR>;
-  using PhysicalDeviceUniformBufferStandardLayoutFeaturesKHR = DescriptionT<VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR>;
   using PhysicalDeviceDepthClipEnableFeaturesEXT = InfoT<VkPhysicalDeviceDepthClipEnableFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT>;
   using PipelineRasterizationDepthClipStateCreateInfoEXT = InfoT<VkPipelineRasterizationDepthClipStateCreateInfoEXT, VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_DEPTH_CLIP_STATE_CREATE_INFO_EXT>;
   using PhysicalDeviceMemoryBudgetPropertiesEXT = InfoT<VkPhysicalDeviceMemoryBudgetPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_BUDGET_PROPERTIES_EXT>;
   using PhysicalDeviceMemoryPriorityFeaturesEXT = InfoT<VkPhysicalDeviceMemoryPriorityFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PRIORITY_FEATURES_EXT>;
   using MemoryPriorityAllocateInfoEXT = InfoT<VkMemoryPriorityAllocateInfoEXT, VK_STRUCTURE_TYPE_MEMORY_PRIORITY_ALLOCATE_INFO_EXT>;
   using PhysicalDevicePageableDeviceLocalMemoryFeaturesEXT = InfoT<VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PAGEABLE_DEVICE_LOCAL_MEMORY_FEATURES_EXT>;
-  using PhysicalDeviceBufferDeviceAddressFeaturesKHR = DescriptionT<VkPhysicalDeviceBufferDeviceAddressFeaturesKHR>;
   using PhysicalDeviceBufferDeviceAddressFeaturesEXT = InfoT<VkPhysicalDeviceBufferDeviceAddressFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_EXT>;
-  using PhysicalDeviceBufferAddressFeaturesEXT = DescriptionT<VkPhysicalDeviceBufferAddressFeaturesEXT>;
-  using BufferDeviceAddressInfoKHR = DescriptionT<VkBufferDeviceAddressInfoKHR>;
-  using BufferDeviceAddressInfoEXT = DescriptionT<VkBufferDeviceAddressInfoEXT>;
-  using BufferOpaqueCaptureAddressCreateInfoKHR = DescriptionT<VkBufferOpaqueCaptureAddressCreateInfoKHR>;
   using BufferDeviceAddressCreateInfoEXT = InfoT<VkBufferDeviceAddressCreateInfoEXT, VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_CREATE_INFO_EXT>;
   using PhysicalDeviceImageViewImageFormatInfoEXT = InfoT<VkPhysicalDeviceImageViewImageFormatInfoEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_VIEW_IMAGE_FORMAT_INFO_EXT>;
   using FilterCubicImageViewImageFormatPropertiesEXT = InfoT<VkFilterCubicImageViewImageFormatPropertiesEXT, VK_STRUCTURE_TYPE_FILTER_CUBIC_IMAGE_VIEW_IMAGE_FORMAT_PROPERTIES_EXT>;
-  using PhysicalDeviceImagelessFramebufferFeaturesKHR = DescriptionT<VkPhysicalDeviceImagelessFramebufferFeaturesKHR>;
-  using FramebufferAttachmentsCreateInfoKHR = DescriptionT<VkFramebufferAttachmentsCreateInfoKHR>;
-  using FramebufferAttachmentImageInfoKHR = DescriptionT<VkFramebufferAttachmentImageInfoKHR>;
-  using RenderPassAttachmentBeginInfoKHR = DescriptionT<VkRenderPassAttachmentBeginInfoKHR>;
-  using PhysicalDeviceTextureCompressionASTCHDRFeaturesEXT = DescriptionT<VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT>;
   using PhysicalDeviceCooperativeMatrixFeaturesNV = InfoT<VkPhysicalDeviceCooperativeMatrixFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_NV>;
   using PhysicalDeviceCooperativeMatrixPropertiesNV = InfoT<VkPhysicalDeviceCooperativeMatrixPropertiesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_PROPERTIES_NV>;
   using CooperativeMatrixPropertiesNV = InfoT<VkCooperativeMatrixPropertiesNV, VK_STRUCTURE_TYPE_COOPERATIVE_MATRIX_PROPERTIES_NV>;
   using PhysicalDeviceYcbcrImageArraysFeaturesEXT = InfoT<VkPhysicalDeviceYcbcrImageArraysFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_IMAGE_ARRAYS_FEATURES_EXT>;
   using ImageViewHandleInfoNVX = InfoT<VkImageViewHandleInfoNVX, VK_STRUCTURE_TYPE_IMAGE_VIEW_HANDLE_INFO_NVX>;
   using ImageViewAddressPropertiesNVX = InfoT<VkImageViewAddressPropertiesNVX, VK_STRUCTURE_TYPE_IMAGE_VIEW_ADDRESS_PROPERTIES_NVX>;
-  using PipelineCreationFeedbackEXT = DescriptionT<VkPipelineCreationFeedbackEXT>;
-  using PipelineCreationFeedbackCreateInfoEXT = DescriptionT<VkPipelineCreationFeedbackCreateInfoEXT>;
   using PhysicalDevicePresentBarrierFeaturesNV = InfoT<VkPhysicalDevicePresentBarrierFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_BARRIER_FEATURES_NV>;
   using SurfaceCapabilitiesPresentBarrierNV = InfoT<VkSurfaceCapabilitiesPresentBarrierNV, VK_STRUCTURE_TYPE_SURFACE_CAPABILITIES_PRESENT_BARRIER_NV>;
   using SwapchainPresentBarrierCreateInfoNV = InfoT<VkSwapchainPresentBarrierCreateInfoNV, VK_STRUCTURE_TYPE_SWAPCHAIN_PRESENT_BARRIER_CREATE_INFO_NV>;
@@ -1043,53 +255,33 @@ namespace vku {
   using PipelineCoverageReductionStateCreateInfoNV = InfoT<VkPipelineCoverageReductionStateCreateInfoNV, VK_STRUCTURE_TYPE_PIPELINE_COVERAGE_REDUCTION_STATE_CREATE_INFO_NV>;
   using FramebufferMixedSamplesCombinationNV = InfoT<VkFramebufferMixedSamplesCombinationNV, VK_STRUCTURE_TYPE_FRAMEBUFFER_MIXED_SAMPLES_COMBINATION_NV>;
   using PhysicalDeviceShaderIntegerFunctions2FeaturesINTEL = InfoT<VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_INTEGER_FUNCTIONS_2_FEATURES_INTEL>;
-  using PerformanceValueINTEL = DescriptionT<VkPerformanceValueINTEL>;
   using InitializePerformanceApiInfoINTEL = InfoT<VkInitializePerformanceApiInfoINTEL, VK_STRUCTURE_TYPE_INITIALIZE_PERFORMANCE_API_INFO_INTEL>;
   using QueryPoolPerformanceQueryCreateInfoINTEL = InfoT<VkQueryPoolPerformanceQueryCreateInfoINTEL, VK_STRUCTURE_TYPE_QUERY_POOL_PERFORMANCE_QUERY_CREATE_INFO_INTEL>;
-  using QueryPoolCreateInfoINTEL = DescriptionT<VkQueryPoolCreateInfoINTEL>;
   using PerformanceMarkerInfoINTEL = InfoT<VkPerformanceMarkerInfoINTEL, VK_STRUCTURE_TYPE_PERFORMANCE_MARKER_INFO_INTEL>;
   using PerformanceStreamMarkerInfoINTEL = InfoT<VkPerformanceStreamMarkerInfoINTEL, VK_STRUCTURE_TYPE_PERFORMANCE_STREAM_MARKER_INFO_INTEL>;
   using PerformanceOverrideInfoINTEL = InfoT<VkPerformanceOverrideInfoINTEL, VK_STRUCTURE_TYPE_PERFORMANCE_OVERRIDE_INFO_INTEL>;
   using PerformanceConfigurationAcquireInfoINTEL = InfoT<VkPerformanceConfigurationAcquireInfoINTEL, VK_STRUCTURE_TYPE_PERFORMANCE_CONFIGURATION_ACQUIRE_INFO_INTEL>;
   using PhysicalDeviceShaderClockFeaturesKHR = InfoT<VkPhysicalDeviceShaderClockFeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR>;
   using PhysicalDeviceIndexTypeUint8FeaturesKHR = InfoT<VkPhysicalDeviceIndexTypeUint8FeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INDEX_TYPE_UINT8_FEATURES_KHR>;
-  using PhysicalDeviceIndexTypeUint8FeaturesEXT = DescriptionT<VkPhysicalDeviceIndexTypeUint8FeaturesEXT>;
   using PhysicalDeviceShaderSMBuiltinsPropertiesNV = InfoT<VkPhysicalDeviceShaderSMBuiltinsPropertiesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SM_BUILTINS_PROPERTIES_NV>;
   using PhysicalDeviceShaderSMBuiltinsFeaturesNV = InfoT<VkPhysicalDeviceShaderSMBuiltinsFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SM_BUILTINS_FEATURES_NV>;
   using PhysicalDeviceFragmentShaderInterlockFeaturesEXT = InfoT<VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT>;
-  using PhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR = DescriptionT<VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR>;
   using PhysicalDevicePrimitiveTopologyListRestartFeaturesEXT = InfoT<VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIMITIVE_TOPOLOGY_LIST_RESTART_FEATURES_EXT>;
-  using AttachmentReferenceStencilLayoutKHR = DescriptionT<VkAttachmentReferenceStencilLayoutKHR>;
-  using AttachmentDescriptionStencilLayoutKHR = DescriptionT<VkAttachmentDescriptionStencilLayoutKHR>;
   using PhysicalDevicePipelineExecutablePropertiesFeaturesKHR = InfoT<VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR>;
   using PipelineInfoKHR = InfoT<VkPipelineInfoKHR, VK_STRUCTURE_TYPE_PIPELINE_INFO_KHR>;
-  using PipelineInfoEXT = DescriptionT<VkPipelineInfoEXT>;
   using PipelineExecutablePropertiesKHR = InfoT<VkPipelineExecutablePropertiesKHR, VK_STRUCTURE_TYPE_PIPELINE_EXECUTABLE_PROPERTIES_KHR>;
   using PipelineExecutableInfoKHR = InfoT<VkPipelineExecutableInfoKHR, VK_STRUCTURE_TYPE_PIPELINE_EXECUTABLE_INFO_KHR>;
   using PipelineExecutableStatisticKHR = InfoT<VkPipelineExecutableStatisticKHR, VK_STRUCTURE_TYPE_PIPELINE_EXECUTABLE_STATISTIC_KHR>;
   using PipelineExecutableInternalRepresentationKHR = InfoT<VkPipelineExecutableInternalRepresentationKHR, VK_STRUCTURE_TYPE_PIPELINE_EXECUTABLE_INTERNAL_REPRESENTATION_KHR>;
-  using PhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT = DescriptionT<VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT>;
   using PhysicalDeviceTexelBufferAlignmentFeaturesEXT = InfoT<VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT>;
-  using PhysicalDeviceTexelBufferAlignmentPropertiesEXT = DescriptionT<VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT>;
-  using PhysicalDeviceSubgroupSizeControlFeaturesEXT = DescriptionT<VkPhysicalDeviceSubgroupSizeControlFeaturesEXT>;
-  using PhysicalDeviceSubgroupSizeControlPropertiesEXT = DescriptionT<VkPhysicalDeviceSubgroupSizeControlPropertiesEXT>;
-  using PipelineShaderStageRequiredSubgroupSizeCreateInfoEXT = DescriptionT<VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT>;
-  using ShaderRequiredSubgroupSizeCreateInfoEXT = DescriptionT<VkShaderRequiredSubgroupSizeCreateInfoEXT>;
   using SubpassShadingPipelineCreateInfoHUAWEI = InfoT<VkSubpassShadingPipelineCreateInfoHUAWEI, VK_STRUCTURE_TYPE_SUBPASS_SHADING_PIPELINE_CREATE_INFO_HUAWEI>;
   using PhysicalDeviceSubpassShadingPropertiesHUAWEI = InfoT<VkPhysicalDeviceSubpassShadingPropertiesHUAWEI, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBPASS_SHADING_PROPERTIES_HUAWEI>;
   using PhysicalDeviceClusterCullingShaderPropertiesHUAWEI = InfoT<VkPhysicalDeviceClusterCullingShaderPropertiesHUAWEI, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CLUSTER_CULLING_SHADER_PROPERTIES_HUAWEI>;
-  using MemoryOpaqueCaptureAddressAllocateInfoKHR = DescriptionT<VkMemoryOpaqueCaptureAddressAllocateInfoKHR>;
-  using DeviceMemoryOpaqueCaptureAddressInfoKHR = DescriptionT<VkDeviceMemoryOpaqueCaptureAddressInfoKHR>;
   using PhysicalDeviceLineRasterizationFeaturesKHR = InfoT<VkPhysicalDeviceLineRasterizationFeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_KHR>;
-  using PhysicalDeviceLineRasterizationFeaturesEXT = DescriptionT<VkPhysicalDeviceLineRasterizationFeaturesEXT>;
   using PhysicalDeviceLineRasterizationPropertiesKHR = InfoT<VkPhysicalDeviceLineRasterizationPropertiesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_KHR>;
-  using PhysicalDeviceLineRasterizationPropertiesEXT = DescriptionT<VkPhysicalDeviceLineRasterizationPropertiesEXT>;
   using PipelineRasterizationLineStateCreateInfoKHR = InfoT<VkPipelineRasterizationLineStateCreateInfoKHR, VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_LINE_STATE_CREATE_INFO_KHR>;
-  using PipelineRasterizationLineStateCreateInfoEXT = DescriptionT<VkPipelineRasterizationLineStateCreateInfoEXT>;
-  using PhysicalDevicePipelineCreationCacheControlFeaturesEXT = DescriptionT<VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT>;
   using PipelineCompilerControlCreateInfoAMD = InfoT<VkPipelineCompilerControlCreateInfoAMD, VK_STRUCTURE_TYPE_PIPELINE_COMPILER_CONTROL_CREATE_INFO_AMD>;
   using PhysicalDeviceCoherentMemoryFeaturesAMD = InfoT<VkPhysicalDeviceCoherentMemoryFeaturesAMD, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD>;
-  using PhysicalDeviceToolPropertiesEXT = DescriptionT<VkPhysicalDeviceToolPropertiesEXT>;
   using SamplerCustomBorderColorCreateInfoEXT = InfoT<VkSamplerCustomBorderColorCreateInfoEXT, VK_STRUCTURE_TYPE_SAMPLER_CUSTOM_BORDER_COLOR_CREATE_INFO_EXT>;
   using PhysicalDeviceCustomBorderColorPropertiesEXT = InfoT<VkPhysicalDeviceCustomBorderColorPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_PROPERTIES_EXT>;
   using PhysicalDeviceCustomBorderColorFeaturesEXT = InfoT<VkPhysicalDeviceCustomBorderColorFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT>;
@@ -1100,14 +292,7 @@ namespace vku {
   using AccelerationStructureGeometryInstancesDataKHR = InfoT<VkAccelerationStructureGeometryInstancesDataKHR, VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_INSTANCES_DATA_KHR>;
   using AccelerationStructureGeometryKHR = InfoT<VkAccelerationStructureGeometryKHR, VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR>;
   using AccelerationStructureBuildGeometryInfoKHR = InfoT<VkAccelerationStructureBuildGeometryInfoKHR, VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR>;
-  using AccelerationStructureBuildRangeInfoKHR = DescriptionT<VkAccelerationStructureBuildRangeInfoKHR>;
   using AccelerationStructureCreateInfoKHR = InfoT<VkAccelerationStructureCreateInfoKHR, VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR>;
-  using AabbPositionsKHR = DescriptionT<VkAabbPositionsKHR>;
-  using AabbPositionsNV = DescriptionT<VkAabbPositionsNV>;
-  using TransformMatrixKHR = DescriptionT<VkTransformMatrixKHR>;
-  using TransformMatrixNV = DescriptionT<VkTransformMatrixNV>;
-  using AccelerationStructureInstanceKHR = DescriptionT<VkAccelerationStructureInstanceKHR>;
-  using AccelerationStructureInstanceNV = DescriptionT<VkAccelerationStructureInstanceNV>;
   using AccelerationStructureDeviceAddressInfoKHR = InfoT<VkAccelerationStructureDeviceAddressInfoKHR, VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR>;
   using AccelerationStructureVersionInfoKHR = InfoT<VkAccelerationStructureVersionInfoKHR, VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_VERSION_INFO_KHR>;
   using CopyAccelerationStructureInfoKHR = InfoT<VkCopyAccelerationStructureInfoKHR, VK_STRUCTURE_TYPE_COPY_ACCELERATION_STRUCTURE_INFO_KHR>;
@@ -1119,41 +304,25 @@ namespace vku {
   using PhysicalDeviceExtendedDynamicState2FeaturesEXT = InfoT<VkPhysicalDeviceExtendedDynamicState2FeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT>;
   using PhysicalDeviceExtendedDynamicState3FeaturesEXT = InfoT<VkPhysicalDeviceExtendedDynamicState3FeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_3_FEATURES_EXT>;
   using PhysicalDeviceExtendedDynamicState3PropertiesEXT = InfoT<VkPhysicalDeviceExtendedDynamicState3PropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_3_PROPERTIES_EXT>;
-  using ColorBlendEquationEXT = DescriptionT<VkColorBlendEquationEXT>;
-  using ColorBlendAdvancedEXT = DescriptionT<VkColorBlendAdvancedEXT>;
   using RenderPassTransformBeginInfoQCOM = InfoT<VkRenderPassTransformBeginInfoQCOM, VK_STRUCTURE_TYPE_RENDER_PASS_TRANSFORM_BEGIN_INFO_QCOM>;
   using CopyCommandTransformInfoQCOM = InfoT<VkCopyCommandTransformInfoQCOM, VK_STRUCTURE_TYPE_COPY_COMMAND_TRANSFORM_INFO_QCOM>;
   using CommandBufferInheritanceRenderPassTransformInfoQCOM = InfoT<VkCommandBufferInheritanceRenderPassTransformInfoQCOM, VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_RENDER_PASS_TRANSFORM_INFO_QCOM>;
   using PhysicalDeviceDiagnosticsConfigFeaturesNV = InfoT<VkPhysicalDeviceDiagnosticsConfigFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DIAGNOSTICS_CONFIG_FEATURES_NV>;
   using DeviceDiagnosticsConfigCreateInfoNV = InfoT<VkDeviceDiagnosticsConfigCreateInfoNV, VK_STRUCTURE_TYPE_DEVICE_DIAGNOSTICS_CONFIG_CREATE_INFO_NV>;
-  using PhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR = DescriptionT<VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR>;
   using PhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR = InfoT<VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_FEATURES_KHR>;
   using PhysicalDeviceRobustness2FeaturesEXT = InfoT<VkPhysicalDeviceRobustness2FeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT>;
   using PhysicalDeviceRobustness2PropertiesEXT = InfoT<VkPhysicalDeviceRobustness2PropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT>;
-  using PhysicalDeviceImageRobustnessFeaturesEXT = DescriptionT<VkPhysicalDeviceImageRobustnessFeaturesEXT>;
   using PhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR = InfoT<VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_FEATURES_KHR>;
   using PhysicalDevice4444FormatsFeaturesEXT = InfoT<VkPhysicalDevice4444FormatsFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_4444_FORMATS_FEATURES_EXT>;
   using PhysicalDeviceSubpassShadingFeaturesHUAWEI = InfoT<VkPhysicalDeviceSubpassShadingFeaturesHUAWEI, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBPASS_SHADING_FEATURES_HUAWEI>;
   using PhysicalDeviceClusterCullingShaderFeaturesHUAWEI = InfoT<VkPhysicalDeviceClusterCullingShaderFeaturesHUAWEI, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CLUSTER_CULLING_SHADER_FEATURES_HUAWEI>;
   using PhysicalDeviceClusterCullingShaderVrsFeaturesHUAWEI = InfoT<VkPhysicalDeviceClusterCullingShaderVrsFeaturesHUAWEI, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CLUSTER_CULLING_SHADER_VRS_FEATURES_HUAWEI>;
-  using BufferCopy2KHR = DescriptionT<VkBufferCopy2KHR>;
-  using ImageCopy2KHR = DescriptionT<VkImageCopy2KHR>;
-  using ImageBlit2KHR = DescriptionT<VkImageBlit2KHR>;
-  using BufferImageCopy2KHR = DescriptionT<VkBufferImageCopy2KHR>;
-  using ImageResolve2KHR = DescriptionT<VkImageResolve2KHR>;
-  using CopyBufferInfo2KHR = DescriptionT<VkCopyBufferInfo2KHR>;
-  using CopyImageInfo2KHR = DescriptionT<VkCopyImageInfo2KHR>;
-  using BlitImageInfo2KHR = DescriptionT<VkBlitImageInfo2KHR>;
-  using CopyBufferToImageInfo2KHR = DescriptionT<VkCopyBufferToImageInfo2KHR>;
-  using CopyImageToBufferInfo2KHR = DescriptionT<VkCopyImageToBufferInfo2KHR>;
-  using ResolveImageInfo2KHR = DescriptionT<VkResolveImageInfo2KHR>;
   using PhysicalDeviceShaderImageAtomicInt64FeaturesEXT = InfoT<VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_IMAGE_ATOMIC_INT64_FEATURES_EXT>;
   using FragmentShadingRateAttachmentInfoKHR = InfoT<VkFragmentShadingRateAttachmentInfoKHR, VK_STRUCTURE_TYPE_FRAGMENT_SHADING_RATE_ATTACHMENT_INFO_KHR>;
   using PipelineFragmentShadingRateStateCreateInfoKHR = InfoT<VkPipelineFragmentShadingRateStateCreateInfoKHR, VK_STRUCTURE_TYPE_PIPELINE_FRAGMENT_SHADING_RATE_STATE_CREATE_INFO_KHR>;
   using PhysicalDeviceFragmentShadingRateFeaturesKHR = InfoT<VkPhysicalDeviceFragmentShadingRateFeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_FEATURES_KHR>;
   using PhysicalDeviceFragmentShadingRatePropertiesKHR = InfoT<VkPhysicalDeviceFragmentShadingRatePropertiesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR>;
   using PhysicalDeviceFragmentShadingRateKHR = InfoT<VkPhysicalDeviceFragmentShadingRateKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_KHR>;
-  using PhysicalDeviceShaderTerminateInvocationFeaturesKHR = DescriptionT<VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR>;
   using PhysicalDeviceFragmentShadingRateEnumsFeaturesNV = InfoT<VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_ENUMS_FEATURES_NV>;
   using PhysicalDeviceFragmentShadingRateEnumsPropertiesNV = InfoT<VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_ENUMS_PROPERTIES_NV>;
   using PipelineFragmentShadingRateEnumStateCreateInfoNV = InfoT<VkPipelineFragmentShadingRateEnumStateCreateInfoNV, VK_STRUCTURE_TYPE_PIPELINE_FRAGMENT_SHADING_RATE_ENUM_STATE_CREATE_INFO_NV>;
@@ -1162,11 +331,7 @@ namespace vku {
   using PhysicalDeviceImageSlicedViewOf3DFeaturesEXT = InfoT<VkPhysicalDeviceImageSlicedViewOf3DFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_SLICED_VIEW_OF_3D_FEATURES_EXT>;
   using PhysicalDeviceAttachmentFeedbackLoopDynamicStateFeaturesEXT = InfoT<VkPhysicalDeviceAttachmentFeedbackLoopDynamicStateFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ATTACHMENT_FEEDBACK_LOOP_DYNAMIC_STATE_FEATURES_EXT>;
   using PhysicalDeviceMutableDescriptorTypeFeaturesEXT = InfoT<VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MUTABLE_DESCRIPTOR_TYPE_FEATURES_EXT>;
-  using PhysicalDeviceMutableDescriptorTypeFeaturesVALVE = DescriptionT<VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE>;
-  using MutableDescriptorTypeListEXT = DescriptionT<VkMutableDescriptorTypeListEXT>;
-  using MutableDescriptorTypeListVALVE = DescriptionT<VkMutableDescriptorTypeListVALVE>;
   using MutableDescriptorTypeCreateInfoEXT = InfoT<VkMutableDescriptorTypeCreateInfoEXT, VK_STRUCTURE_TYPE_MUTABLE_DESCRIPTOR_TYPE_CREATE_INFO_EXT>;
-  using MutableDescriptorTypeCreateInfoVALVE = DescriptionT<VkMutableDescriptorTypeCreateInfoVALVE>;
   using PhysicalDeviceDepthClipControlFeaturesEXT = InfoT<VkPhysicalDeviceDepthClipControlFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_CONTROL_FEATURES_EXT>;
   using PipelineViewportDepthClipControlCreateInfoEXT = InfoT<VkPipelineViewportDepthClipControlCreateInfoEXT, VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_DEPTH_CLIP_CONTROL_CREATE_INFO_EXT>;
   using PhysicalDeviceVertexInputDynamicStateFeaturesEXT = InfoT<VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_INPUT_DYNAMIC_STATE_FEATURES_EXT>;
@@ -1175,16 +340,8 @@ namespace vku {
   using VertexInputAttributeDescription2EXT = InfoT<VkVertexInputAttributeDescription2EXT, VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT>;
   using PhysicalDeviceColorWriteEnableFeaturesEXT = InfoT<VkPhysicalDeviceColorWriteEnableFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COLOR_WRITE_ENABLE_FEATURES_EXT>;
   using PipelineColorWriteCreateInfoEXT = InfoT<VkPipelineColorWriteCreateInfoEXT, VK_STRUCTURE_TYPE_PIPELINE_COLOR_WRITE_CREATE_INFO_EXT>;
-  using MemoryBarrier2KHR = DescriptionT<VkMemoryBarrier2KHR>;
-  using ImageMemoryBarrier2KHR = DescriptionT<VkImageMemoryBarrier2KHR>;
-  using BufferMemoryBarrier2KHR = DescriptionT<VkBufferMemoryBarrier2KHR>;
-  using DependencyInfoKHR = DescriptionT<VkDependencyInfoKHR>;
-  using SemaphoreSubmitInfoKHR = DescriptionT<VkSemaphoreSubmitInfoKHR>;
-  using CommandBufferSubmitInfoKHR = DescriptionT<VkCommandBufferSubmitInfoKHR>;
-  using SubmitInfo2KHR = DescriptionT<VkSubmitInfo2KHR>;
   using QueueFamilyCheckpointProperties2NV = InfoT<VkQueueFamilyCheckpointProperties2NV, VK_STRUCTURE_TYPE_QUEUE_FAMILY_CHECKPOINT_PROPERTIES_2_NV>;
   using CheckpointData2NV = InfoT<VkCheckpointData2NV, VK_STRUCTURE_TYPE_CHECKPOINT_DATA_2_NV>;
-  using PhysicalDeviceSynchronization2FeaturesKHR = DescriptionT<VkPhysicalDeviceSynchronization2FeaturesKHR>;
   using PhysicalDeviceHostImageCopyFeaturesEXT = InfoT<VkPhysicalDeviceHostImageCopyFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_IMAGE_COPY_FEATURES_EXT>;
   using PhysicalDeviceHostImageCopyPropertiesEXT = InfoT<VkPhysicalDeviceHostImageCopyPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_IMAGE_COPY_PROPERTIES_EXT>;
   using MemoryToImageCopyEXT = InfoT<VkMemoryToImageCopyEXT, VK_STRUCTURE_TYPE_MEMORY_TO_IMAGE_COPY_EXT>;
@@ -1263,8 +420,6 @@ namespace vku {
   using VideoEncodeH264ProfileInfoKHR = InfoT<VkVideoEncodeH264ProfileInfoKHR, VK_STRUCTURE_TYPE_VIDEO_ENCODE_H264_PROFILE_INFO_KHR>;
   using VideoEncodeH264NaluSliceInfoKHR = InfoT<VkVideoEncodeH264NaluSliceInfoKHR, VK_STRUCTURE_TYPE_VIDEO_ENCODE_H264_NALU_SLICE_INFO_KHR>;
   using VideoEncodeH264RateControlInfoKHR = InfoT<VkVideoEncodeH264RateControlInfoKHR, VK_STRUCTURE_TYPE_VIDEO_ENCODE_H264_RATE_CONTROL_INFO_KHR>;
-  using VideoEncodeH264QpKHR = DescriptionT<VkVideoEncodeH264QpKHR>;
-  using VideoEncodeH264FrameSizeKHR = DescriptionT<VkVideoEncodeH264FrameSizeKHR>;
   using VideoEncodeH264GopRemainingFrameInfoKHR = InfoT<VkVideoEncodeH264GopRemainingFrameInfoKHR, VK_STRUCTURE_TYPE_VIDEO_ENCODE_H264_GOP_REMAINING_FRAME_INFO_KHR>;
   using VideoEncodeH264RateControlLayerInfoKHR = InfoT<VkVideoEncodeH264RateControlLayerInfoKHR, VK_STRUCTURE_TYPE_VIDEO_ENCODE_H264_RATE_CONTROL_LAYER_INFO_KHR>;
   using VideoEncodeH265CapabilitiesKHR = InfoT<VkVideoEncodeH265CapabilitiesKHR, VK_STRUCTURE_TYPE_VIDEO_ENCODE_H265_CAPABILITIES_KHR>;
@@ -1277,8 +432,6 @@ namespace vku {
   using VideoEncodeH265PictureInfoKHR = InfoT<VkVideoEncodeH265PictureInfoKHR, VK_STRUCTURE_TYPE_VIDEO_ENCODE_H265_PICTURE_INFO_KHR>;
   using VideoEncodeH265NaluSliceSegmentInfoKHR = InfoT<VkVideoEncodeH265NaluSliceSegmentInfoKHR, VK_STRUCTURE_TYPE_VIDEO_ENCODE_H265_NALU_SLICE_SEGMENT_INFO_KHR>;
   using VideoEncodeH265RateControlInfoKHR = InfoT<VkVideoEncodeH265RateControlInfoKHR, VK_STRUCTURE_TYPE_VIDEO_ENCODE_H265_RATE_CONTROL_INFO_KHR>;
-  using VideoEncodeH265QpKHR = DescriptionT<VkVideoEncodeH265QpKHR>;
-  using VideoEncodeH265FrameSizeKHR = DescriptionT<VkVideoEncodeH265FrameSizeKHR>;
   using VideoEncodeH265GopRemainingFrameInfoKHR = InfoT<VkVideoEncodeH265GopRemainingFrameInfoKHR, VK_STRUCTURE_TYPE_VIDEO_ENCODE_H265_GOP_REMAINING_FRAME_INFO_KHR>;
   using VideoEncodeH265RateControlLayerInfoKHR = InfoT<VkVideoEncodeH265RateControlLayerInfoKHR, VK_STRUCTURE_TYPE_VIDEO_ENCODE_H265_RATE_CONTROL_LAYER_INFO_KHR>;
   using VideoEncodeH265ProfileInfoKHR = InfoT<VkVideoEncodeH265ProfileInfoKHR, VK_STRUCTURE_TYPE_VIDEO_ENCODE_H265_PROFILE_INFO_KHR>;
@@ -1305,8 +458,6 @@ namespace vku {
   using SamplerCaptureDescriptorDataInfoEXT = InfoT<VkSamplerCaptureDescriptorDataInfoEXT, VK_STRUCTURE_TYPE_SAMPLER_CAPTURE_DESCRIPTOR_DATA_INFO_EXT>;
   using AccelerationStructureCaptureDescriptorDataInfoEXT = InfoT<VkAccelerationStructureCaptureDescriptorDataInfoEXT, VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CAPTURE_DESCRIPTOR_DATA_INFO_EXT>;
   using OpaqueCaptureDescriptorDataCreateInfoEXT = InfoT<VkOpaqueCaptureDescriptorDataCreateInfoEXT, VK_STRUCTURE_TYPE_OPAQUE_CAPTURE_DESCRIPTOR_DATA_CREATE_INFO_EXT>;
-  using PhysicalDeviceShaderIntegerDotProductFeaturesKHR = DescriptionT<VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR>;
-  using PhysicalDeviceShaderIntegerDotProductPropertiesKHR = DescriptionT<VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR>;
   using PhysicalDeviceDrmPropertiesEXT = InfoT<VkPhysicalDeviceDrmPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRM_PROPERTIES_EXT>;
   using PhysicalDeviceFragmentShaderBarycentricFeaturesKHR = InfoT<VkPhysicalDeviceFragmentShaderBarycentricFeaturesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_BARYCENTRIC_FEATURES_KHR>;
   using PhysicalDeviceFragmentShaderBarycentricPropertiesKHR = InfoT<VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_BARYCENTRIC_PROPERTIES_KHR>;
@@ -1314,32 +465,19 @@ namespace vku {
   using PhysicalDeviceRayTracingValidationFeaturesNV = InfoT<VkPhysicalDeviceRayTracingValidationFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_VALIDATION_FEATURES_NV>;
   using AccelerationStructureGeometryMotionTrianglesDataNV = InfoT<VkAccelerationStructureGeometryMotionTrianglesDataNV, VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_MOTION_TRIANGLES_DATA_NV>;
   using AccelerationStructureMotionInfoNV = InfoT<VkAccelerationStructureMotionInfoNV, VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_MOTION_INFO_NV>;
-  using SRTDataNV = DescriptionT<VkSRTDataNV>;
-  using AccelerationStructureSRTMotionInstanceNV = DescriptionT<VkAccelerationStructureSRTMotionInstanceNV>;
-  using AccelerationStructureMatrixMotionInstanceNV = DescriptionT<VkAccelerationStructureMatrixMotionInstanceNV>;
-  using AccelerationStructureMotionInstanceNV = DescriptionT<VkAccelerationStructureMotionInstanceNV>;
   using MemoryGetRemoteAddressInfoNV = InfoT<VkMemoryGetRemoteAddressInfoNV, VK_STRUCTURE_TYPE_MEMORY_GET_REMOTE_ADDRESS_INFO_NV>;
   using CudaModuleCreateInfoNV = InfoT<VkCudaModuleCreateInfoNV, VK_STRUCTURE_TYPE_CUDA_MODULE_CREATE_INFO_NV>;
   using CudaFunctionCreateInfoNV = InfoT<VkCudaFunctionCreateInfoNV, VK_STRUCTURE_TYPE_CUDA_FUNCTION_CREATE_INFO_NV>;
   using CudaLaunchInfoNV = InfoT<VkCudaLaunchInfoNV, VK_STRUCTURE_TYPE_CUDA_LAUNCH_INFO_NV>;
   using PhysicalDeviceRGBA10X6FormatsFeaturesEXT = InfoT<VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RGBA10X6_FORMATS_FEATURES_EXT>;
-  using FormatProperties3KHR = DescriptionT<VkFormatProperties3KHR>;
   using DrmFormatModifierPropertiesList2EXT = InfoT<VkDrmFormatModifierPropertiesList2EXT, VK_STRUCTURE_TYPE_DRM_FORMAT_MODIFIER_PROPERTIES_LIST_2_EXT>;
-  using DrmFormatModifierProperties2EXT = DescriptionT<VkDrmFormatModifierProperties2EXT>;
-  using PipelineRenderingCreateInfoKHR = DescriptionT<VkPipelineRenderingCreateInfoKHR>;
-  using RenderingInfoKHR = DescriptionT<VkRenderingInfoKHR>;
-  using RenderingAttachmentInfoKHR = DescriptionT<VkRenderingAttachmentInfoKHR>;
   using RenderingFragmentShadingRateAttachmentInfoKHR = InfoT<VkRenderingFragmentShadingRateAttachmentInfoKHR, VK_STRUCTURE_TYPE_RENDERING_FRAGMENT_SHADING_RATE_ATTACHMENT_INFO_KHR>;
   using RenderingFragmentDensityMapAttachmentInfoEXT = InfoT<VkRenderingFragmentDensityMapAttachmentInfoEXT, VK_STRUCTURE_TYPE_RENDERING_FRAGMENT_DENSITY_MAP_ATTACHMENT_INFO_EXT>;
-  using PhysicalDeviceDynamicRenderingFeaturesKHR = DescriptionT<VkPhysicalDeviceDynamicRenderingFeaturesKHR>;
-  using CommandBufferInheritanceRenderingInfoKHR = DescriptionT<VkCommandBufferInheritanceRenderingInfoKHR>;
   using AttachmentSampleCountInfoAMD = InfoT<VkAttachmentSampleCountInfoAMD, VK_STRUCTURE_TYPE_ATTACHMENT_SAMPLE_COUNT_INFO_AMD>;
-  using AttachmentSampleCountInfoNV = DescriptionT<VkAttachmentSampleCountInfoNV>;
   using MultiviewPerViewAttributesInfoNVX = InfoT<VkMultiviewPerViewAttributesInfoNVX, VK_STRUCTURE_TYPE_MULTIVIEW_PER_VIEW_ATTRIBUTES_INFO_NVX>;
   using PhysicalDeviceImageViewMinLodFeaturesEXT = InfoT<VkPhysicalDeviceImageViewMinLodFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_VIEW_MIN_LOD_FEATURES_EXT>;
   using ImageViewMinLodCreateInfoEXT = InfoT<VkImageViewMinLodCreateInfoEXT, VK_STRUCTURE_TYPE_IMAGE_VIEW_MIN_LOD_CREATE_INFO_EXT>;
   using PhysicalDeviceRasterizationOrderAttachmentAccessFeaturesEXT = InfoT<VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_FEATURES_EXT>;
-  using PhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM = DescriptionT<VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM>;
   using PhysicalDeviceLinearColorAttachmentFeaturesNV = InfoT<VkPhysicalDeviceLinearColorAttachmentFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINEAR_COLOR_ATTACHMENT_FEATURES_NV>;
   using PhysicalDeviceGraphicsPipelineLibraryFeaturesEXT = InfoT<VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GRAPHICS_PIPELINE_LIBRARY_FEATURES_EXT>;
   using PhysicalDeviceGraphicsPipelineLibraryPropertiesEXT = InfoT<VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GRAPHICS_PIPELINE_LIBRARY_PROPERTIES_EXT>;
@@ -1358,13 +496,9 @@ namespace vku {
   using ImageCompressionPropertiesEXT = InfoT<VkImageCompressionPropertiesEXT, VK_STRUCTURE_TYPE_IMAGE_COMPRESSION_PROPERTIES_EXT>;
   using PhysicalDeviceImageCompressionControlSwapchainFeaturesEXT = InfoT<VkPhysicalDeviceImageCompressionControlSwapchainFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_COMPRESSION_CONTROL_SWAPCHAIN_FEATURES_EXT>;
   using ImageSubresource2KHR = InfoT<VkImageSubresource2KHR, VK_STRUCTURE_TYPE_IMAGE_SUBRESOURCE_2_KHR>;
-  using ImageSubresource2EXT = DescriptionT<VkImageSubresource2EXT>;
   using SubresourceLayout2KHR = InfoT<VkSubresourceLayout2KHR, VK_STRUCTURE_TYPE_SUBRESOURCE_LAYOUT_2_KHR>;
-  using SubresourceLayout2EXT = DescriptionT<VkSubresourceLayout2EXT>;
   using RenderPassCreationControlEXT = InfoT<VkRenderPassCreationControlEXT, VK_STRUCTURE_TYPE_RENDER_PASS_CREATION_CONTROL_EXT>;
-  using RenderPassCreationFeedbackInfoEXT = DescriptionT<VkRenderPassCreationFeedbackInfoEXT>;
   using RenderPassCreationFeedbackCreateInfoEXT = InfoT<VkRenderPassCreationFeedbackCreateInfoEXT, VK_STRUCTURE_TYPE_RENDER_PASS_CREATION_FEEDBACK_CREATE_INFO_EXT>;
-  using RenderPassSubpassFeedbackInfoEXT = DescriptionT<VkRenderPassSubpassFeedbackInfoEXT>;
   using RenderPassSubpassFeedbackCreateInfoEXT = InfoT<VkRenderPassSubpassFeedbackCreateInfoEXT, VK_STRUCTURE_TYPE_RENDER_PASS_SUBPASS_FEEDBACK_CREATE_INFO_EXT>;
   using PhysicalDeviceSubpassMergeFeedbackFeaturesEXT = InfoT<VkPhysicalDeviceSubpassMergeFeedbackFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBPASS_MERGE_FEEDBACK_FEATURES_EXT>;
   using MicromapBuildInfoEXT = InfoT<VkMicromapBuildInfoEXT, VK_STRUCTURE_TYPE_MICROMAP_BUILD_INFO_EXT>;
@@ -1374,8 +508,6 @@ namespace vku {
   using CopyMicromapToMemoryInfoEXT = InfoT<VkCopyMicromapToMemoryInfoEXT, VK_STRUCTURE_TYPE_COPY_MICROMAP_TO_MEMORY_INFO_EXT>;
   using CopyMemoryToMicromapInfoEXT = InfoT<VkCopyMemoryToMicromapInfoEXT, VK_STRUCTURE_TYPE_COPY_MEMORY_TO_MICROMAP_INFO_EXT>;
   using MicromapBuildSizesInfoEXT = InfoT<VkMicromapBuildSizesInfoEXT, VK_STRUCTURE_TYPE_MICROMAP_BUILD_SIZES_INFO_EXT>;
-  using MicromapUsageEXT = DescriptionT<VkMicromapUsageEXT>;
-  using MicromapTriangleEXT = DescriptionT<VkMicromapTriangleEXT>;
   using PhysicalDeviceOpacityMicromapFeaturesEXT = InfoT<VkPhysicalDeviceOpacityMicromapFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_OPACITY_MICROMAP_FEATURES_EXT>;
   using PhysicalDeviceOpacityMicromapPropertiesEXT = InfoT<VkPhysicalDeviceOpacityMicromapPropertiesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_OPACITY_MICROMAP_PROPERTIES_EXT>;
   using AccelerationStructureTrianglesOpacityMicromapEXT = InfoT<VkAccelerationStructureTrianglesOpacityMicromapEXT, VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_TRIANGLES_OPACITY_MICROMAP_EXT>;
@@ -1406,15 +538,11 @@ namespace vku {
   using OpticalFlowSessionCreatePrivateDataInfoNV = InfoT<VkOpticalFlowSessionCreatePrivateDataInfoNV, VK_STRUCTURE_TYPE_OPTICAL_FLOW_SESSION_CREATE_PRIVATE_DATA_INFO_NV>;
   using OpticalFlowExecuteInfoNV = InfoT<VkOpticalFlowExecuteInfoNV, VK_STRUCTURE_TYPE_OPTICAL_FLOW_EXECUTE_INFO_NV>;
   using PhysicalDeviceFaultFeaturesEXT = InfoT<VkPhysicalDeviceFaultFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FAULT_FEATURES_EXT>;
-  using DeviceFaultAddressInfoEXT = DescriptionT<VkDeviceFaultAddressInfoEXT>;
-  using DeviceFaultVendorInfoEXT = DescriptionT<VkDeviceFaultVendorInfoEXT>;
   using DeviceFaultCountsEXT = InfoT<VkDeviceFaultCountsEXT, VK_STRUCTURE_TYPE_DEVICE_FAULT_COUNTS_EXT>;
   using DeviceFaultInfoEXT = InfoT<VkDeviceFaultInfoEXT, VK_STRUCTURE_TYPE_DEVICE_FAULT_INFO_EXT>;
-  using DeviceFaultVendorBinaryHeaderVersionOneEXT = DescriptionT<VkDeviceFaultVendorBinaryHeaderVersionOneEXT>;
   using PhysicalDevicePipelineLibraryGroupHandlesFeaturesEXT = InfoT<VkPhysicalDevicePipelineLibraryGroupHandlesFeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_LIBRARY_GROUP_HANDLES_FEATURES_EXT>;
   using DepthBiasInfoEXT = InfoT<VkDepthBiasInfoEXT, VK_STRUCTURE_TYPE_DEPTH_BIAS_INFO_EXT>;
   using DepthBiasRepresentationInfoEXT = InfoT<VkDepthBiasRepresentationInfoEXT, VK_STRUCTURE_TYPE_DEPTH_BIAS_REPRESENTATION_INFO_EXT>;
-  using DecompressMemoryRegionNV = DescriptionT<VkDecompressMemoryRegionNV>;
   using PhysicalDeviceShaderCoreBuiltinsPropertiesARM = InfoT<VkPhysicalDeviceShaderCoreBuiltinsPropertiesARM, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_BUILTINS_PROPERTIES_ARM>;
   using PhysicalDeviceShaderCoreBuiltinsFeaturesARM = InfoT<VkPhysicalDeviceShaderCoreBuiltinsFeaturesARM, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_BUILTINS_FEATURES_ARM>;
   using FrameBoundaryEXT = InfoT<VkFrameBoundaryEXT, VK_STRUCTURE_TYPE_FRAME_BOUNDARY_EXT>;
@@ -1506,82 +634,39 @@ namespace vku {
   using MemoryMapPlacedInfoEXT = InfoT<VkMemoryMapPlacedInfoEXT, VK_STRUCTURE_TYPE_MEMORY_MAP_PLACED_INFO_EXT>;
   using PhysicalDeviceRawAccessChainsFeaturesNV = InfoT<VkPhysicalDeviceRawAccessChainsFeaturesNV, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAW_ACCESS_CHAINS_FEATURES_NV>;
 #if defined(VK_VERSION_1_0)
-  using BaseOutStructure = DescriptionT<VkBaseOutStructure>;
-  using BaseInStructure = DescriptionT<VkBaseInStructure>;
-  using ClearRect = DescriptionT<VkClearRect>;
-  using ComponentMapping = DescriptionT<VkComponentMapping>;
-  using PhysicalDeviceProperties = DescriptionT<VkPhysicalDeviceProperties>;
-  using ExtensionProperties = DescriptionT<VkExtensionProperties>;
-  using LayerProperties = DescriptionT<VkLayerProperties>;
   using ApplicationInfo = InfoT<VkApplicationInfo, VK_STRUCTURE_TYPE_APPLICATION_INFO>;
-  using AllocationCallbacks = DescriptionT<VkAllocationCallbacks>;
   using DeviceQueueCreateInfo = InfoT<VkDeviceQueueCreateInfo, VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO>;
   using DeviceCreateInfo = InfoT<VkDeviceCreateInfo, VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO>;
   using InstanceCreateInfo = InfoT<VkInstanceCreateInfo, VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO>;
-  using QueueFamilyProperties = DescriptionT<VkQueueFamilyProperties>;
-  using PhysicalDeviceMemoryProperties = DescriptionT<VkPhysicalDeviceMemoryProperties>;
   using MemoryAllocateInfo = InfoT<VkMemoryAllocateInfo, VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO>;
-  using MemoryRequirements = DescriptionT<VkMemoryRequirements>;
-  using SparseImageFormatProperties = DescriptionT<VkSparseImageFormatProperties>;
-  using SparseImageMemoryRequirements = DescriptionT<VkSparseImageMemoryRequirements>;
-  using MemoryType = DescriptionT<VkMemoryType>;
-  using MemoryHeap = DescriptionT<VkMemoryHeap>;
   using MappedMemoryRange = InfoT<VkMappedMemoryRange, VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE>;
-  using FormatProperties = DescriptionT<VkFormatProperties>;
-  using ImageFormatProperties = DescriptionT<VkImageFormatProperties>;
-  using DescriptorBufferInfo = DescriptionT<VkDescriptorBufferInfo>;
-  using DescriptorImageInfo = DescriptionT<VkDescriptorImageInfo>;
   using WriteDescriptorSet = InfoT<VkWriteDescriptorSet, VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET>;
   using CopyDescriptorSet = InfoT<VkCopyDescriptorSet, VK_STRUCTURE_TYPE_COPY_DESCRIPTOR_SET>;
   using BufferCreateInfo = InfoT<VkBufferCreateInfo, VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO>;
   using BufferViewCreateInfo = InfoT<VkBufferViewCreateInfo, VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO>;
-  using ImageSubresource = DescriptionT<VkImageSubresource>;
-  using ImageSubresourceLayers = DescriptionT<VkImageSubresourceLayers>;
-  using ImageSubresourceRange = DescriptionT<VkImageSubresourceRange>;
   using MemoryBarrier = InfoT<VkMemoryBarrier, VK_STRUCTURE_TYPE_MEMORY_BARRIER>;
   using BufferMemoryBarrier = InfoT<VkBufferMemoryBarrier, VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER>;
   using ImageMemoryBarrier = InfoT<VkImageMemoryBarrier, VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER>;
   using ImageCreateInfo = InfoT<VkImageCreateInfo, VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO>;
-  using SubresourceLayout = DescriptionT<VkSubresourceLayout>;
   using ImageViewCreateInfo = InfoT<VkImageViewCreateInfo, VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO>;
-  using BufferCopy = DescriptionT<VkBufferCopy>;
-  using SparseMemoryBind = DescriptionT<VkSparseMemoryBind>;
-  using SparseImageMemoryBind = DescriptionT<VkSparseImageMemoryBind>;
-  using SparseBufferMemoryBindInfo = DescriptionT<VkSparseBufferMemoryBindInfo>;
-  using SparseImageOpaqueMemoryBindInfo = DescriptionT<VkSparseImageOpaqueMemoryBindInfo>;
-  using SparseImageMemoryBindInfo = DescriptionT<VkSparseImageMemoryBindInfo>;
   using BindSparseInfo = InfoT<VkBindSparseInfo, VK_STRUCTURE_TYPE_BIND_SPARSE_INFO>;
-  using ImageCopy = DescriptionT<VkImageCopy>;
-  using ImageBlit = DescriptionT<VkImageBlit>;
-  using BufferImageCopy = DescriptionT<VkBufferImageCopy>;
-  using ImageResolve = DescriptionT<VkImageResolve>;
   using ShaderModuleCreateInfo = InfoT<VkShaderModuleCreateInfo, VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO>;
-  using DescriptorSetLayoutBinding = DescriptionT<VkDescriptorSetLayoutBinding>;
   using DescriptorSetLayoutCreateInfo = InfoT<VkDescriptorSetLayoutCreateInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO>;
-  using DescriptorPoolSize = DescriptionT<VkDescriptorPoolSize>;
   using DescriptorPoolCreateInfo = InfoT<VkDescriptorPoolCreateInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO>;
   using DescriptorSetAllocateInfo = InfoT<VkDescriptorSetAllocateInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO>;
-  using SpecializationMapEntry = DescriptionT<VkSpecializationMapEntry>;
-  using SpecializationInfo = DescriptionT<VkSpecializationInfo>;
   using PipelineShaderStageCreateInfo = InfoT<VkPipelineShaderStageCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO>;
   using ComputePipelineCreateInfo = InfoT<VkComputePipelineCreateInfo, VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO>;
-  using VertexInputBindingDescription = DescriptionT<VkVertexInputBindingDescription>;
-  using VertexInputAttributeDescription = DescriptionT<VkVertexInputAttributeDescription>;
   using PipelineVertexInputStateCreateInfo = InfoT<VkPipelineVertexInputStateCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO>;
   using PipelineInputAssemblyStateCreateInfo = InfoT<VkPipelineInputAssemblyStateCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO>;
   using PipelineTessellationStateCreateInfo = InfoT<VkPipelineTessellationStateCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO>;
   using PipelineViewportStateCreateInfo = InfoT<VkPipelineViewportStateCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO>;
   using PipelineRasterizationStateCreateInfo = InfoT<VkPipelineRasterizationStateCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO>;
   using PipelineMultisampleStateCreateInfo = InfoT<VkPipelineMultisampleStateCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO>;
-  using PipelineColorBlendAttachmentState = DescriptionT<VkPipelineColorBlendAttachmentState>;
   using PipelineColorBlendStateCreateInfo = InfoT<VkPipelineColorBlendStateCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO>;
   using PipelineDynamicStateCreateInfo = InfoT<VkPipelineDynamicStateCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO>;
-  using StencilOpState = DescriptionT<VkStencilOpState>;
   using PipelineDepthStencilStateCreateInfo = InfoT<VkPipelineDepthStencilStateCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO>;
   using GraphicsPipelineCreateInfo = InfoT<VkGraphicsPipelineCreateInfo, VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO>;
   using PipelineCacheCreateInfo = InfoT<VkPipelineCacheCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO>;
-  using PipelineCacheHeaderVersionOne = DescriptionT<VkPipelineCacheHeaderVersionOne>;
-  using PushConstantRange = DescriptionT<VkPushConstantRange>;
   using PipelineLayoutCreateInfo = InfoT<VkPipelineLayoutCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO>;
   using SamplerCreateInfo = InfoT<VkSamplerCreateInfo, VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO>;
   using CommandPoolCreateInfo = InfoT<VkCommandPoolCreateInfo, VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO>;
@@ -1589,24 +674,12 @@ namespace vku {
   using CommandBufferInheritanceInfo = InfoT<VkCommandBufferInheritanceInfo, VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO>;
   using CommandBufferBeginInfo = InfoT<VkCommandBufferBeginInfo, VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO>;
   using RenderPassBeginInfo = InfoT<VkRenderPassBeginInfo, VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO>;
-  using ClearDepthStencilValue = DescriptionT<VkClearDepthStencilValue>;
-  using ClearAttachment = DescriptionT<VkClearAttachment>;
-  using AttachmentDescription = DescriptionT<VkAttachmentDescription>;
-  using AttachmentReference = DescriptionT<VkAttachmentReference>;
-  using SubpassDescription = DescriptionT<VkSubpassDescription>;
-  using SubpassDependency = DescriptionT<VkSubpassDependency>;
   using RenderPassCreateInfo = InfoT<VkRenderPassCreateInfo, VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO>;
   using EventCreateInfo = InfoT<VkEventCreateInfo, VK_STRUCTURE_TYPE_EVENT_CREATE_INFO>;
   using FenceCreateInfo = InfoT<VkFenceCreateInfo, VK_STRUCTURE_TYPE_FENCE_CREATE_INFO>;
-  using PhysicalDeviceFeatures = DescriptionT<VkPhysicalDeviceFeatures>;
-  using PhysicalDeviceSparseProperties = DescriptionT<VkPhysicalDeviceSparseProperties>;
-  using PhysicalDeviceLimits = DescriptionT<VkPhysicalDeviceLimits>;
   using SemaphoreCreateInfo = InfoT<VkSemaphoreCreateInfo, VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO>;
   using QueryPoolCreateInfo = InfoT<VkQueryPoolCreateInfo, VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO>;
   using FramebufferCreateInfo = InfoT<VkFramebufferCreateInfo, VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO>;
-  using DrawIndirectCommand = DescriptionT<VkDrawIndirectCommand>;
-  using DrawIndexedIndirectCommand = DescriptionT<VkDrawIndexedIndirectCommand>;
-  using DispatchIndirectCommand = DescriptionT<VkDispatchIndirectCommand>;
   using SubmitInfo = InfoT<VkSubmitInfo, VK_STRUCTURE_TYPE_SUBMIT_INFO>;
 #endif // VK_VERSION_1_0
 #if defined(VK_VERSION_1_1)
@@ -1620,8 +693,6 @@ namespace vku {
   using SparseImageFormatProperties2 = InfoT<VkSparseImageFormatProperties2, VK_STRUCTURE_TYPE_SPARSE_IMAGE_FORMAT_PROPERTIES_2>;
   using PhysicalDeviceSparseImageFormatInfo2 = InfoT<VkPhysicalDeviceSparseImageFormatInfo2, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SPARSE_IMAGE_FORMAT_INFO_2>;
   using PhysicalDeviceVariablePointersFeatures = InfoT<VkPhysicalDeviceVariablePointersFeatures, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES>;
-  using PhysicalDeviceVariablePointerFeatures = DescriptionT<VkPhysicalDeviceVariablePointerFeatures>;
-  using ExternalMemoryProperties = DescriptionT<VkExternalMemoryProperties>;
   using PhysicalDeviceExternalImageFormatInfo = InfoT<VkPhysicalDeviceExternalImageFormatInfo, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_IMAGE_FORMAT_INFO>;
   using ExternalImageFormatProperties = InfoT<VkExternalImageFormatProperties, VK_STRUCTURE_TYPE_EXTERNAL_IMAGE_FORMAT_PROPERTIES>;
   using PhysicalDeviceExternalBufferInfo = InfoT<VkPhysicalDeviceExternalBufferInfo, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_BUFFER_INFO>;
@@ -1650,9 +721,7 @@ namespace vku {
   using DeviceGroupSubmitInfo = InfoT<VkDeviceGroupSubmitInfo, VK_STRUCTURE_TYPE_DEVICE_GROUP_SUBMIT_INFO>;
   using DeviceGroupBindSparseInfo = InfoT<VkDeviceGroupBindSparseInfo, VK_STRUCTURE_TYPE_DEVICE_GROUP_BIND_SPARSE_INFO>;
   using DeviceGroupDeviceCreateInfo = InfoT<VkDeviceGroupDeviceCreateInfo, VK_STRUCTURE_TYPE_DEVICE_GROUP_DEVICE_CREATE_INFO>;
-  using DescriptorUpdateTemplateEntry = DescriptionT<VkDescriptorUpdateTemplateEntry>;
   using DescriptorUpdateTemplateCreateInfo = InfoT<VkDescriptorUpdateTemplateCreateInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_UPDATE_TEMPLATE_CREATE_INFO>;
-  using InputAttachmentAspectReference = DescriptionT<VkInputAttachmentAspectReference>;
   using RenderPassInputAttachmentAspectCreateInfo = InfoT<VkRenderPassInputAttachmentAspectCreateInfo, VK_STRUCTURE_TYPE_RENDER_PASS_INPUT_ATTACHMENT_ASPECT_CREATE_INFO>;
   using PhysicalDevice16BitStorageFeatures = InfoT<VkPhysicalDevice16BitStorageFeatures, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES>;
   using PhysicalDeviceSubgroupProperties = InfoT<VkPhysicalDeviceSubgroupProperties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES>;
@@ -1679,10 +748,8 @@ namespace vku {
   using PhysicalDeviceMaintenance3Properties = InfoT<VkPhysicalDeviceMaintenance3Properties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES>;
   using DescriptorSetLayoutSupport = InfoT<VkDescriptorSetLayoutSupport, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_SUPPORT>;
   using PhysicalDeviceShaderDrawParametersFeatures = InfoT<VkPhysicalDeviceShaderDrawParametersFeatures, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES>;
-  using PhysicalDeviceShaderDrawParameterFeatures = DescriptionT<VkPhysicalDeviceShaderDrawParameterFeatures>;
 #endif // VK_VERSION_1_1
 #if defined(VK_VERSION_1_2)
-  using ConformanceVersion = DescriptionT<VkConformanceVersion>;
   using PhysicalDeviceDriverProperties = InfoT<VkPhysicalDeviceDriverProperties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES>;
   using PhysicalDeviceShaderSubgroupExtendedTypesFeatures = InfoT<VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES>;
   using PhysicalDeviceSamplerFilterMinmaxProperties = InfoT<VkPhysicalDeviceSamplerFilterMinmaxProperties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_FILTER_MINMAX_PROPERTIES>;
@@ -1747,7 +814,6 @@ namespace vku {
   using PhysicalDeviceMaintenance4Features = InfoT<VkPhysicalDeviceMaintenance4Features, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_FEATURES>;
   using PhysicalDeviceMaintenance4Properties = InfoT<VkPhysicalDeviceMaintenance4Properties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_PROPERTIES>;
   using PhysicalDeviceTextureCompressionASTCHDRFeatures = InfoT<VkPhysicalDeviceTextureCompressionASTCHDRFeatures, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXTURE_COMPRESSION_ASTC_HDR_FEATURES>;
-  using PipelineCreationFeedback = DescriptionT<VkPipelineCreationFeedback>;
   using PipelineCreationFeedbackCreateInfo = InfoT<VkPipelineCreationFeedbackCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_CREATION_FEEDBACK_CREATE_INFO>;
   using PhysicalDeviceShaderDemoteToHelperInvocationFeatures = InfoT<VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES>;
   using PhysicalDeviceTexelBufferAlignmentProperties = InfoT<VkPhysicalDeviceTexelBufferAlignmentProperties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES>;

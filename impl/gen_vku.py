@@ -265,10 +265,10 @@ FORMAT_METADATA_TYPES = """  //
 
   struct ChannelMetadata {
     static constexpr uint8_t kNoShift = 0xff;
-    ChannelType type = ChannelType::Invalid;
-    NumericFormat numeric_format = NumericFormat::Invalid;
-    uint8_t bit_count = 0;
-    uint8_t bit_shift = kNoShift;
+    ChannelType type;
+    NumericFormat numeric_format;
+    uint8_t bit_count;
+    uint8_t bit_shift;
     bool is_format_match(const ChannelMetadata& rhs, bool check_shift) const {
       return numeric_format == rhs.numeric_format && bit_count == rhs.bit_count && (!check_shift || bit_shift == rhs.bit_shift);
     }
@@ -286,8 +286,8 @@ FORMAT_METADATA_TYPES = """  //
   };
   
   struct UncompressedFormatMetadata {
-    uint8_t size_bytes = 0;
-    uint8_t channel_count = 0;
+    uint8_t size_bytes;
+    uint8_t channel_count;
     ChannelMetadata channels[4];
     operator bool() const {
       return !!size_bytes;
@@ -408,10 +408,10 @@ FORMAT_METADATA_TYPES = """  //
   };
 
   struct VideoFormatMetadata {
-    uint8_t block_width = 0;
-    uint8_t block_size_bytes = 0;
-    uint8_t channel_count = 0;
-    NumericFormat numeric_format = NumericFormat::Invalid;
+    uint8_t block_width;
+    uint8_t block_size_bytes;
+    uint8_t channel_count;
+    NumericFormat numeric_format;
     // implementation not complete. TBD at need.
     operator bool() const {
       return numeric_format != NumericFormat::Invalid;
@@ -896,11 +896,11 @@ def gen_uncompressed_metadata(vk_format: dict) -> str:
         #   uint8_t bit_count;
         #   uint8_t bit_shift;
         # };
-        chan_meta.append("ChannelMetadata{" f"ChannelType::{channel_type}, NumericFormat::{num_format}, {bit_count}, {shift}" "}")
-    for _ in range(len(channels), 4):
-        chan_meta.append('ChannelMetadata{ChannelType::Invalid, NumericFormat::Invalid, 0, ChannelMetadata::kNoShift}')
+        chan_meta.append("{" f"ChannelType::{channel_type}, NumericFormat::{num_format}, {bit_count}, {shift}" "}")
+    # for _ in range(len(channels), 4):
+    #     chan_meta.append('{ChannelType::Invalid, NumericFormat::Invalid, 0, ChannelMetadata::kNoShift}')
     meta.append("{" f"{', '.join(chan_meta)}" "}")
-    return "UncompressedFormatMetadata{" f"{', '.join(meta)}" "}"
+    return "{" f"{', '.join(meta)}" "}"
 
 
 def gen_compressed_metadata(vk_format: dict) -> str:
@@ -928,7 +928,7 @@ def gen_compressed_metadata(vk_format: dict) -> str:
         str(channel_count),
         f"NumericFormat::{num_format}"
     ]
-    return "CompressedFormatMetadata{" f"{', '.join(meta)}" "}"
+    return "{" f"{', '.join(meta)}" "}"
 
 
 def gen_video_metadata(vk_format: dict) -> str:
@@ -952,7 +952,7 @@ def gen_video_metadata(vk_format: dict) -> str:
         str(channel_count),
         f"NumericFormat::{num_format}"
     ]
-    return "VideoFormatMetadata{" f"{', '.join(meta)}" "}"
+    return "{" f"{', '.join(meta)}" "}"
 
 
 def gen_format_metadata_functions():

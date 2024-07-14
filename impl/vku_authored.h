@@ -59,7 +59,7 @@ namespace vku {
       y = rhs.y;
       return *this;
     }
-    operator ivec2() const { return ivec2{x, y}; }
+    operator ivec2() const { return {x, y}; }
   };
 
   struct Extent2D : VkExtent2D {
@@ -78,7 +78,7 @@ namespace vku {
       return *this;
     }
     operator uvec2() const {
-      return uvec2{width, height};
+      return {width, height};
     }
   };
 
@@ -124,7 +124,7 @@ namespace vku {
       return *this;
     }
     operator ivec3() const {
-      return ivec3{x, y, z};
+      return {x, y, z};
     }
   };
 
@@ -150,7 +150,7 @@ namespace vku {
       return *this;
     }
     operator uvec3() const {
-      return uvec3{width, height, depth};
+      return {width, height, depth};
     }
   };
 

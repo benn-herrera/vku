@@ -195,7 +195,7 @@ namespace vku {
   VKU_PROTO uint32_t get_uncompressed_image_texel_count(uvec2 image_size, uint32_t mip_max = ~0u, uint32_t array_len=1);
   VKU_PROTO uint32_t get_uncompressed_image_size_bytes(VkFormat format, const uvec2& image_size, bool mip_mapped, uint32_t array_len=1);
   // R, RG, RGB, or RGBA uncompressed, homogenous, base API level format.
-  VKU_PROTO VkFormat vanilla_format_for(uint32_t channelCount, NumericFormat nf, uint32_t bitCount, bool packed=false);
+  VKU_PROTO VkFormat vanilla_format_for(uint32_t channel_count, NumericFormat nf, uint32_t bit_count, bool packed=false);
 
 #if defined(VKU_INLINE_ALL) || defined(VKU_IMPLEMENT)
   //

@@ -10,6 +10,10 @@
   * No required dependencies beyond Vulkan headers
   * No use of std:: strings or containers (or std:: anything)
   * No heap allocations
+  * Minimal impact on compile time
+      * As anything generated from vulkan.xml is, this header is long
+      * The constructs used are simple
+      * Most of the lines are type aliases and switch cases.
 
 ### Types
 * Structs subclassed with default zero initialization
@@ -43,13 +47,15 @@
     * Enum types that are aliased to VkFlags64 have explicitly named to_string()
         * e.g. VkEnumTypeFoo -> enum_type_foo_to_string(VkEnumTypeFoo v); 
         * This was the simplest of a set of imperfect options
-* VK_FORMAT property getters and predicates. e.g.
-    * bool has_float_channels(VkFormat f)
-    * int get_channel_count(VkFormat f)
-    * int get_sample_size_bytes(Vkformat f)
-
+* VK_FORMAT metadata getters
+    * UncompressedFormatMetadata get_uncompressed_format_metadata(VkFormat)
+    * CompressedFormatMetadata get_ccompressed_format_metadata(VkFormat)
+    * VideoFormatMetadata get_video_format_metadata(VkFormat fmt)
 ### General Utility Functions
-* TODO: examples
+* uint32_t get_uncompressed_image_texel_count(uvec2 size, uint32_t mip_max, uint32_t array_len)
+* uint32_t get_uncompressed_image_size_bytes(VkFormat fnt, uvec2 size, bool use_mips, uint32_t array_len)
+* VKU_PROTO VkFormat vanilla_format_for(uint32_t channel_count, NumericFormat nf, uint32_t bit_count, bool packed)
+    * R, RG, RGB, or RGBA uncompressed, homogenous, base API level format
 
 ## Usage
 * For Existing Header Versions

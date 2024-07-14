@@ -216,17 +216,17 @@ namespace vku {
 
   VKU_IMPL uint32_t get_uncompressed_image_size_bytes(VkFormat format, const uvec2& image_size, bool mip_mapped, uint32_t array_len) {
     return get_uncompressed_image_sample_count(image_size, mip_mapped ? ~0u : 1u, array_len) *
-               get_uncompressed_format_metadata(format).sampleSizeBytes;
+               get_uncompressed_format_metadata(format).size_bytes;
   }
 
-  VKU_IMPL VkFormat vanilla_format_for(uint32_t channelCount, NumericFormat nf, uint32_t bitCount, bool packed) {
+  VKU_IMPL VkFormat vanilla_format_for(uint32_t channel_count, NumericFormat nf, uint32_t bit_count, bool packed) {
     for (uint32_t i = 1; i < 1000; ++i) {
       if (UncompressedFormatMetadata md = get_uncompressed_format_metadata(VkFormat(i))) {
-        if ( md.channelCount == channelCount &&
-             md.isHomogenous() &&
-             md.hasNumericFormat(nf) &&
-             md.channels[0].bitCount == bitCount &&
-             md.isPacked() == packed
+        if ( md.channel_count == channel_count &&
+             md.is_homogenous() &&
+             md.has_numeric_format(nf) &&
+             md.channels[0].bit_count == bit_count &&
+             md.is_packed() == packed
         ) {
           return VkFormat(i);
         }
@@ -234,7 +234,7 @@ namespace vku {
       }
       break;
     }
-    return VK_FORMAT_INVALID;
+    return VK_FORMAT_UNDEFINED;
   }
 #endif // VKU_INLINE_ALL || VKU_IMPLEMENT
 
@@ -256,7 +256,7 @@ namespace vku {
   }
 
   inline uint32_t get_format_extension(VkFormat f) {
-    return (uin32_t(f) < 1000u) ? 0u : ((uint32_t(f) - 1000000000u) / 1000u) + 1u;
+    return (uint32_t(f) < 1000u) ? 0u : ((uint32_t(f) - 1000000000u) / 1000u) + 1u;
   }
 
   inline bool is_extended_format(VkFormat f) {
@@ -264,11 +264,11 @@ namespace vku {
   }
 
   inline uint32_t get_uncompressed_mip_size_bytes(VkFormat format, uvec2 image_size, uint32_t mip, uint32_t array_len=1) {
-    return get_uncompressed_mip_sample_count(image_size, mip, array_len) * get_uncompressed_sample_size_bytes(format);
+    return get_uncompressed_mip_sample_count(image_size, mip, array_len) * get_uncompressed_format_metadata(format).size_bytes;
   }
 
   inline uint32_t get_uncompressed_mip_byte_offset(VkFormat format, const uvec2& image_size, uint32_t mip, uint32_t array_len=1) {
-    return get_uncompressed_image_sample_count(image_size, mip, array_len) * get_uncompressed_sample_size_bytes(format);
+    return get_uncompressed_image_sample_count(image_size, mip, array_len) * get_uncompressed_format_metadata(format).size_bytes;
   }
 
   inline VkFormatFeatureFlags image_usage_to_format_feature_flags(VkImageUsageFlags usage) {

@@ -4,7 +4,13 @@ THIS_DIR=$(dirname "${0}")
 # can't rely on realpath existing
 THIS_DIR=$(cd "${THIS_DIR}"; pwd)
 
-DEFAULT_SDK_VER="1.3.283"
+DEFAULT_SDK_VER=$(
+  awk '
+  /^[ \t]*set\([ \t]*VKU_VERSION[ \t]+[0-9]+\.[0-9]+\.[0-9]+[ \t]*\)/ {
+    gsub(/\(|\)/, "", $0); print($NF); exit(0);
+  }
+  ' "${THIS_DIR}/CMakeLists.txt"
+)
 VK_HEADERS_NAME="Vulkan-Headers"
 VK_HEADERS_REPO="https://github.com/KhronosGroup/${VK_HEADERS_NAME}.git"
 

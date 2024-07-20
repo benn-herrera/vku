@@ -88,7 +88,8 @@
 
 ## Usage
 * For Existing Header Versions
-    * Clone repo and add vku/[vk-sdk-version]/include to your project's include path
+    * add vku/[vk-sdk-version]/include to your project's include path
+    * OR ```(mkdir build && cd build && cmake .. && cmake --build . --target install)```
     * all inline
         * add -DVKU_INLINE_ALL to compiler options
         * #include "vku/vku.h"
@@ -101,6 +102,3 @@
         * On Windows run from git bash 
     * version must match a tag in https://github.com/KhronosGroup/VulkanHeaders.git
     * ./gen_vku.sh -h for more details.
-
-### TODO:
-* CMake file with install rule
